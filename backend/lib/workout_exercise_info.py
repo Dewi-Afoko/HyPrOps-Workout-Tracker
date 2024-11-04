@@ -8,14 +8,17 @@ class Workout_Exercise_Info:
         self.exercise_dict = {exercise.name : 
                                 {"Reps" : [],
                                 "Loading" : [],
-                                "Rest" : []}
+                                "Rest" : [],
+                                "Performance Notes" : []}
                                 }
+        
         
     def add_exercise(self, exercise):
         self.exercise_dict[exercise.name] = {
                                 "Reps" : [],
                                 "Loading" : [],
-                                "Rest" : []
+                                "Rest" : [],
+                                "Performance Notes" : []
                                 }
         
     def add_set(self, exercise, reps):
@@ -26,3 +29,9 @@ class Workout_Exercise_Info:
 
     def set_rest_period(self, exercise, rest):
         self.exercise_dict[exercise.name]["Rest"].append(rest)
+    
+    def add_performance_notes(self, exercise, notes):
+        self.exercise_dict[exercise.name]["Performance Notes"].append(notes)
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
