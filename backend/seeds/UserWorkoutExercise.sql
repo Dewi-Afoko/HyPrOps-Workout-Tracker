@@ -16,9 +16,9 @@ CREATE TABLE workouts (
     date text,
     exercise_list jsonb,
     complete boolean,
-    user_username text,
-    constraint fk_username foreign key(user_username)
-    references users(username)
+    user_id int,
+    constraint fk_id foreign key(user_id)
+    references users(id)
     on delete set null
     on update set default
 );
@@ -28,9 +28,7 @@ DROP TABLE IF EXISTS Exercise;
 CREATE TABLE Exercise (
     id SERIAL PRIMARY KEY,
     name text,
-    type text,
-    muscle text,
-    equipment text,
-    difficulty text,
-    instructions text
+    type text[],
+    muscles text[],
+    equipment text[]
 );

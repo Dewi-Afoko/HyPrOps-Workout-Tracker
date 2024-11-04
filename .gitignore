@@ -1,7 +1,6 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 
-
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
@@ -87,3 +86,6 @@ coverage.xml
 
 # Pyright type checker
 .pyright/
+
+.env
+*env*
