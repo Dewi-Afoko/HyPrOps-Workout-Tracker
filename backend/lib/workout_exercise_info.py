@@ -3,7 +3,6 @@ class Workout_Exercise_Info: #TODO: Unit and integration tests!
 
     def __init__(self, workout, exercise):
         self.workout_id = workout.id
-        self.exercise_id = exercise.id
         self.exercise_dict = {exercise.name : 
                                 {"Reps" : [],
                                 "Loading" : [],
@@ -34,3 +33,6 @@ class Workout_Exercise_Info: #TODO: Unit and integration tests!
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
+    
+    def __repr__(self):
+        return f"Workout Exercise Info({self.workout_id}, {self.exercise_dict})"
