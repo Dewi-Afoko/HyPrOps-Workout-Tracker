@@ -2,11 +2,12 @@ from datetime import datetime
 
 class Workout:
 
-    def __init__(self, user):
+    def __init__(self, user, id=0):
         self.exercise_list = []
         self.user_id = user.id
         self.date = datetime.now().strftime("%Y/%m/%d")
         self.complete = False
+        self.id = id
 
     def add_exercise(self, exercise):
         self.exercise_list.append(exercise)
