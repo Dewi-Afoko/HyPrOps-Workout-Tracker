@@ -1,6 +1,5 @@
-#TODO: Unit and integration tests!
+class Workout_Exercise_Info: #TODO: Unit and integration tests!
 
-class Workout_Exercise_Info:
 
     def __init__(self, workout, exercise):
         self.workout_id = workout.id
