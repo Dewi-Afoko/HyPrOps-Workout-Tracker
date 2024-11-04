@@ -1,0 +1,28 @@
+#TODO: Unit and integration tests!
+
+class Workout_Exercise_Info:
+
+    def __init__(self, workout, exercise):
+        self.workout_id = workout.id
+        self.exercise_id = exercise.id
+        self.exercise_dict = {exercise.name : 
+                                {"Reps" : [],
+                                "Loading" : [],
+                                "Rest" : []}
+                                }
+        
+    def add_exercise(self, exercise):
+        self.exercise_dict[exercise.name] = {
+                                "Reps" : [],
+                                "Loading" : [],
+                                "Rest" : []
+                                }
+        
+    def add_set(self, exercise, reps):
+        self.exercise_dict[exercise.name]["Reps"].append(reps)
+
+    def set_loading(self, exercise, loading):
+        self.exercise_dict[exercise.name]["Loading"].append(loading)
+
+    def set_rest_period(self, exercise, rest):
+        self.exercise_dict[exercise.name]["Rest"].append(rest)
