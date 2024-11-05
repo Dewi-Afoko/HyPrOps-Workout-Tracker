@@ -6,8 +6,7 @@ import os
 from xprocess import ProcessStarter
 from mongoengine import connect, disconnect
 from backend.lib.database_connection import initialize_db, close_db
-
-from app import app
+from backend.app import app
 from models.user import User
 from models.workout import Workout
 from models.workout_exercise_info import WorkoutExerciseInfo
