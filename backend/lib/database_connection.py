@@ -1,21 +1,14 @@
-
+import os
 from mongoengine import connect, disconnect
 
-def initialize_db(db_name="HyPrOps", host="localhost", port=27017, username=None, password=None, alias="default"):
+def initialize_db(db_name="HyPrOps", alias="default"):
     """
-    Initialize the MongoDB connection.
+    Initialize the MongoDB connection using an environment variable for the URI.
     """
-    connect(
-        db=db_name,
-        host=host,
-        port=port,
-        username=username,
-        password=password,
-        authentication_source="admin" if username else None,
-        alias=alias,
-        uuidRepresentation="standard"  # Set uuidRepresentation to suppress deprecation warning
-    )
-    print(f"Connected to MongoDB database: {db_name}")
+    # Use MONGO_URI if provided, otherwise default to localhost settings
+    mongo_uri = os.getenv("MONGO_URI", f"mongodb://localhost:27017/{db_name}")
+    connect(alias=alias, host=mongo_uri, uuidRepresentation="standard")
+    print(f"Connected to MongoDB database: {db_name} (URI: {mongo_uri})")
 
 def close_db(alias="default"):
     """

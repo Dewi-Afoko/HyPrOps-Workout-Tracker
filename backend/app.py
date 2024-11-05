@@ -4,6 +4,10 @@ from models.user import User
 from models.workout import Workout
 from models.workout_exercise_info import WorkoutExerciseInfo
 from bson import ObjectId
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Initialize the Flask app
 app = Flask(__name__)
