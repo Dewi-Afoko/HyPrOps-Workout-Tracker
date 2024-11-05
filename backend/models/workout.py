@@ -7,6 +7,7 @@ class Workout(Document):
     date = DateTimeField(default=datetime.now)
     complete = BooleanField(default=False)
     exercise_list = ListField(EmbeddedDocumentField(WorkoutExerciseInfo), default=list)
+    
 
     def add_exercise(self, exercise_info):
         self.exercise_list.append(exercise_info)
