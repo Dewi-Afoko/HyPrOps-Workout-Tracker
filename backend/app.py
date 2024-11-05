@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from lib.database_connection import initialize_db
+from backend.lib.database_connection import initialize_db
 from models.user import User
 from models.workout import Workout
 from models.workout_exercise_info import WorkoutExerciseInfo

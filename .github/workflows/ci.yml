@@ -41,7 +41,7 @@ jobs:
 
     # Add PYTHONPATH to include the project root
     - name: Set PYTHONPATH
-      run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
+      run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)/backend" >> $GITHUB_ENV
 
     - name: Run tests with pytest
       run: |
