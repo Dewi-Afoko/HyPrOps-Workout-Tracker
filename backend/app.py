@@ -50,7 +50,7 @@ def create_workout_exercise_info(user_id, workout_id):
     if not workout:
         return jsonify({"error": "Workout not found"}), 404
     
-    data = request.get_json() # Doesn't currently require more than the exercise name as 'exercise_name'
+    data = request.get_json() # Only requirement is exercise name
 
     for entry in workout['exercise_list']:
         if data['exercise_name'] in entry['exercise_name']:
@@ -69,7 +69,7 @@ def add_details_to_exercise_info(user_id, workout_id):
 
     # Payload logic for empty fields
     for entry in workout['exercise_list']:
-        if data['exercise_name'] in entry['exercise_name']:
+        if data['exercise_name'] in entry['exercise_name']: # Exercise name required to identify where to add these values
             if "reps" in data:
                 entry.add_set(data['reps'])
             if 'loading' in data:
@@ -82,11 +82,6 @@ def add_details_to_exercise_info(user_id, workout_id):
             return "Details added!"
     else:
             return "Exercise not found!"
-
-            
-    
-    
-    
 
 
 
