@@ -4,7 +4,7 @@ from lib.user import User
 from lib.workout import Workout
 from lib.workout_exercise_info import Workout_Exercise_Info
 
-def test_new_user_new_workout_new_exercise():
+def test_new_user_new_workout_new_exercise(): # Old functionality/structure
     user1 = User("Test")
     exercise1 = Exercise("Pull Up")
     workout1 = Workout(user1)

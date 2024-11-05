@@ -9,8 +9,8 @@ class Workout:
         self.complete = False
         self.id = id
 
-    def add_exercise(self, exercise):
-        self.exercise_list.append(exercise)
+    def add_exercise(self, exercise_info):
+        self.exercise_list.append(exercise_info)
 
     def mark_complete(self):
         self.complete  = True

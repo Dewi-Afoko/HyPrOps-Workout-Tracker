@@ -8,8 +8,8 @@ class User:
     def update_password(self, password):
         self.password = password
 
-    def add_workout(self, exercise):
-        self.workout_list.append(exercise)
+    def add_workout(self, workout):
+        self.workout_list.append(workout)
 
     def __repr__(self):
         return f"User({self.username}, {self.workout_list})"
