@@ -27,3 +27,11 @@ class WorkoutExerciseInfo(EmbeddedDocument):
             f"WorkoutExerciseInfo(exercise_name={self.exercise_name}, reps={self.reps}, "
             f"loading={self.loading}, rest={self.rest}, performance_notes={self.performance_notes})"
         )
+    def to_dict(self):
+        return {
+            "exercise_name": self.exercise_name,
+            "reps": self.reps,
+            "loading": self.loading,
+            "rest": self.rest,
+            "performance_notes": self.performance_notes
+        }

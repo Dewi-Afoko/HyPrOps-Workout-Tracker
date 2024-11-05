@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from backend.lib.database_connection import initialize_db
+from lib.database_connection import initialize_db
 from models.user import User
 from models.workout import Workout
 from models.workout_exercise_info import WorkoutExerciseInfo
@@ -34,6 +34,16 @@ def get_users():
     return jsonify(users=[{"id": str(user.id), "username": user.username} for user in users])
 
 # Workout routes (/workouts)
+
+@app.route('/workouts/<user_id>', methods=['GET'])
+def my_workouts(user_id):
+    user = User.objects(id=user_id).first()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    workouts = Workout.objects(user_id=user.id)
+    workouts_list = [workout.to_dict() for workout in workouts]
+    return jsonify(workouts_list)
 
 @app.route('/workouts/<user_id>', methods=['POST'])
 def create_workout(user_id):
