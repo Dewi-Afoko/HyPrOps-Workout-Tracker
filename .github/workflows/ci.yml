@@ -20,7 +20,7 @@ jobs:
         image: mongo:latest
         ports:
           - 27017:27017
-        options: --quiet --config /etc/mongo/mongod.conf
+
 
     steps:
     # Step 1: Check out the code from the repository
