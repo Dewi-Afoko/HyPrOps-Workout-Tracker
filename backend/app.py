@@ -16,6 +16,7 @@ initialize_db(db_name="HyPrOps")  # Use your actual database name here
 def index():
     return jsonify({"message": "Welcome to HyPrOps backend... We finna be cooking!!"})
 
+# User routes (/users)
 @app.route('/users', methods=['POST'])
 def create_user():
     data = request.get_json()
@@ -28,7 +29,9 @@ def get_users():
     users = User.objects()
     return jsonify(users=[{"id": str(user.id), "username": user.username} for user in users])
 
-@app.route('/users/<user_id>/workouts', methods=['POST'])
+# Workout routes (/workouts)
+
+@app.route('/workouts/<user_id>', methods=['POST'])
 def create_workout(user_id):
     user = User.objects(id=user_id).first()
     if not user:
@@ -41,7 +44,7 @@ def create_workout(user_id):
 
     return jsonify({"user_id": str(user.id), "workout_id": str(workout.id)}), 201
 
-@app.route('/users/<user_id>/workouts/<workout_id>/add_exercise', methods=['POST'])
+@app.route('/workouts/<user_id>/<workout_id>/add_exercise', methods=['POST'])
 def create_workout_exercise_info(user_id, workout_id):
     workout = Workout.objects(user_id=user_id, id=ObjectId(workout_id)).first()
     if not workout:
@@ -57,7 +60,7 @@ def create_workout_exercise_info(user_id, workout_id):
     workout.add_exercise(details)
     return jsonify({"workout id": str(workout.id), "exercise added": str(details.exercise_name)}), 201
 
-@app.route('/users/<user_id>/workouts/<workout_id>/add_details', methods=['PATCH'])
+@app.route('/workouts/<user_id>/<workout_id>/add_details', methods=['PATCH'])
 def add_details_to_exercise_info(user_id, workout_id):
     workout = Workout.objects(user_id=user_id, id=ObjectId(workout_id)).first()
     if not workout:
