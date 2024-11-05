@@ -22,3 +22,12 @@ class Workout(Document):
     
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
+    
+    def to_dict(self):
+        return {
+            "id": str(self.id), 
+            "user_id": str(self.user_id), 
+            "exercise_list": [exercise.to_dict() for exercise in self.exercise_list],
+            "complete": self.complete,
+            "date": self.date,
+        }

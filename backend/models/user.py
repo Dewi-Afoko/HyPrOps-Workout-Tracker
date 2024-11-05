@@ -29,3 +29,12 @@ class User(Document):
     
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
+    
+    def to_dict(self):
+        return {
+            "exercise_name": self.exercise_name,
+            "reps": self.reps,
+            "loading": self.loading,
+            "rest": self.rest,
+            "performance_notes": self.performance_notes,
+        }
