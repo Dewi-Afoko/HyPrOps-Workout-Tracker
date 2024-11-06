@@ -6,7 +6,7 @@ import os
 from xprocess import ProcessStarter
 from mongoengine import connect, disconnect
 from lib.database_connection import initialize_db, close_db
-from app import app
+from app import create_app 
 from models.user import User
 from models.workout import Workout
 from models.workout_exercise_info import WorkoutExerciseInfo
@@ -44,6 +44,7 @@ def test_web_address(xprocess):
 # Fixture for creating a Flask test client
 @pytest.fixture
 def web_client():
+    app = create_app()
     app.config['TESTING'] = True  # Enables testing mode for better errors
 
     with app.test_client() as client:
