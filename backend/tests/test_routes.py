@@ -12,3 +12,4 @@ def test_creating_user(web_client):
     
     response = web_client.post('/users', json=data)
     assert response.status_code == 201
+    
