@@ -71,6 +71,6 @@ def test_workout_exercise_info_defaults():
 
 def test_workout_exercise_info_repr():
     exercise_info = WorkoutExerciseInfo(exercise_name="Pull-ups", reps=[10, 12])
-    expected_repr = "WorkoutExerciseInfo(exercise_name=Pull-ups, reps=[10, 12], loading=[], rest=[], performance_notes=[])"
+    expected_repr = "WorkoutExerciseInfo(exercise_name=Pull-ups, reps=[10, 12], loading=[], rest=[], performance_notes=[], complete=False)"
     assert repr(exercise_info) == expected_repr
 
