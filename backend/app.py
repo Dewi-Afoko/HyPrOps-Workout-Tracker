@@ -6,6 +6,7 @@ from models.workout_exercise_info import WorkoutExerciseInfo
 from bson import ObjectId
 import os
 from dotenv import load_dotenv
+from mongoengine.errors import NotUniqueError
 
 load_dotenv()
 
@@ -27,14 +28,21 @@ def create_app():
     @app.route('/users', methods=['POST'])
     def create_user():
         data = request.get_json()
-        user = User(username=data['username'], password=data['password'])
-        user.save()
-        return jsonify({"id": str(user.id), "username": user.username}), 201
+        try:
+        # Attempt to create and save the user
+            user = User(username=data['username'], password=data['password'])
+            user.save()
+            return jsonify({"id": str(user.id), "username": user.username}), 201
+        except NotUniqueError:
+        # Return 400 Bad Request if username already exists
+            return jsonify({"error": "Username already exists"}), 400
 
     @app.route('/users', methods=['GET'])
     def get_users():
         users = User.objects()
-        return jsonify(users=[{"id": str(user.id), "username": user.username} for user in users]), 200
+        if len(users) > 0:
+            return jsonify(users=[{"id": str(user.id), "username": user.username} for user in users]), 200
+        return jsonify({'error': 'No users found!'}), 400
 
     # Workout routes (/workouts)
 
@@ -104,6 +112,8 @@ def create_app():
                 return jsonify(response_payload), 201
         else:
                 return jsonify({"error" : "Exercise not found!"}), 418
+        
+        
     return app
 
 

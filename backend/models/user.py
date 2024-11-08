@@ -27,14 +27,13 @@ class User(Document):
     def __repr__(self):
         return f"User(username={self.username}, workout_list={self.workout_list})"
     
-    def __eq__(self, other):
+def __eq__(self, other):
+    if isinstance(other, User):
         return self.__dict__ == other.__dict__
+    return False
     
-    def to_dict(self):
+def to_dict(self):
         return {
-            "exercise_name": self.exercise_name,
-            "reps": self.reps,
-            "loading": self.loading,
-            "rest": self.rest,
-            "performance_notes": self.performance_notes,
+            "username": self.username,
+            "workout_list": self.workout_list
         }
