@@ -6,7 +6,7 @@ import os
 from xprocess import ProcessStarter
 from mongoengine import connect, disconnect
 from lib.database_connection import initialize_db, close_db
-from app import app
+from app import create_app 
 from models.user import User
 from models.workout import Workout
 from models.workout_exercise_info import WorkoutExerciseInfo
@@ -14,13 +14,13 @@ from models.workout_exercise_info import WorkoutExerciseInfo
 # Fixture for MongoDB connection
 @pytest.fixture(scope="session", autouse=True)
 def mongo_connection():
-    # Ensure any existing connections are disconnected before starting
-    disconnect(alias="default")
+    # Set environment to 'test' for safe test database usage
+    os.environ['APP_ENV'] = 'test'
     
-    # Initialize MongoDB connection for testing
-    initialize_db(db_name="test_mongodb", alias="default")
+    # Disconnect any active connections and connect to the test database
+    disconnect(alias="default")
+    initialize_db(db_name="test_mongodb", alias="default")  # Ensure this is a dedicated test database
     yield
-    # Disconnect from MongoDB after all tests complete
     close_db(alias="default")
 
 # Fixture for starting the test server
@@ -44,7 +44,8 @@ def test_web_address(xprocess):
 # Fixture for creating a Flask test client
 @pytest.fixture
 def web_client():
-    app.config['TESTING'] = True  # Enables testing mode for better errors
+    app = create_app()
+    app.config['TESTING'] = True  # Enable testing mode
 
     with app.test_client() as client:
         yield client
@@ -90,3 +91,10 @@ def sample_user_with_workout():
     yield user
     user.delete()  # Cleanup after test
     workout.delete()
+
+@pytest.fixture(autouse=True)
+def clean_database():
+    yield
+    for model in [User, Workout, WorkoutExerciseInfo]:
+        if hasattr(model, 'objects'):
+            model.objects.delete()
