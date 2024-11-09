@@ -71,7 +71,11 @@ def sample_workout(sample_user):
 def sample_workout_with_exercise(sample_user):
     # Create a Workout and add an exercise to its exercise_list
     workout = Workout(user_id=sample_user.id)
-    exercise_info = WorkoutExerciseInfo(exercise_name="Push-ups", reps=[10, 12])
+    exercise_info = WorkoutExerciseInfo(
+        exercise_name="Push-ups",
+        reps=[10, 12],
+        performance_notes=["Good form"]  # Ensure performance_notes has at least one item
+    )
     workout.exercise_list.append(exercise_info)
     workout.save()
     yield workout
