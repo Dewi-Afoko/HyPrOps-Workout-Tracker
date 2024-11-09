@@ -1,15 +1,19 @@
 import os
 from mongoengine import connect, disconnect
 
-def initialize_db(db_name="HyPrOps", alias="default"):
 
-    if os.getenv("APP_ENV") == "test":
+def initialize_db(db_name=None, alias="default"):
+    # Check APP_ENV and set db_name if not provided
+    if os.environ.get("APP_ENV") == "test":
         db_name = "test_mongodb"
-    
+    else:
+        db_name = db_name or "HyPrOps"  # Default to the primary database
 
-    mongo_uri = os.getenv("MONGO_URI", f"mongodb://localhost:27017/{db_name}")
-    connect(alias=alias, host=mongo_uri, uuidRepresentation="standard")
-    print(f"Connected to MongoDB database: {db_name} (URI: {mongo_uri})")
+    connect(
+        db=db_name,
+        alias=alias,
+        uuidRepresentation="standard"  # Set to 'standard' to avoid deprecation warning
+    )
 
 def close_db(alias="default"):
     """

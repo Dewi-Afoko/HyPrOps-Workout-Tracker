@@ -14,12 +14,15 @@ from models.workout_exercise_info import WorkoutExerciseInfo
 # Fixture for MongoDB connection
 @pytest.fixture(scope="session", autouse=True)
 def mongo_connection():
-    # Set environment to 'test' for safe test database usage
+    # Explicitly set the environment to 'test' and select the test database
     os.environ['APP_ENV'] = 'test'
     
-    # Disconnect any active connections and connect to the test database
+    # Disconnect any active connections to ensure switching to the test database
     disconnect(alias="default")
-    initialize_db(db_name="test_mongodb", alias="default")  # Ensure this is a dedicated test database
+    
+    # Initialize the database connection with test-specific database
+    test_db_name = "test_mongodb"
+    initialize_db(db_name=test_db_name, alias="default")  # Ensure the test database name here
     yield
     close_db(alias="default")
 
@@ -68,7 +71,11 @@ def sample_workout(sample_user):
 def sample_workout_with_exercise(sample_user):
     # Create a Workout and add an exercise to its exercise_list
     workout = Workout(user_id=sample_user.id)
-    exercise_info = WorkoutExerciseInfo(exercise_name="Push-ups", reps=[10, 12])
+    exercise_info = WorkoutExerciseInfo(
+        exercise_name="Push-ups",
+        reps=[10, 12],
+        performance_notes=["Good form"]  # Ensure performance_notes has at least one item
+    )
     workout.exercise_list.append(exercise_info)
     workout.save()
     yield workout

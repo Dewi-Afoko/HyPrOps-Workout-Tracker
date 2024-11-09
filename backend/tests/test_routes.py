@@ -2,6 +2,7 @@ import pytest
 from mongoengine.errors import NotUniqueError
 from models import User
 from bson import ObjectId
+import json
 
 
 def test_home_route(web_client):
@@ -121,3 +122,90 @@ def test_add_details_workout_not_found(web_client, sample_user):
     response = web_client.patch(f"/workouts/{sample_user.id}/60b7a57f4f1d2c3a2d123456/add_details", json=data)
     assert response.status_code == 404
     assert response.json == {"error": "Workout not found"}
+
+
+### Route: edit_details_in_exercise_info (PATCH /workouts/<user_id>/<workout_id>/edit_details)
+
+def test_edit_details_success(web_client, sample_workout_with_exercise):
+    workout_id = str(sample_workout_with_exercise.id)
+    user_id = str(sample_workout_with_exercise.user_id.id)  # Access `id` of the `user_id` object
+    url = f"/workouts/{user_id}/{workout_id}/edit_details"
+
+    # Data for updating reps and performance notes for an existing exercise
+    data = {
+        "exercise_name": "Push-ups",
+        "reps_index": 1,
+        "reps_value": 15,
+        "performance_notes_index": 0,
+        "performance_notes_value": "Improved form"
+    }
+
+    # Send the PATCH request
+    response = web_client.patch(url, json=data)
+
+    # Check response and verify updates
+    assert response.status_code == 200
+    response_data = response.get_json()
+    assert response_data == {
+        "updated_reps": "reps[1] = 15",
+        "updated_performance_notes": "performance_notes[0] = Improved form"
+    }
+
+
+def test_edit_details_workout_not_found(web_client):
+    # Generate valid but non-existent ObjectIds
+    fake_user_id = str(ObjectId())
+    fake_workout_id = str(ObjectId())
+    url = f"/workouts/{fake_user_id}/{fake_workout_id}/edit_details"
+
+    # Data for attempting an update
+    data = {
+        "exercise_name": "Push-ups",
+        "reps_index": 1,
+        "reps_value": 15
+    }
+
+    # Send the PATCH request
+    response = web_client.patch(url, json=data)
+
+    # Assert the response for a missing workout
+    assert response.status_code == 404
+    assert response.get_json() == {"error": "Workout not found"}
+
+
+def test_edit_details_exercise_not_found(web_client, sample_workout_with_exercise):
+    workout_id = str(sample_workout_with_exercise.id)
+    user_id = str(sample_workout_with_exercise.user_id.id)  # Access `id` of the `user_id` object
+    url = f"/workouts/{user_id}/{workout_id}/edit_details"
+
+    # Data with a non-existent exercise name
+    data = {
+        "exercise_name": "Squats",  # This exercise is not in the workout
+        "reps_index": 1,
+        "reps_value": 15
+    }
+
+    # Send the PATCH request
+    response = web_client.patch(url, json=data)
+
+    # Assert the response for a missing exercise
+    assert response.status_code == 404
+    assert response.get_json() == {"error": "Exercise not found"}
+
+
+def test_edit_details_no_updates_provided(web_client, sample_workout_with_exercise):
+    workout_id = str(sample_workout_with_exercise.id)
+    user_id = str(sample_workout_with_exercise.user_id.id)  # Access `id` of the `user_id` object
+    url = f"/workouts/{user_id}/{workout_id}/edit_details"
+
+    # Data only contains the exercise name, no update fields
+    data = {
+        "exercise_name": "Push-ups"
+    }
+
+    # Send the PATCH request
+    response = web_client.patch(url, json=data)
+
+    # Assert the response indicating no updates were provided
+    assert response.status_code == 200
+    assert response.get_json() == {"message": "No details to update provided or indices out of range"}
