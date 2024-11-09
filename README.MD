@@ -3,6 +3,11 @@ MongoDB and models - Python classes and SQL seed from previous iterations still 
 Flask server and routes created for user and workout creation – as well as adding details to workout exercise components
 Everything fully tested with Pytest – 97% coverage of all functionality
 Continuous Integration established for tests on GitHub repo
+Edit route added, tests added, Postman accessible
+
+Next step:
+Backend comments and documentation
+API/routes documnentation
 
 Next steps:
 Javascript/React web application frontend
