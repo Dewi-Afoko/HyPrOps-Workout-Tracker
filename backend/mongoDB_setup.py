@@ -46,6 +46,7 @@ def seed_data():
     exercise_info.loading = [0.0, 0.0, 0.0]
     exercise_info.rest = [60, 60, 90]
     exercise_info.performance_notes = ["Felt strong", "Need improvement", "Good form"]
+    exercise_info.complete = False
     
     # Append the exercise info to workout's exercise list
     workout.exercise_list.append(exercise_info)

@@ -19,9 +19,28 @@ class WorkoutExerciseInfo(EmbeddedDocument):
 
     def add_performance_notes(self, notes):
         self.performance_notes.append(notes)
+
+    def edit_details(self, reps="", loading="", rest="", perfomance_notes=""):
+        edit_fields = {}
+        response = {}
+        if reps > 0:
+            edit_fields['reps'] = reps
+            response['updated_reps'] = f'{reps = }'
+        if rest > 0:
+            edit_fields['rest'] = rest
+            response['updated_rest'] = f'{rest = }'
+        if loading > 0:
+            edit_fields['loading'] = loading
+            response['updated_loading'] = f'{loading = }'
+        if len(perfomance_notes) > 0:
+            edit_fields['performance_notes'] = perfomance_notes
+            response['updated_performance_notes'] = f'{perfomance_notes = }'
+        if len(response) < 1:
+            response['message'] = 'No details to update provided!'
+        return response
+        
     
     def mark_complete(self):
-        """Method to set complete to True."""
         self.complete = True
 
     def __eq__(self, other):
