@@ -2,7 +2,7 @@ from mongoengine import Document, StringField, ListField, ReferenceField, DateTi
 from datetime import datetime
 from .workout_exercise_info import WorkoutExerciseInfo
 
-class Workout(Document):
+class Workout(Document): #TODO: Add notes for workout, add to __repr__ and to_dict, add edit routes, testing and documentation
     user_id = ReferenceField('User', required=True) 
     date = DateTimeField(default=datetime.now)
     complete = BooleanField(default=False)
@@ -17,7 +17,7 @@ class Workout(Document):
         self.complete = True
         self.save()
 
-    def __repr__(self):
+    def __repr__(self): #TODO: Add complete, id and date to this function - fix tests for those criteria
         return f"Workout(user_id={self.user_id}, exercise_list={self.exercise_list})"
     
     def __eq__(self, other):
