@@ -7,12 +7,14 @@ from bson import ObjectId
 import os
 from dotenv import load_dotenv
 from mongoengine.errors import NotUniqueError
+from flask_cors import CORS
 
 load_dotenv()
 
 
 def create_app():
     app = Flask(__name__)
+    CORS(app)
 
 
 
