@@ -5,6 +5,7 @@ click==8.1.7
 coverage==7.6.4
 dnspython==2.7.0
 Flask==3.0.3
+Flask-Cors==5.0.0
 idna==3.10
 iniconfig==2.0.0
 itsdangerous==2.2.0
