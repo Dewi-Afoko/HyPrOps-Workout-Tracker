@@ -19,6 +19,11 @@ const AddDetailsToExercise = () => {
             alert("No exercise found!");
             return;
         }
+        // Validate inputs
+        if (reps <= 0 || loading <= 0 || rest <= 0 || notes.trim() === "") {
+            alert("Please fill out all fields with valid values!");
+            return;
+        }
         try {
             const response = await axios.patch(`http://127.0.0.1:5000/workouts/${user_id}/${workout_id}/add_details`, 
                 {
