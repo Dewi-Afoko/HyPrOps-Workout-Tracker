@@ -20,7 +20,7 @@ const AddDetailsToExercise = () => {
             return;
         }
         // Validate inputs
-        if (reps <= 0 || loading <= 0 || rest <= 0 || notes.trim() === "") {
+        if (reps <= 0 && loading <= 0 && rest <= 0 && notes.trim() === "") {
             alert("Please fill out all fields with valid values!");
             return;
         }
