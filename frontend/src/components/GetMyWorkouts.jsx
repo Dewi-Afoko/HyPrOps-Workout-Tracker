@@ -3,12 +3,18 @@ import axios from "axios";
 import Button from "react-bootstrap/Button";
 import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
 
-const GetUsers = () => {
+const GetWorkouts = () => {
 
     const handleButtonClick = async () => {
+        const user_id = localStorage.getItem("user_id")
+        if (!user_id) {
+            alert("User ID not found in localStorage.");
+            return;
+        }
         try {
-            const response = await axios.get("http://127.0.0.1:5000/users");
+            const response = await axios.get(`http://127.0.0.1:5000/workouts/${user_id}`);
             alert(`API Response: ${JSON.stringify(response.data)}`);
+            const myWorkouts = response.data;                                               //TODO: Make this list return in a component
         } catch (error) {
             console.error("Error making API call:", error);
             alert("Failed to fetch data. Check console for details.");
@@ -27,9 +33,9 @@ const GetUsers = () => {
                 padding: "10px 20px",
             }}
         >
-            Click Me to Call GET Users
+            Get My Workouts
         </Button>
     );
 };
 
-export default GetUsers;
+export default GetWorkouts;
