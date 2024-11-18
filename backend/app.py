@@ -98,16 +98,16 @@ def create_app():
         response_payload = {}
         for entry in workout['exercise_list']:
             if data['exercise_name'] in entry['exercise_name']: # Exercise name required to identify where to add these values
-                if "reps" in data:
+                if "reps" in data and data["reps"] > 0:
                     response_payload['reps'] = data['reps']
                     entry.add_set(data['reps'])
-                if 'loading' in data:
+                if 'loading' in data and data["loading"] > 0:
                     response_payload['loading'] = data['loading']
                     entry.set_loading(data['loading'])
-                if 'rest' in data:
+                if 'rest' in data and data["rest"] > 0:
                     response_payload['rest'] = data['rest']
                     entry.set_rest_period(data['rest'])
-                if 'notes' in data:
+                if 'notes' in data and len(data["notes"]) > 0:
                     response_payload['notes'] = data['notes']
                     entry.add_performance_notes(data['notes'])
                 workout.save()

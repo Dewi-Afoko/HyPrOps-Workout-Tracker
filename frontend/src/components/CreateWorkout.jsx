@@ -14,7 +14,7 @@ const CreateWorkout = () => {
         try {
             const response = await axios.post(`http://127.0.0.1:5000/workouts/${user_id}`);
             alert(`API Response: ${JSON.stringify(response.data)}`);
-            localStorage.setItem('workout_id', response.workout_id); // Set workout's ID in localStorage
+            localStorage.setItem('workout_id', response.data.workout_id); // Set workout's ID in localStorage
         } catch (error) {
             console.error("Error making API call:", error);
             alert("Failed to fetch data. Check console for details.");
