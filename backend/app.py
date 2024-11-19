@@ -1,12 +1,6 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify
 from lib.database_connection import initialize_db
-from models.user import User
-from models.workout import Workout
-from models.workout_exercise_info import WorkoutExerciseInfo
-from bson import ObjectId
-import os
 from dotenv import load_dotenv
-from mongoengine.errors import NotUniqueError
 from flask_cors import CORS
 from routes.user_routes import user_bp
 from routes.workout_routes import workout_bp
