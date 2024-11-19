@@ -48,38 +48,43 @@ def add_details_to_exercise_info(user_id, workout_id):
         else:
                 return jsonify({"error" : "Exercise not found!"}), 418
         
-workout_details_bp.route('/workouts/<user_id>/<workout_id>/edit_details', methods=['PATCH'])
+@workout_details_bp.route('/workouts/<user_id>/<workout_id>/edit_details', methods=['PATCH'])
 def edit_details_in_exercise_info(user_id, workout_id):
-        workout = Workout.objects(user_id=user_id, id=ObjectId(workout_id)).first()
-        if not workout:
-            return jsonify({"error": "Workout not found"}), 404
-        data = request.get_json()
+    workout = Workout.objects(user_id=user_id, id=ObjectId(workout_id)).first()
+    if not workout:
+        return jsonify({"error": "Workout not found"}), 404
+
+    data = request.get_json()
 
     # Retrieve exercise name and locate the exercise in the workout
-        exercise_name = data['exercise_name']
-        exercise_info = next((exercise for exercise in workout.exercise_list if exercise.exercise_name == exercise_name), None)
-        if not exercise_info:
-            return jsonify({"error": "Exercise not found"}), 404
+    exercise_name = data.get('exercise_name')
+    if not exercise_name:
+        return jsonify({"error": "Exercise name is required"}), 400
 
-        payload = {}
-        if 'reps_index' in data and 'reps_value' in data:
-            payload['reps_index'] = data['reps_index']
-            payload['reps_value'] = data['reps_value']
-        if 'loading_index' in data and 'loading_value' in data:
-            payload['loading_index'] = data['loading_index']
-            payload['loading_value'] = data['loading_value']
-        if 'rest_index' in data and 'rest_value' in data:
-            payload['rest_index'] = data['rest_index']
-            payload['rest_value'] = data['rest_value']
-        if 'performance_notes_index' in data and 'performance_notes_value' in data:
-            payload['performance_notes_index'] = data['performance_notes_index']
-            payload['performance_notes_value'] = data['performance_notes_value']
+    exercise_info = next((exercise for exercise in workout.exercise_list if exercise.exercise_name == exercise_name), None)
+    if not exercise_info:
+        return jsonify({"error": "Exercise not found"}), 404
 
-        response = exercise_info.edit_details(**payload)
+    # Build the payload for the edit_details method
+    payload = {}
+    if 'reps_index' in data and 'reps_value' in data:
+        payload['reps_index'] = data['reps_index']
+        payload['reps_value'] = data['reps_value']
+    if 'performance_notes_index' in data and 'performance_notes_value' in data:
+        payload['performance_notes_index'] = data['performance_notes_index']
+        payload['performance_notes_value'] = data['performance_notes_value']
 
-        # Save the workout if any updates were made
-        if 'message' not in response or response['message'] != 'No details to update provided or indices out of range':
-            workout.save()
+    # Apply updates via edit_details method
+    response = exercise_info.edit_details(**payload)
 
-        # Return the response indicating what was updated
-        return jsonify(response), 200 if 'error' not in response else 400
+    # Save the workout if any updates were made
+    if 'message' not in response or response['message'] != 'No details to update provided or indices out of range':
+        workout.save()
+
+    # Return the response
+    if 'error' in response:
+        return jsonify(response), 400
+    elif 'message' in response and response['message'] == 'No details to update provided or indices out of range':
+        return jsonify(response), 400
+    else:
+        return jsonify(response), 200

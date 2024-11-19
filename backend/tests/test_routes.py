@@ -207,5 +207,5 @@ def test_edit_details_no_updates_provided(web_client, sample_workout_with_exerci
     response = web_client.patch(url, json=data)
 
     # Assert the response indicating no updates were provided
-    assert response.status_code == 200
+    assert response.status_code == 400
     assert response.get_json() == {"message": "No details to update provided or indices out of range"}
