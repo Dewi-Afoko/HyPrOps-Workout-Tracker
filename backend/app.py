@@ -5,6 +5,8 @@ from flask_cors import CORS
 from routes.user_routes import user_bp
 from routes.workout_routes import workout_bp
 from routes.workout_details_routes import workout_details_bp
+from flask_jwt_extended import JWTManager
+import os
 
 load_dotenv()
 
@@ -12,6 +14,9 @@ load_dotenv()
 def create_app():
     app = Flask(__name__)
     CORS(app)
+
+    app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "default_secret_key")
+    jwt = JWTManager(app)
 
     # Initialize the database
     initialize_db(db_name="HyPrOps")
