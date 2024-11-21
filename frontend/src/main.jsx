@@ -1,27 +1,22 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import GetUsers from "./components/GetUsers";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import GetWorkouts from "./components/GetMyWorkouts";
-import CreateWorkout from "./components/CreateWorkout"
-import CreateUser from "./components/CreateUser"
-import AddExerciseToWorkout from "./components/AddExerciseToWorkout";
-import AddDetailsToExercise from "./components/AddDetailsToExercise";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HomePage } from "./pages/Homepage/LandingPage";
+import { RegisterUser } from "./pages/Register/Register";
 
-//TODO: Separate components to their own pages, create Navbar to link to them - don't render everything here
 
 const App = () => {
     return (
         <div style={{ textAlign: "center", marginTop: "50px" }}>
-            <h1>HyPrOps Fullstack Workout App</h1>
-            <GetUsers />
-            <GetWorkouts/>
-            <CreateWorkout/>
-            <CreateUser/>
-            <AddExerciseToWorkout/>
-            <AddDetailsToExercise/>
-        </div>
-
+                        <h1>HyPrOps Fullstack Workout App</h1>
+                <BrowserRouter>
+        <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/register" element={<RegisterUser/>} />
+        </Routes>
+    </BrowserRouter>
+</div>
     );
 };
 
