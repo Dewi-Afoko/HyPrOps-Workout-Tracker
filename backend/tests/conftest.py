@@ -9,6 +9,7 @@ from lib.database_connection import initialize_db, close_db
 from app import create_app 
 from models.user import User
 from models.workout import Workout
+from werkzeug.security import generate_password_hash
 from models.workout_exercise_info import WorkoutExerciseInfo
 
 # Fixture for MongoDB connection
@@ -55,8 +56,8 @@ def web_client():
 
 @pytest.fixture
 def sample_user():
-    user = User(username="testuser", password="hashedpassword")
-    user.save()
+    user = User(username="testuser", password="plainpassword")  # Plain text password
+    user.save()  # Password will be hashed during save()
     yield user
     user.delete()  # Cleanup after test
 
