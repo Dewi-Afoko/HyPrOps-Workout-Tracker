@@ -3,6 +3,7 @@ from mongoengine.errors import NotUniqueError
 from models import User
 from bson import ObjectId
 import json
+from flask_jwt_extended import create_access_token
 
 
 def test_home_route(web_client):
@@ -209,3 +210,70 @@ def test_edit_details_no_updates_provided(web_client, sample_workout_with_exerci
     # Assert the response indicating no updates were provided
     assert response.status_code == 400
     assert response.get_json() == {"message": "No details to update provided or indices out of range"}
+
+def test_login_success(web_client, sample_user):
+    """Test successful login with valid credentials."""
+    response = web_client.post(
+        "/token/login",
+        json={"username": "testuser", "password": "plainpassword"},
+    )
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "token" in data
+    assert "advice" in data
+    assert data["advice"] == "It's dangerous to go alone, take this with you *hands over a *JWT*"
+
+
+def test_login_failure_invalid_username(web_client):
+    """Test login failure with invalid username."""
+    response = web_client.post(
+        "/token/login",
+        json={"username": "wronguser", "password": "plainpassword"},
+    )
+    assert response.status_code == 401
+    data = response.get_json()
+    assert data["message"] == "Invalid username or password"
+
+
+def test_login_failure_invalid_password(web_client, sample_user):
+    """Test login failure with invalid password."""
+    response = web_client.post(
+        "/token/login",
+        json={"username": "testuser", "password": "wrongpassword"},
+    )
+    assert response.status_code == 401
+    data = response.get_json()
+    assert data["message"] == "Invalid username or password"
+
+
+def test_token_check_success(web_client, sample_user):
+    """Test successful access to token_check with valid JWT."""
+    # Generate a JWT for the test user
+    with web_client.application.app_context():
+        access_token = create_access_token(identity=str(sample_user.id))
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = web_client.get("/token/token_check", headers=headers)
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "message" in data
+    assert "advice" in data
+    assert f"Welcome, user {sample_user.id}!" in data["message"]
+    assert data["advice"] == "It's dangerous to go alone, take this with you *hands over a *JWT*"
+
+
+def test_token_check_failure_missing_token(web_client):
+    """Test access to token_check without a JWT."""
+    response = web_client.get("/token/token_check")
+    assert response.status_code == 401
+    data = response.get_json()
+    assert data["msg"] == "Missing Authorization Header"
+
+
+def test_token_check_failure_invalid_token(web_client):
+    """Test access to token_check with an invalid JWT."""
+    headers = {"Authorization": "Bearer invalidtoken"}
+    response = web_client.get("/token/token_check", headers=headers)
+    assert response.status_code == 422
+    data = response.get_json()
+    assert data["msg"] == "Not enough segments"
