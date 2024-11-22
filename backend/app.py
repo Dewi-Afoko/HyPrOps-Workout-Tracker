@@ -18,7 +18,7 @@ def create_app():
 
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "default_secret_key")
     jwt = JWTManager(app)
-
+    app.config["TESTING"] = True
     # Initialize the database
     initialize_db(db_name="HyPrOps")
 
@@ -28,12 +28,16 @@ def create_app():
     app.register_blueprint(workout_details_bp)
     app.register_blueprint(token_bp)
 
+
     @app.route('/')
     def index():
         return jsonify({"message": "Welcome to HyPrOps backend... We finna be cooking!!"})
-
+    
     return app
 
-if __name__ == '__main__':
+def main():
     app = create_app()
     app.run(debug=True)
+
+if __name__ == '__main__':
+    main()

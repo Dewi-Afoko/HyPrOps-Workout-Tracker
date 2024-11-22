@@ -1,11 +1,12 @@
 from flask import Blueprint, request, jsonify
 from models.workout import Workout
 from models.user import User
-from bson import ObjectId
+from flask_jwt_extended import jwt_required
 
-workout_bp = Blueprint('workout', __name__)
+workout_bp = Blueprint('workout_bp', __name__)
 
 @workout_bp.route('/workouts/<user_id>', methods=['GET'])
+@jwt_required()
 def my_workouts(user_id):
     user = User.objects(id=user_id).first()
     if not user:
@@ -16,6 +17,7 @@ def my_workouts(user_id):
     return jsonify(workouts_list), 200
 
 @workout_bp.route('/workouts/<user_id>', methods=['POST'])
+@jwt_required()
 def create_workout(user_id):
     user = User.objects(id=user_id).first()
     if not user:

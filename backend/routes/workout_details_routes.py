@@ -2,10 +2,12 @@ from flask import Blueprint, request, jsonify
 from models.workout import Workout
 from models.workout_exercise_info import WorkoutExerciseInfo
 from bson import ObjectId
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
-workout_details_bp = Blueprint('exercise', __name__)
+workout_details_bp = Blueprint('workout_details_bp', __name__)
 
 @workout_details_bp.route('/workouts/<user_id>/<workout_id>/add_exercise', methods=['POST'])
+@jwt_required()
 def create_workout_exercise_info(user_id, workout_id):
     workout = Workout.objects(user_id=user_id, id=ObjectId(workout_id)).first()
     if not workout:
@@ -21,6 +23,7 @@ def create_workout_exercise_info(user_id, workout_id):
     return jsonify({"workout id": str(workout.id), "exercise added": str(details.exercise_name)}), 201
 
 @workout_details_bp.route('/workouts/<user_id>/<workout_id>/add_details', methods=['PATCH'])
+@jwt_required()
 def add_details_to_exercise_info(user_id, workout_id):
         workout = Workout.objects(user_id=user_id, id=ObjectId(workout_id)).first()
         if not workout:
@@ -49,6 +52,7 @@ def add_details_to_exercise_info(user_id, workout_id):
                 return jsonify({"error" : "Exercise not found!"}), 418
         
 @workout_details_bp.route('/workouts/<user_id>/<workout_id>/edit_details', methods=['PATCH'])
+@jwt_required()
 def edit_details_in_exercise_info(user_id, workout_id):
     workout = Workout.objects(user_id=user_id, id=ObjectId(workout_id)).first()
     if not workout:
