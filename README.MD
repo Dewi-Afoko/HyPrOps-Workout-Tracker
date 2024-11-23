@@ -9,3 +9,13 @@
 
 - Backend JWT implementation started, but routes using it not created
     - App.py updated
+
+# UPDATE:
+
+- Backend routing for registration with hashed passwords implemented
+- Login backend/HTTP requests functional
+- Tokens awarded as they should be
+- All routes that should require tokens now do - and work with them
+- Signup page/component on frontend working
+    - Styling needs fixing as does post-registration behaviour
+    
