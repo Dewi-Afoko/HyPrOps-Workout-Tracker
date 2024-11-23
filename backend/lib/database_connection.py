@@ -9,6 +9,9 @@ def initialize_db(db_name=None, alias="default"):
     else:
         db_name = db_name or "HyPrOps"  # Default to the primary database
 
+    print(f"Connecting to database: {db_name}")  # Debugging log
+
+
     connect(
         db=db_name,
         alias=alias,

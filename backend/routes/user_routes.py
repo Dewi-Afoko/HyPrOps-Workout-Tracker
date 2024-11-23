@@ -1,8 +1,10 @@
 from flask import Blueprint, request, jsonify
 from models.user import User
 from mongoengine.errors import NotUniqueError
+from flask_jwt_extended import jwt_required
 
-user_bp = Blueprint('user', __name__)
+# Ensure the Blueprint name is unique
+user_bp = Blueprint('user_bp', __name__)
 
 @user_bp.route('/users', methods=['POST'])
 def create_user():
@@ -15,8 +17,10 @@ def create_user():
         return jsonify({"error": "Username already exists"}), 400
 
 @user_bp.route('/users', methods=['GET'])
+@jwt_required()
 def get_users():
     users = User.objects()
-    if len(users) > 0:
-        return jsonify(users=[{"id": str(user.id), "username": user.username} for user in users]), 200
-    return jsonify({'error': 'No users found!'}), 400
+    if not users:
+        return jsonify({'error': 'No users found!'}), 400
+    return jsonify(users=[{"id": str(user.id), "username": user.username} for user in users]), 200
+

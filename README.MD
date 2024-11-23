@@ -1,16 +1,21 @@
-Backend MVP complete:
-MongoDB and models - Python classes and SQL seed from previous iterations still exist
-Flask server and routes created for user and workout creation – as well as adding details to workout exercise components
-Everything fully tested with Pytest – 97% coverage of all functionality
-Continuous Integration established for tests on GitHub repo
-Edit route added, tests added, Postman accessible
+###This isn't an actual read me, this is just so I can remember the last thing I did... 😅
 
-Next step:
-Backend comments and documentation
-API/routes documnentation
 
-Next steps:
-Javascript/React web application frontend
-Kotlin/Android Studio mobile app frontend
+## **Started Creating Pages, Pivoted to Token Implementation**
 
-This read me file isn't for you, I made it for me. Stop reading my words! They belong to me!... This will eventually be an actual readme.
+- Landing and registration pages created
+    - Feature boxes outlining user functionality populated
+    - Styling needs correcting
+
+- Backend JWT implementation started, but routes using it not created
+    - App.py updated
+
+# UPDATE:
+
+- Backend routing for registration with hashed passwords implemented
+- Login backend/HTTP requests functional
+- Tokens awarded as they should be
+- All routes that should require tokens now do - and work with them
+- Signup page/component on frontend working
+    - Styling needs fixing as does post-registration behaviour
+    

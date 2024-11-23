@@ -1,39 +1,39 @@
-from mongoengine import Document, StringField, ListField, ReferenceField, IntField
+from mongoengine import Document, StringField, ListField
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(Document):
     username = StringField(required=True, unique=True)
-    password = StringField(required=True)  #TODO: Hash passwords
+    password = StringField(required=True)  # Stores hashed password
     workout_list = ListField()
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # After initialization, set `self.id` to the MongoDB `_id`
-        if not hasattr(self, 'id'):
-            self.id = None  # Initialize to None until saved
-
     def save(self, *args, **kwargs):
+        # Check if the password is already hashed
+        if not self.password.startswith('scrypt:'):
+            self.password = generate_password_hash(self.password)
         super().save(*args, **kwargs)
-        # After saving, assign MongoDB `_id` to `self.id`
-        self.id = self.pk
 
 
     def update_password(self, password):
-        self.password = password #TODO: Hash passwords
+        # Hash the new password before updating
+        self.password = generate_password_hash(password)
+
+    def verify_password(self, password):
+        # Verify the given password against the stored hashed password
+        return check_password_hash(self.password, password)
 
     def add_workout(self, workout):
-        from .workout import Workout
         self.workout_list.append(workout)
 
     def __repr__(self):
         return f"User(username={self.username}, workout_list={self.workout_list})"
-    
-def __eq__(self, other):
-    if isinstance(other, User):
-        return self.__dict__ == other.__dict__
-    return False
-    
-def to_dict(self):
+
+    def to_dict(self):
         return {
             "username": self.username,
             "workout_list": self.workout_list
         }
+
+    def __eq__(self, other):
+        if isinstance(other, User):
+            return self.__dict__ == other.__dict__
+        return False
