@@ -19,3 +19,9 @@
 - Signup page/component on frontend working
     - Styling needs fixing as does post-registration behaviour
     
+## NEXT UP:
+
+- Login frontend
+    - Component
+    - Page
+    
