@@ -18,4 +18,14 @@
 - All routes that should require tokens now do - and work with them
 - Signup page/component on frontend working
     - Styling needs fixing as does post-registration behaviour
+- Login frontend functional
+    - Component complete
+    - Page complete
+    - token and user ID passed to localStorage
+    
+## NEXT UP:
+
+- Potentially sessions over localStorage?
+- Configure login and register pages to navigate somewhere useful
+- Start working on the (MVP) workouts page
     

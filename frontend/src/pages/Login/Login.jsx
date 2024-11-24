@@ -1,26 +1,18 @@
 import { Link } from "react-router-dom";
 import { Container, Row, Col, Button, Card } from 'react-bootstrap';
+import LogIn from "../../components/LogIn";
 
 
-
-export function HomePage() {
+export function Login() {
 return (
     <div>
       {/* Full-width header */}
     <header className="text-center py-5">
         <Container>
         <Row className="justify-content-center align-items-center">
-            <Col xs={12} md={8}>
-            <h1 className="display-4 text-center">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HyPrOps ALPHA</h1>
-            <div className="mt-4 d-flex justify-content-center">
-            <Button variant="dark"
-                    style={{backgroundColor: "black",color: "red",borderRadius: "50px",fontSize: "16px",padding: "10px 20px"}}><Link className="no-link" to="/login">Log In</Link></Button>
-                <Button variant="dark"
-                    style={{backgroundColor: "black",color: "red",borderRadius: "50px",fontSize: "16px",padding: "10px 20px"}}><Link to="/register">Sign Up</Link></Button>
-            </div>
-            </Col>
+        <LogIn/>
         </Row>
-        </Container>
+        </Container> 
     </header>
 
       {/* Feature cards */}
