@@ -407,7 +407,7 @@ def test_login_success(web_client, clean_database):
     assert response.status_code == 200
     response_data = response.get_json()
     assert "token" in response_data
-    assert response_data["advice"] == "It's dangerous to go alone, take this with you *hands over a *JWT*"
+    assert response_data["advice"] == "It's dangerous to go alone, take this with you *hands over a JWT*"
 
 
 def test_login_invalid_username(web_client, clean_database):
@@ -454,7 +454,7 @@ def test_token_check_success(web_client, auth_token):
     assert response.status_code == 200
     response_data = response.get_json()
     assert "Welcome, user" in response_data["message"]
-    assert response_data["advice"] == "It's dangerous to go alone, take this with you *hands over a *JWT*"
+    assert response_data["advice"] == "It's dangerous to go alone, take this with you *hands over a JWT*"
 
 
 def test_token_check_missing_token(web_client):
