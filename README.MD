@@ -22,10 +22,23 @@
     - Component complete
     - Page complete
     - token and user ID passed to localStorage
-    
+- MVP workout page in progress, blended with profile page
+    - All workout details displayed
+        - Looks awful, but data readily available
+- Auth headers added to all relevant frontend components
+- Get Workouts component no longer a button, returns list
+    - Needs to be adapted to useState
+
 ## NEXT UP:
 
+- Add state where relevant
+- Figure out the add details component config and frontend logic
+
+
+## TODO:
+
 - Potentially sessions over localStorage?
-- Configure login and register pages to navigate somewhere useful
-- Start working on the (MVP) workouts page
+- useNavigate
+- Navbar
+
     
