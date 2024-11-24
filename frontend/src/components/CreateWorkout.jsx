@@ -6,13 +6,23 @@ import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
 const CreateWorkout = () => {
 
     const handleButtonClick = async () => {
-        const user_id = localStorage.getItem('user_id')
-        if (!user_id) {
-            alert("User ID not found in localStorage.");
+        const user_id = localStorage.getItem('user_id');
+        const token = localStorage.getItem('token'); // Retrieve token from localStorage
+        if (!user_id || !token) {
+            alert("User ID or token not found in localStorage.");
             return;
         }
         try {
-            const response = await axios.post(`http://127.0.0.1:5000/workouts/${user_id}`);
+            // Make the POST request with token in headers
+            const response = await axios.post(
+                `http://127.0.0.1:5000/workouts/${user_id}`, 
+                {}, // Assuming no body is required, otherwise replace with the request payload
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}` // Add token to Authorization header
+                    }
+                }
+            );
             alert(`API Response: ${JSON.stringify(response.data)}`);
             localStorage.setItem('workout_id', response.data.workout_id); // Set workout's ID in localStorage
         } catch (error) {

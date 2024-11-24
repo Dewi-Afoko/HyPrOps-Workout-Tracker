@@ -14,14 +14,14 @@ const AddDetailsToExercise = () => {
         const user_id = localStorage.getItem('user_id');
         const workout_id = localStorage.getItem('workout_id');
         const exercise_name = localStorage.getItem('exercise_name');
-
-        if (!exercise_name) {
-            alert("No exercise found!");
+        const token = localStorage.getItem('token'); // Retrieve token from localStorage
+        if (!user_id || !token || !workout_id || !exercise_name) {
+            alert("User ID, token, workout_id or exercise_name not found in localStorage.");
             return;
         }
         // Validate inputs
         if (reps <= 0 && loading <= 0 && rest <= 0 && notes.trim() === "") {
-            alert("Please fill out all fields with valid values!");
+            alert("Please fill out SOME fields with valid values!");
             return;
         }
         try {
@@ -32,6 +32,8 @@ const AddDetailsToExercise = () => {
                     loading: parseFloat(loading), 
                     rest: parseFloat(rest), 
                     notes: notes, 
+                },  {headers: {
+                    Authorization: `Bearer ${token}` }// Add token to Authorization header
                 });
             alert(`API Response: ${JSON.stringify(response.data)}`);
         } catch (error) {
