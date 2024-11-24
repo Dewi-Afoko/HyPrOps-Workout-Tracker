@@ -21,6 +21,7 @@
 - Login frontend functional
     - Component complete
     - Page complete
+    - token and user ID passed to localStorage
     
 ## NEXT UP:
 
