@@ -18,7 +18,7 @@ def login():
 
     # Generate JWT
     access_token = create_access_token(identity=str(user.username))
-    return jsonify({'token': access_token, "advice": "It's dangerous to go alone, take this with you *hands over a *JWT*"}), 200
+    return jsonify({'token': access_token, "advice": "It's dangerous to go alone, take this with you *hands over a *JWT*", 'user_id': str(user.id)}), 200
 
 @token_bp.route('/token_check', methods=['GET'])
 @jwt_required()

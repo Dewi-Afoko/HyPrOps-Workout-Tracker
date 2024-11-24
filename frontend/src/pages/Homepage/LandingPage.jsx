@@ -13,7 +13,8 @@ return (
             <Col xs={12} md={8}>
             <h1 className="display-4 text-center">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HyPrOps ALPHA</h1>
             <div className="mt-4 d-flex justify-content-center">
-                <Button variant="outline-secondary " className="no-link"><Link className="no-link" to="/login">#TODO: Log In</Link></Button>
+            <Button variant="dark"
+                    style={{backgroundColor: "black",color: "red",borderRadius: "50px",fontSize: "16px",padding: "10px 20px"}}><Link className="no-link" to="/login">Log In</Link></Button>
                 <Button variant="dark"
                     style={{backgroundColor: "black",color: "red",borderRadius: "50px",fontSize: "16px",padding: "10px 20px"}}><Link to="/register">Sign Up</Link></Button>
             </div>

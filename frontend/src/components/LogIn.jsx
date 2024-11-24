@@ -18,7 +18,7 @@ const LogIn = () => {
             const token = response.data.token;
             localStorage.setItem('token', token);
             alert(`API Response: ${JSON.stringify(response.data)}`);
-            localStorage.setItem("user_id", response.data.id); // Set user's ID in localStorage
+            localStorage.setItem("user_id", response.data.user_id); // Set user's ID in localStorage
         } catch (error) {
             console.error("Error making API call:", error);
             alert("Failed to log in. Check console for details.");
