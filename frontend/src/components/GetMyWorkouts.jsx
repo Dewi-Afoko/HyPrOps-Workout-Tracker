@@ -72,27 +72,14 @@ const GetWorkouts = ({ onRefresh }) => {
                             </thead>
                             <tbody>
                                 {(() => {
-                                    // Initialize variables to track the last seen value for each column
-                                    let lastExercise = "";
-                                    let lastLoading = "";
-                                    let lastRest = "";
-                                    let lastReps = "";
-                                    let lastNotes = "";
+
 
                                     return workout.exercise_list.map((exercise, exerciseIndex) => {
-                                        // Check if current value exists; if not, inherit the previous value
-                                        const exerciseName = exercise.exercise_name || lastExercise;
-                                        const loading = exercise.loading || lastLoading;
-                                        const rest = exercise.rest || lastRest;
-                                        const reps = exercise.reps || lastReps;
-                                        const notes = exercise.performance_notes || lastNotes;
-
-                                        // Update the "last seen" values
-                                        lastExercise = exerciseName;
-                                        lastLoading = loading;
-                                        lastRest = rest;
-                                        lastReps = reps;
-                                        lastNotes = notes;
+                                        const exerciseName = exercise.exercise_name;
+                                        const loading = exercise.loading.join(', ');
+                                        const rest = exercise.rest.join(', ');
+                                        const reps = exercise.reps.join(', ');
+                                        const notes = exercise.performance_notes.join(', ');
 
                                         return (
                                             <tr key={`${index}-${exerciseIndex}`}>
