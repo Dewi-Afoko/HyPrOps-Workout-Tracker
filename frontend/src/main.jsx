@@ -6,6 +6,7 @@ import { HomePage } from "./pages/Homepage/LandingPage";
 import { RegisterUser } from "./pages/Register/Register";
 import { Login } from "./pages/Login/Login";
 import { Dashboard } from "./pages/Dashboard/UserProfile";
+import { WorkoutsProvider } from "./context/WorkoutsContext";
 
 
 const App = () => {
@@ -24,4 +25,8 @@ const App = () => {
     );
 };
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+ReactDOM.createRoot(document.getElementById("root")).render(
+<WorkoutsProvider>
+<App />
+</WorkoutsProvider>
+);

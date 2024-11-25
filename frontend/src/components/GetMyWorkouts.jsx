@@ -1,36 +1,44 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
+import { Table } from "react-bootstrap";
 
-const GetWorkouts = () => {
-    const [myWorkouts, setMyWorkouts] = useState([]); // State to store the list of workouts
+const GetWorkouts = ({ onRefresh }) => {
+    const [myWorkouts, setMyWorkouts] = useState([]);
+
+    const fetchWorkouts = async () => {
+        const user_id = localStorage.getItem("user_id");
+        const token = localStorage.getItem("token");
+        if (!user_id || !token) {
+            alert("User ID or token not found in localStorage.");
+            return;
+        }
+        try {
+            const response = await axios.get(
+                `http://127.0.0.1:5000/workouts/${user_id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            setMyWorkouts(response.data);
+        } catch (error) {
+            console.error("Error making API call:", error);
+            alert("Failed to fetch data. Check console for details.");
+        }
+    };
 
     useEffect(() => {
-        const fetchWorkouts = async () => {
-            const user_id = localStorage.getItem("user_id");
-            const token = localStorage.getItem("token"); // Retrieve token from localStorage
-            if (!user_id || !token) {
-                alert("User ID or token not found in localStorage.");
-                return;
-            }
-            try {
-                const response = await axios.get(
-                    `http://127.0.0.1:5000/workouts/${user_id}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`, // Add token to Authorization header
-                        },
-                    }
-                );
-                setMyWorkouts(response.data); // Update state with the fetched workouts
-            } catch (error) {
-                console.error("Error making API call:", error);
-                alert("Failed to fetch data. Check console for details.");
-            }
-        };
+        fetchWorkouts();
+    }, []);
 
-        fetchWorkouts(); // Call the function on component mount
-    }, []); // Empty dependency array ensures it runs only once when the component mounts
+    // Optionally expose fetchWorkouts via props
+    useEffect(() => {
+        if (onRefresh) {
+            onRefresh(fetchWorkouts);
+        }
+    }, [onRefresh]);
 
     return (
         <div style={{ textAlign: "center", marginTop: "20px" }}>
@@ -52,22 +60,53 @@ const GetWorkouts = () => {
                         <br />
                         {`Created: ${workout.date}`}
                         <br />
-                        {/* Currently requires refresh to update; use state to fix this */}
-                        <ul style={{ listStyleType: "disc", paddingLeft: "20px", marginTop: "10px" }}>
-                            {workout.exercise_list.map((exercise, exerciseIndex) => (
-                                <li key={exerciseIndex}>{`${exerciseIndex + 1}: ${exercise.exercise_name}`}
-                                <br></br>
-                                {`Reps: ${exercise.reps}`}
-                                <br></br>
-                                {`Loading: ${exercise.loading}`}
-                                <br></br>
-                                {`Rest: ${exercise.rest}`}
-                                <br></br>
-                                {`Notes: ${exercise.performance_notes}`}
-                                </li>
-                                
-                            ))}
-                        </ul>
+                        <Table striped bordered hover>
+                            <thead>
+                                <tr>
+                                    <th>Exercise</th>
+                                    <th>Loading</th>
+                                    <th>Rest Interval</th>
+                                    <th>Reps</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {(() => {
+                                    // Initialize variables to track the last seen value for each column
+                                    let lastExercise = "";
+                                    let lastLoading = "";
+                                    let lastRest = "";
+                                    let lastReps = "";
+                                    let lastNotes = "";
+
+                                    return workout.exercise_list.map((exercise, exerciseIndex) => {
+                                        // Check if current value exists; if not, inherit the previous value
+                                        const exerciseName = exercise.exercise_name || lastExercise;
+                                        const loading = exercise.loading || lastLoading;
+                                        const rest = exercise.rest || lastRest;
+                                        const reps = exercise.reps || lastReps;
+                                        const notes = exercise.performance_notes || lastNotes;
+
+                                        // Update the "last seen" values
+                                        lastExercise = exerciseName;
+                                        lastLoading = loading;
+                                        lastRest = rest;
+                                        lastReps = reps;
+                                        lastNotes = notes;
+
+                                        return (
+                                            <tr key={`${index}-${exerciseIndex}`}>
+                                                <td>{exerciseName}</td>
+                                                <td>{loading}</td>
+                                                <td>{rest}</td>
+                                                <td>{reps}</td>
+                                                <td>{notes}</td>
+                                            </tr>
+                                        );
+                                    });
+                                })()}
+                            </tbody>
+                        </Table>
                     </li>
                 ))}
             </ul>
