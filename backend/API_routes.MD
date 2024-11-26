@@ -34,6 +34,13 @@ Success = [workout.to_dict()], 200 (success)
 Failure = {error: User not found}, 404 (not found)
 #TODO: Add failure for no workouts
 
+# Return single workout:
+
+GET request to /workouts/<user4_id>/<workout_id>
+
+Success = {workout: workout.to_dict()}, 200 (success)
+Failure = {"error": "Workout not found"}, 404 (not found)
+
 # Create workout:
 
 POST request to /workouts</user_id>

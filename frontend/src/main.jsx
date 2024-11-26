@@ -7,6 +7,7 @@ import { RegisterUser } from "./pages/Register/Register";
 import { Login } from "./pages/Login/Login";
 import { Dashboard } from "./pages/Dashboard/UserProfile";
 import { WorkoutsProvider } from "./context/WorkoutsContext";
+import { SpecificWorkout } from "./pages/WorkoutDetails/SpecificWorkout";
 
 
 const App = () => {
@@ -19,6 +20,7 @@ const App = () => {
         <Route path="/register" element={<RegisterUser/>} />
         <Route path='/login' element={<Login/>}/>
         <Route path='/profile' element={<Dashboard/>}/>
+        <Route path='/thisworkout' element={<SpecificWorkout/>}/>
         </Routes>
     </BrowserRouter>
 </div>

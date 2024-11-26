@@ -4,6 +4,7 @@ import GetWorkouts from "../../components/GetMyWorkouts";
 import CreateWorkout from "../../components/CreateWorkout";
 import AddExerciseToWorkout from "../../components/AddExerciseToWorkout";
 import AddDetailsToExercise from "../../components/AddDetailsToExercise";
+import IndividualWorkoutDetails from "../../components/IndividualWorkoutDetails";
 
 
 

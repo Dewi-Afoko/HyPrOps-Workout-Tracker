@@ -56,8 +56,15 @@ const GetWorkouts = ({ onRefresh }) => {
                             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
                         }}
                     >
-                        {`Workout ${index + 1}`}
-                        <br />
+                <h3
+                    style={{ cursor: "pointer", color: "red" }}
+                    onClick={() => {
+                        localStorage.setItem("workout_id", workout.id);
+                        alert(`Workout ID ${workout.id} set in localStorage!`);
+                    }}
+                >
+                    {`Workout ${index + 1}`}
+                </h3>
                         {`Created: ${workout.date}`}
                         <br />
                         <Table striped bordered hover>
@@ -83,7 +90,11 @@ const GetWorkouts = ({ onRefresh }) => {
 
                                         return (
                                             <tr key={`${index}-${exerciseIndex}`}>
-                                                <td>{exerciseName}</td>
+                                                <td                    style={{ cursor: "pointer", color: "red" }}
+                    onClick={() => {
+                        localStorage.setItem("exercise_name", exerciseName);
+                        alert(`Exercise: ${exerciseName} set in localStorage!`);
+                    }}>{exerciseName}</td>
                                                 <td>{loading}</td>
                                                 <td>{rest}</td>
                                                 <td>{reps}</td>

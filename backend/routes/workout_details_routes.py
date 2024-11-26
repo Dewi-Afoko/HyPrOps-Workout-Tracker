@@ -6,6 +6,17 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 workout_details_bp = Blueprint('workout_details_bp', __name__)
 
+@workout_details_bp.route('/workouts/<user_id>/<workout_id>', methods=['GET'])
+@jwt_required()
+def get_specific_workout(user_id, workout_id):
+    workout = Workout.objects(user_id=user_id, id=ObjectId(workout_id)).first()
+    if not workout:
+        return jsonify({"error": "Workout not found"}), 404
+    
+
+    return jsonify({"workout": workout.to_dict()}), 200
+
+
 @workout_details_bp.route('/workouts/<user_id>/<workout_id>/add_exercise', methods=['POST'])
 @jwt_required()
 def create_workout_exercise_info(user_id, workout_id):
