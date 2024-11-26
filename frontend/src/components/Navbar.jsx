@@ -23,7 +23,12 @@ const NavBar = () => {
         <ul className="navbar-nav">
             <li className="nav-item">
             <Link className="nav-link" to="/profile">
-                Dashboard
+                Profile
+            </Link>
+            </li>
+            <li className="nav-item">
+            <Link className="nav-link" to="/myworkouts">
+                My Workouts
             </Link>
             </li>
             <li className="nav-item">
