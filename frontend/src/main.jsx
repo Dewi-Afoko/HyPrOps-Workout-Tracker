@@ -8,13 +8,15 @@ import { Login } from "./pages/Login/Login";
 import { Dashboard } from "./pages/Dashboard/UserProfile";
 import { WorkoutsProvider } from "./context/WorkoutsContext";
 import { SpecificWorkout } from "./pages/WorkoutDetails/SpecificWorkout";
+import NavBar from "./components/Navbar";
 
 
 const App = () => {
     return (
         <div style={{ textAlign: "center", marginTop: "50px" }}>
                         <h1>HyPrOps Fullstack Workout App</h1>
-                <BrowserRouter>
+        <BrowserRouter>
+        <NavBar/>
         <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/register" element={<RegisterUser/>} />
@@ -28,7 +30,9 @@ const App = () => {
 };
 
 ReactDOM.createRoot(document.getElementById("root")).render(
+<React.StrictMode>
 <WorkoutsProvider>
 <App />
 </WorkoutsProvider>
+</React.StrictMode>
 );
