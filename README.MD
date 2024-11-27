@@ -1,50 +1,40 @@
 ## This isn't an actual read me, this is just so I can remember the last thing I did... 😅
 
+# **Where We're At...**
 
-## **Current task**
+- Workout components all functional
+    - Creation
+    - Adding exercises
+        - Adding details to exercises
+        - Marking exercise complete
+    - Marking workouts as complete
+    - Displaying all workouts
+        - Click through for detailed view
+        - This is where you add details/exercises
+    - Logic relies on onClick and localStorage to return/edit correct values
+        - localStorage set whenever exercise or workout clicked
+            - Also when you click into a field on the details component
 
-- Finalise workout display, creation and adding details
-    - What pages? All on the same?
-    - Click through for details?
+- State and Navigation added in some places, but not comprehensive
+    - Need to start removing alerts/console logs from debugging
 
-### **Started Creating Pages, Pivoted to Token Implementation**
+- Login and Registration complete
+    - Might want to re-issue tokens outside of during login
 
-- Landing and registration pages created
-    - Feature boxes outlining user functionality populated
-    - Styling needs correcting
+- Navbar added with all relevant paths
 
-- Backend JWT implementation started, but routes using it not created
-    - App.py updated
+# Known issues:
 
-### UPDATE:
+- Adding details to exercises not _quite_ right
+    - Currently "Bodyweight" is a visual placeholder on the frontend only
+        - Means adding more loading overwrites the first empty value, ie. replaces bodyweight with new loading
 
-- Backend routing for registration with hashed passwords implemented
-- Login backend/HTTP requests functional
-- Tokens awarded as they should be
-- All routes that should require tokens now do - and work with them
-- Signup page/component on frontend working
-    - Styling needs fixing as does post-registration behaviour
-- Login frontend functional
-    - Component complete
-    - Page complete
-    - token and user ID passed to localStorage
-- MVP workout page in progress, blended with profile page
-    - All workout details displayed
-        - Looks awful, but data readily available
-- Auth headers added to all relevant frontend components
-- Get Workouts component no longer a button, returns list
-    - Needs to be adapted to useState
+- Inconsistent styling
+    - Aesthetics are a mess, I know this, we'll get back to it later
 
-## NEXT UP:
+# Big decisions for next steps!
 
-- Add state where relevant
-- Figure out the add details component config and frontend logic
-
-
-## TODO:
-
-- Potentially sessions over localStorage?
-- useNavigate
-- Navbar
-
+- Live tracker or workout planner first?
+- When to add extra user data, ie. weight, etc.?
+- Kotlin frontend. When?
     
