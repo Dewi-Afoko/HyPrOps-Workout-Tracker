@@ -1,10 +1,22 @@
 from flask import Blueprint, request, jsonify
 from models.workout import Workout
 from models.workout_exercise_info import WorkoutExerciseInfo
+from models.user import User
 from bson import ObjectId
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 workout_details_bp = Blueprint('workout_details_bp', __name__)
+
+@workout_details_bp.route('/workouts/<user_id>/<workout_id>', methods=['GET'])
+@jwt_required()
+def get_specific_workout(user_id, workout_id):
+    workout = Workout.objects(user_id=user_id, id=ObjectId(workout_id)).first()
+    if not workout:
+        return jsonify({"error": "Workout not found"}), 404
+    
+
+    return jsonify({"workout": workout.to_dict()}), 200
+
 
 @workout_details_bp.route('/workouts/<user_id>/<workout_id>/add_exercise', methods=['POST'])
 @jwt_required()
@@ -34,13 +46,13 @@ def add_details_to_exercise_info(user_id, workout_id):
         response_payload = {}
         for entry in workout['exercise_list']:
             if data['exercise_name'] in entry['exercise_name']: # Exercise name required to identify where to add these values
-                if "reps" in data and data["reps"] > 0:
+                if "reps" in data and data["reps"] != None:
                     response_payload['reps'] = data['reps']
                     entry.add_set(data['reps'])
-                if 'loading' in data and data["loading"] > 0:
+                if 'loading' in data and data["loading"] != None:
                     response_payload['loading'] = data['loading']
                     entry.set_loading(data['loading'])
-                if 'rest' in data and data["rest"] > 0:
+                if 'rest' in data and data["rest"] != None:
                     response_payload['rest'] = data['rest']
                     entry.set_rest_period(data['rest'])
                 if 'notes' in data and len(data["notes"]) > 0:
@@ -92,3 +104,30 @@ def edit_details_in_exercise_info(user_id, workout_id):
         return jsonify(response), 400
     else:
         return jsonify(response), 200
+
+@workout_details_bp.route('/workouts/<user_id>/<workout_id>/<exercise_name>', methods=['PATCH'])
+@jwt_required()
+def complete_set(user_id, workout_id, exercise_name):
+    # Find the user
+    user = User.objects(id=user_id).first()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Find the workout
+    workout = Workout.objects(id=workout_id).first()
+    if not workout:
+        return jsonify({"error": "Workout not found"}), 404
+
+    # Find the exercise in the workout's exercise_list
+    exercise = next((ex for ex in workout.exercise_list if ex.exercise_name == exercise_name), None)
+    if not exercise:
+        return jsonify({"error": f"Exercise '{exercise_name}' not found in workout"}), 404
+
+    # Call the mark_complete method on the exercise
+    exercise.mark_complete()
+
+    # Save the workout document to persist changes to the exercise
+    workout.save()
+
+    return jsonify({"message": "Exercise status updated", "exercise": str(exercise.complete)}), 200
+

@@ -14,8 +14,12 @@ class Workout(Document): #TODO: Add notes for workout, add to __repr__ and to_di
         self.save()
 
     def mark_complete(self):
-        self.complete = True
-        self.save()
+        if self.complete == False:
+            self.complete = True
+            self.save()
+        elif self.complete == True:
+            self.complete = False
+            self.save()
 
     def __repr__(self): #TODO: Add complete, id and date to this function - fix tests for those criteria
         return f"Workout(user_id={self.user_id}, exercise_list={self.exercise_list})"

@@ -1,40 +1,60 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Table } from "react-bootstrap";
+import CompleteWorkout from "./MarkWorkoutComplete";
+import { useNavigate } from "react-router-dom";
 
-const GetWorkouts = () => {
-    const [myWorkouts, setMyWorkouts] = useState([]); // State to store the list of workouts
+const GetWorkouts = ({ onRefresh }) => {
+    const [myWorkouts, setMyWorkouts] = useState([]);
+    const navigate = useNavigate();
+
+    const fetchWorkouts = async () => {
+        const user_id = localStorage.getItem("user_id");
+        const token = localStorage.getItem("token");
+        if (!user_id || !token) {
+            alert("User ID or token not found in localStorage.");
+            return;
+        }
+        try {
+            const response = await axios.get(
+                `http://127.0.0.1:5000/workouts/${user_id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            setMyWorkouts(response.data);
+        } catch (error) {
+            console.error("Error making API call:", error);
+            alert("Failed to fetch data. Check console for details.");
+        }
+    };
 
     useEffect(() => {
-        const fetchWorkouts = async () => {
-            const user_id = localStorage.getItem("user_id");
-            const token = localStorage.getItem("token"); // Retrieve token from localStorage
-            if (!user_id || !token) {
-                alert("User ID or token not found in localStorage.");
-                return;
-            }
-            try {
-                const response = await axios.get(
-                    `http://127.0.0.1:5000/workouts/${user_id}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`, // Add token to Authorization header
-                        },
-                    }
-                );
-                setMyWorkouts(response.data); // Update state with the fetched workouts
-            } catch (error) {
-                console.error("Error making API call:", error);
-                alert("Failed to fetch data. Check console for details.");
-            }
-        };
+        fetchWorkouts();
+    }, []);
 
-        fetchWorkouts(); // Call the function on component mount
-    }, []); // Empty dependency array ensures it runs only once when the component mounts
+    useEffect(() => {
+        if (onRefresh) {
+            onRefresh(fetchWorkouts);
+        }
+    }, [onRefresh]);
+
+    const handleStatusChange = (workoutId, newCompleteStatus) => {
+        // Update the specific workout's status in myWorkouts state
+        setMyWorkouts((prevWorkouts) =>
+            prevWorkouts.map((workout) =>
+                workout.id === workoutId
+                    ? { ...workout, complete: newCompleteStatus }
+                    : workout
+            )
+        );
+    };
 
     return (
         <div style={{ textAlign: "center", marginTop: "20px" }}>
-            {/* Renders workoutList as numbered objects with creation date/time */}
             <ul style={{ listStyleType: "none", padding: 0, marginTop: "20px" }}>
                 {myWorkouts.map((workout, index) => (
                     <li
@@ -48,26 +68,68 @@ const GetWorkouts = () => {
                             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
                         }}
                     >
-                        {`Workout ${index + 1}`}
-                        <br />
+                        <h3
+                            style={{ cursor: "pointer", color: "red" }}
+                            onClick={() => {
+                                localStorage.setItem("workout_id", workout.id);
+                                navigate('/thisworkout');
+                            }}
+                        >
+                            {`Workout ${index + 1}`}
+                        </h3>
                         {`Created: ${workout.date}`}
                         <br />
-                        {/* Currently requires refresh to update; use state to fix this */}
-                        <ul style={{ listStyleType: "disc", paddingLeft: "20px", marginTop: "10px" }}>
-                            {workout.exercise_list.map((exercise, exerciseIndex) => (
-                                <li key={exerciseIndex}>{`${exerciseIndex + 1}: ${exercise.exercise_name}`}
-                                <br></br>
-                                {`Reps: ${exercise.reps}`}
-                                <br></br>
-                                {`Loading: ${exercise.loading}`}
-                                <br></br>
-                                {`Rest: ${exercise.rest}`}
-                                <br></br>
-                                {`Notes: ${exercise.performance_notes}`}
-                                </li>
-                                
-                            ))}
-                        </ul>
+                        {`Complete? ${workout.complete}`}
+                        <br />
+                        {/* Pass handleStatusChange as a prop to CompleteWorkout */}
+                        <CompleteWorkout
+                            workoutId={workout.id}
+                            initialComplete={workout.complete}
+                            onStatusChange={handleStatusChange}
+                        />
+                        <br />
+                        <Table striped bordered hover>
+                            <thead>
+                                <tr>
+                                    <th>Exercise</th>
+                                    <th>Loading</th>
+                                    <th>Rest Interval</th>
+                                    <th>Reps</th>
+                                    <th>Complete?</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {workout.exercise_list.map((exercise, exerciseIndex) => {
+                                    const exerciseName = exercise.exercise_name;
+                                    const loading = exercise.loading.join(", ");
+                                    const rest = exercise.rest.join(", ");
+                                    const reps = exercise.reps.join(", ");
+                                    const complete = exercise.complete.toString();
+                                    const notes = exercise.performance_notes.join(", ");
+
+                                    return (
+                                        <tr key={`${index}-${exerciseIndex}`}>
+                                            <td
+                                                style={{ cursor: "pointer", color: "red" }}
+                                                onClick={() => {
+                                                    localStorage.setItem("exercise_name", exerciseName);
+                                                    alert(`Exercise: ${exerciseName} set in localStorage!`);
+                                                    console.log(complete);
+                                                }}
+                                            >
+                                                {exerciseName}
+                                            </td>
+                                            <td>{loading}</td>
+                                            <td>{rest}</td>
+                                            <td>{reps}</td>
+                                            <td>{complete}</td>
+                                            <td>{notes}</td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </Table>
                     </li>
                 ))}
             </ul>

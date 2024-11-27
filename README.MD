@@ -1,6 +1,12 @@
 ## This isn't an actual read me, this is just so I can remember the last thing I did... 😅
 
 
+## **Current task**
+
+- Finalise workout display, creation and adding details
+    - What pages? All on the same?
+    - Click through for details?
+
 ### **Started Creating Pages, Pivoted to Token Implementation**
 
 - Landing and registration pages created

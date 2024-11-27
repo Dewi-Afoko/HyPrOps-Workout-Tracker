@@ -2,8 +2,10 @@ import React from "react";
 import axios from "axios";
 import Button from "react-bootstrap/Button";
 import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
+import { useNavigate } from "react-router-dom";
 
 const CreateWorkout = () => {
+    const navigate = useNavigate();
 
     const handleButtonClick = async () => {
         const user_id = localStorage.getItem('user_id');
@@ -25,6 +27,7 @@ const CreateWorkout = () => {
             );
             alert(`API Response: ${JSON.stringify(response.data)}`);
             localStorage.setItem('workout_id', response.data.workout_id); // Set workout's ID in localStorage
+            navigate('/thisworkout');
         } catch (error) {
             console.error("Error making API call:", error);
             alert("Failed to fetch data. Check console for details.");
