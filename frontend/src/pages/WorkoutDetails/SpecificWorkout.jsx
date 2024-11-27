@@ -8,8 +8,6 @@ export function SpecificWorkout() {
     return(
         <div>
         <IndividualWorkoutDetails/>
-        <AddExerciseToWorkout/>
-        <AddDetailsToExercise/>
         </div>
     )
 }

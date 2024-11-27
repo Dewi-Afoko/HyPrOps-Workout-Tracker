@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Table } from "react-bootstrap";
+import AddDetailsToExercise from "./AddDetailsToExercise";
+import AddExerciseToWorkout from "./AddExerciseToWorkout";
 
 const IndividualWorkoutDetails = () => {
     const [thisWorkout, setThisWorkout] = useState({
@@ -32,50 +34,70 @@ const IndividualWorkoutDetails = () => {
             console.error("Error making API call:", error);
             alert("Failed to fetch data. Check console for details.");
         }
-
     };
-    
+
     useEffect(() => {
         getThisWorkout();
     }, []);
 
-    return (
-<div>
-Workout ID: {thisWorkout.id}
-<Table striped bordered hover>
-    <thead>
-        <tr>
-            <th>Exercise</th>
-            <th>Set Number</th>
-            <th>Loading</th>
-            <th>Rest Interval</th>
-            <th>Reps</th>
-            <th>Complete?</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
-        {thisWorkout.exercise_list &&
-            thisWorkout.exercise_list.map((exercise, exerciseIndex) => {
-                // For each exercise, create rows for each item in the reps array
-                return exercise.reps.map((rep, repIndex) => {
-                    return (
-                        <tr key={`exercise-${exerciseIndex}-rep-${repIndex}`}>
-                            <td>{repIndex === 0 ? exercise.exercise_name : ''}</td> {/* Only show exercise name for the first row */}
-                            <td>{repIndex + 1}</td> {/* Set number starts from 1 */}
-                            <td>{exercise.loading[repIndex] || ''}</td>
-                            <td>{exercise.rest[repIndex] || ''}</td>
-                            <td>{rep}</td>
-                            <td>{exercise.complete}</td>
-                            <td>{exercise.performance_notes[repIndex] || ''}</td>
-                        </tr>
-                    );
-                });
-            })}
-    </tbody>
-</Table>
+    const handleNewExercise = async () => {
+        // Re-fetch the updated workout data to include the new exercise
+        await getThisWorkout();
+    };
 
-</div>
+    return (
+        <div>
+            <p>Workout ID: {thisWorkout.id}</p>
+            <AddExerciseToWorkout onNewExercise={handleNewExercise} />
+            {thisWorkout.exercise_list &&
+                thisWorkout.exercise_list.map((exercise, exerciseIndex) => (
+                    <div key={`exercise-table-${exerciseIndex}`} style={{ marginBottom: "20px" }}>
+                        <h4
+                            style={{ cursor: "pointer", color: "red" }}
+                            onClick={() => {
+                                localStorage.setItem("exercise_name", exercise.exercise_name);
+                                alert(`Exercise: ${exercise.exercise_name} set in localStorage!`);
+                            }}
+                        >
+                            {exercise.exercise_name}
+                        </h4>
+                        <Table striped bordered hover>
+                            <thead>
+                                <tr>
+                                    <th>Entry</th>
+                                    <th>Reps</th>
+                                    <th>Loading</th>
+                                    <th>Rest Interval</th>
+                                    <th>Complete?</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {(() => {
+                                    const maxLength = Math.max(
+                                        exercise.reps?.length || 0,
+                                        exercise.loading?.length || 0,
+                                        exercise.rest?.length || 0,
+                                        exercise.performance_notes?.length || 0
+                                    );
+
+                                    return Array.from({ length: maxLength }).map((_, index) => (
+                                        <tr key={`exercise-${exerciseIndex}-entry-${index}`}>
+                                            <td>{index + 1}</td>
+                                            <td>{exercise.reps?.[index] || ""}</td>
+                                            <td>{exercise.loading?.[index] || "Bodyweight"}</td>
+                                            <td>{exercise.rest?.[index] || ""}</td>
+                                            <td>{exercise.complete}</td>
+                                            <td>{exercise.performance_notes?.[index] || ""}</td>
+                                        </tr>
+                                    ));
+                                })()}
+                            </tbody>
+                        </Table>
+                        <AddDetailsToExercise exerciseName={exercise.exercise_name} onUpdate={getThisWorkout} />
+                    </div>
+                ))}
+        </div>
     );
 };
 
