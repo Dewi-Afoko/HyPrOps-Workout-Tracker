@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
+import "bootstrap/dist/css/bootstrap.min.css";
 import { Table } from "react-bootstrap";
+import CompleteWorkout from "./MarkWorkoutComplete";
 
 const GetWorkouts = ({ onRefresh }) => {
     const [myWorkouts, setMyWorkouts] = useState([]);
@@ -33,16 +34,25 @@ const GetWorkouts = ({ onRefresh }) => {
         fetchWorkouts();
     }, []);
 
-    // Optionally expose fetchWorkouts via props
     useEffect(() => {
         if (onRefresh) {
             onRefresh(fetchWorkouts);
         }
     }, [onRefresh]);
 
+    const handleStatusChange = (workoutId, newCompleteStatus) => {
+        // Update the specific workout's status in myWorkouts state
+        setMyWorkouts((prevWorkouts) =>
+            prevWorkouts.map((workout) =>
+                workout.id === workoutId
+                    ? { ...workout, complete: newCompleteStatus }
+                    : workout
+            )
+        );
+    };
+
     return (
         <div style={{ textAlign: "center", marginTop: "20px" }}>
-            {/* Renders workoutList as numbered objects with creation date/time */}
             <ul style={{ listStyleType: "none", padding: 0, marginTop: "20px" }}>
                 {myWorkouts.map((workout, index) => (
                     <li
@@ -56,16 +66,25 @@ const GetWorkouts = ({ onRefresh }) => {
                             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
                         }}
                     >
-                <h3
-                    style={{ cursor: "pointer", color: "red" }}
-                    onClick={() => {
-                        localStorage.setItem("workout_id", workout.id);
-                        alert(`Workout ID ${workout.id} set in localStorage!`);
-                    }}
-                >
-                    {`Workout ${index + 1}`}
-                </h3>
+                        <h3
+                            style={{ cursor: "pointer", color: "red" }}
+                            onClick={() => {
+                                localStorage.setItem("workout_id", workout.id);
+                                alert(`Workout ID ${workout.id} set in localStorage!`);
+                            }}
+                        >
+                            {`Workout ${index + 1}`}
+                        </h3>
                         {`Created: ${workout.date}`}
+                        <br />
+                        {`Complete? ${workout.complete}`}
+                        <br />
+                        {/* Pass handleStatusChange as a prop to CompleteWorkout */}
+                        <CompleteWorkout
+                            workoutId={workout.id}
+                            initialComplete={workout.complete}
+                            onStatusChange={handleStatusChange}
+                        />
                         <br />
                         <Table striped bordered hover>
                             <thead>
@@ -74,35 +93,39 @@ const GetWorkouts = ({ onRefresh }) => {
                                     <th>Loading</th>
                                     <th>Rest Interval</th>
                                     <th>Reps</th>
+                                    <th>Complete?</th>
                                     <th>Notes</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {(() => {
+                                {workout.exercise_list.map((exercise, exerciseIndex) => {
+                                    const exerciseName = exercise.exercise_name;
+                                    const loading = exercise.loading.join(", ");
+                                    const rest = exercise.rest.join(", ");
+                                    const reps = exercise.reps.join(", ");
+                                    const complete = exercise.complete.toString();
+                                    const notes = exercise.performance_notes.join(", ");
 
-
-                                    return workout.exercise_list.map((exercise, exerciseIndex) => {
-                                        const exerciseName = exercise.exercise_name;
-                                        const loading = exercise.loading.join(', ');
-                                        const rest = exercise.rest.join(', ');
-                                        const reps = exercise.reps.join(', ');
-                                        const notes = exercise.performance_notes.join(', ');
-
-                                        return (
-                                            <tr key={`${index}-${exerciseIndex}`}>
-                                                <td                    style={{ cursor: "pointer", color: "red" }}
-                    onClick={() => {
-                        localStorage.setItem("exercise_name", exerciseName);
-                        alert(`Exercise: ${exerciseName} set in localStorage!`);
-                    }}>{exerciseName}</td>
-                                                <td>{loading}</td>
-                                                <td>{rest}</td>
-                                                <td>{reps}</td>
-                                                <td>{notes}</td>
-                                            </tr>
-                                        );
-                                    });
-                                })()}
+                                    return (
+                                        <tr key={`${index}-${exerciseIndex}`}>
+                                            <td
+                                                style={{ cursor: "pointer", color: "red" }}
+                                                onClick={() => {
+                                                    localStorage.setItem("exercise_name", exerciseName);
+                                                    alert(`Exercise: ${exerciseName} set in localStorage!`);
+                                                    console.log(complete);
+                                                }}
+                                            >
+                                                {exerciseName}
+                                            </td>
+                                            <td>{loading}</td>
+                                            <td>{rest}</td>
+                                            <td>{reps}</td>
+                                            <td>{complete}</td>
+                                            <td>{notes}</td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </Table>
                     </li>
