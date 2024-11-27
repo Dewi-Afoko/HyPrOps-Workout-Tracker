@@ -1,6 +1,6 @@
-## This isn't an actual read me, this is just so I can remember the last thing I did... 😅
+# This isn't an actual read me, this is just so I can remember the last thing I did... 😅
 
-# **Where We're At...**
+## **Where We're At...**
 
 - Workout components all functional
     - Creation
@@ -23,7 +23,7 @@
 
 - Navbar added with all relevant paths
 
-# Known issues:
+## Known issues:
 
 - Adding details to exercises not _quite_ right
     - Currently "Bodyweight" is a visual placeholder on the frontend only
@@ -32,7 +32,7 @@
 - Inconsistent styling
     - Aesthetics are a mess, I know this, we'll get back to it later
 
-# Big decisions for next steps!
+## Big decisions for next steps!
 
 - Live tracker or workout planner first?
 - When to add extra user data, ie. weight, etc.?
