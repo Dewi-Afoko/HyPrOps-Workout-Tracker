@@ -66,7 +66,12 @@ class WorkoutExerciseInfo(EmbeddedDocument):
         
     
     def mark_complete(self):
-        self.complete = True
+        if self.complete == False:
+            self.complete = True
+ 
+        elif self.complete == True:
+            self.complete = False
+
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__

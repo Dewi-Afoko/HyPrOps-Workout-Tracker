@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from models.workout import Workout
 from models.workout_exercise_info import WorkoutExerciseInfo
+from models.user import User
 from bson import ObjectId
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -103,3 +104,30 @@ def edit_details_in_exercise_info(user_id, workout_id):
         return jsonify(response), 400
     else:
         return jsonify(response), 200
+
+@workout_details_bp.route('/workouts/<user_id>/<workout_id>/<exercise_name>', methods=['PATCH'])
+@jwt_required()
+def complete_set(user_id, workout_id, exercise_name):
+    # Find the user
+    user = User.objects(id=user_id).first()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Find the workout
+    workout = Workout.objects(id=workout_id).first()
+    if not workout:
+        return jsonify({"error": "Workout not found"}), 404
+
+    # Find the exercise in the workout's exercise_list
+    exercise = next((ex for ex in workout.exercise_list if ex.exercise_name == exercise_name), None)
+    if not exercise:
+        return jsonify({"error": f"Exercise '{exercise_name}' not found in workout"}), 404
+
+    # Call the mark_complete method on the exercise
+    exercise.mark_complete()
+
+    # Save the workout document to persist changes to the exercise
+    workout.save()
+
+    return jsonify({"message": "Exercise status updated", "exercise": str(exercise.complete)}), 200
+

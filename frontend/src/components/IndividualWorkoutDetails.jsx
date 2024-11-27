@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Table } from "react-bootstrap";
 import AddDetailsToExercise from "./AddDetailsToExercise";
 import AddExerciseToWorkout from "./AddExerciseToWorkout";
+import CompleteSet from "./MarkExerciseComplete";
 
 const IndividualWorkoutDetails = () => {
     const [thisWorkout, setThisWorkout] = useState({
@@ -41,8 +42,19 @@ const IndividualWorkoutDetails = () => {
     }, []);
 
     const handleNewExercise = async () => {
-        // Re-fetch the updated workout data to include the new exercise
         await getThisWorkout();
+    };
+
+    const handleCompleteStatusChange = (exerciseName, newCompleteStatus) => {
+        // Update the local state for the specific exercise
+        setThisWorkout((prevWorkout) => {
+            const updatedExerciseList = prevWorkout.exercise_list.map((exercise) =>
+                exercise.exercise_name === exerciseName
+                    ? { ...exercise, complete: newCompleteStatus }
+                    : exercise
+            );
+            return { ...prevWorkout, exercise_list: updatedExerciseList };
+        });
     };
 
     return (
@@ -61,6 +73,11 @@ const IndividualWorkoutDetails = () => {
                         >
                             {exercise.exercise_name}
                         </h4>
+                        <CompleteSet
+                            exerciseName={exercise.exercise_name}
+                            currentComplete={exercise.complete}
+                            onCompleteStatusChange={handleCompleteStatusChange}
+                        />
                         <Table striped bordered hover>
                             <thead>
                                 <tr>
@@ -87,7 +104,7 @@ const IndividualWorkoutDetails = () => {
                                             <td>{exercise.reps?.[index] || ""}</td>
                                             <td>{exercise.loading?.[index] || "Bodyweight"}</td>
                                             <td>{exercise.rest?.[index] || ""}</td>
-                                            <td>{exercise.complete}</td>
+                                            <td>{exercise.complete.toString()}</td>
                                             <td>{exercise.performance_notes?.[index] || ""}</td>
                                         </tr>
                                     ));

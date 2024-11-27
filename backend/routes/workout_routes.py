@@ -42,3 +42,4 @@ def complete_workout(user_id, workout_id):
     workout.mark_complete()
 
     return jsonify({"message": "completion status updated", "workout_id": str(workout.complete)}), 200
+
