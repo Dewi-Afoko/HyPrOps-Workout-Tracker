@@ -46,13 +46,13 @@ def add_details_to_exercise_info(user_id, workout_id):
         response_payload = {}
         for entry in workout['exercise_list']:
             if data['exercise_name'] in entry['exercise_name']: # Exercise name required to identify where to add these values
-                if "reps" in data and data["reps"] > 0:
+                if "reps" in data and data["reps"] != None:
                     response_payload['reps'] = data['reps']
                     entry.add_set(data['reps'])
-                if 'loading' in data and data["loading"] > 0:
+                if 'loading' in data and data["loading"] != None:
                     response_payload['loading'] = data['loading']
                     entry.set_loading(data['loading'])
-                if 'rest' in data and data["rest"] > 0:
+                if 'rest' in data and data["rest"] != None:
                     response_payload['rest'] = data['rest']
                     entry.set_rest_period(data['rest'])
                 if 'notes' in data and len(data["notes"]) > 0:

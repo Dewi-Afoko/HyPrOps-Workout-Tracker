@@ -3,9 +3,11 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Table } from "react-bootstrap";
 import CompleteWorkout from "./MarkWorkoutComplete";
+import { useNavigate } from "react-router-dom";
 
 const GetWorkouts = ({ onRefresh }) => {
     const [myWorkouts, setMyWorkouts] = useState([]);
+    const navigate = useNavigate();
 
     const fetchWorkouts = async () => {
         const user_id = localStorage.getItem("user_id");
@@ -70,7 +72,7 @@ const GetWorkouts = ({ onRefresh }) => {
                             style={{ cursor: "pointer", color: "red" }}
                             onClick={() => {
                                 localStorage.setItem("workout_id", workout.id);
-                                alert(`Workout ID ${workout.id} set in localStorage!`);
+                                navigate('/thisworkout');
                             }}
                         >
                             {`Workout ${index + 1}`}
