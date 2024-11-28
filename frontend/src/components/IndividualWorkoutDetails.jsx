@@ -6,6 +6,7 @@ import AddDetailsToExercise from "./AddDetailsToExercise";
 import AddExerciseToWorkout from "./AddExerciseToWorkout";
 import CompleteSet from "./MarkExerciseComplete";
 import DeleteDetails from "./DeleteExerciseDetails";
+import DeleteExercise from "./DeleteExerciseFromWorkout";
 
 const IndividualWorkoutDetails = () => {
     const [thisWorkout, setThisWorkout] = useState({
@@ -113,8 +114,11 @@ const IndividualWorkoutDetails = () => {
                                 alert(`Exercise: ${exercise.exercise_name} set in localStorage!`);
                             }}
                         >
-                            {exercise.exercise_name}
+                        {exercise.exercise_name}
                         </h4>
+                            <DeleteExercise exerciseName={exercise.exercise_name}
+    onDeleteSuccess={getThisWorkout}
+/>
                         <CompleteSet
                             exerciseName={exercise.exercise_name}
                             currentComplete={exercise.complete}
