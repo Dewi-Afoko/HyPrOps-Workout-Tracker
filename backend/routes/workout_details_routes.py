@@ -131,3 +131,63 @@ def complete_set(user_id, workout_id, exercise_name):
 
     return jsonify({"message": "Exercise status updated", "exercise": str(exercise.complete)}), 200
 
+@workout_details_bp.route('/workouts/<user_id>/<workout_id>/delete_details', methods=['DELETE'])
+@jwt_required()
+def delete_details_in_exercise_info(user_id, workout_id):
+    workout = Workout.objects(user_id=user_id, id=ObjectId(workout_id)).first()
+    if not workout:
+        return jsonify({"error": "Workout not found"}), 404
+
+    data = request.get_json()
+    exercise_name = data.get('exercise_name')
+
+    if not exercise_name:
+        return jsonify({"error": "Exercise name is required"}), 400
+
+    exercise_info = next((exercise for exercise in workout.exercise_list if exercise.exercise_name == exercise_name), None)
+
+    if not exercise_info:
+        return jsonify({"error": "Exercise not found"}), 404
+
+    # Debug: Ensure exercise_info is of the correct type
+    print(f"Type of exercise_info: {type(exercise_info)}")
+
+    # Ensure exercise_info is of type WorkoutExerciseInfo
+    if not isinstance(exercise_info, WorkoutExerciseInfo):
+        return jsonify({"error": "Invalid exercise information type"}), 400
+
+    payload = {}
+    for key in ['reps_index', 'loading_index', 'rest_index', 'performance_notes_index']:
+        if key in data:
+            if isinstance(data[key], list):
+                payload[key] = data[key]
+            else:
+                return jsonify({"error": f"{key} must be a list of indices"}), 400
+
+    response = exercise_info.delete_details(**payload)
+
+    if 'message' not in response or response['message'] != 'No valid details to delete or indices out of range':
+        workout.save()
+
+    if 'error' in response:
+        return jsonify(response), 400
+    elif 'message' in response and response['message'] == 'No valid details to delete or indices out of range':
+        return jsonify(response), 400
+    else:
+        return jsonify(response), 200
+
+
+@workout_details_bp.route('/workouts/<user_id>/<workout_id>/delete_exercise', methods=['DELETE'])
+@jwt_required()
+def delete_exercise(user_id, workout_id):
+    workout = Workout.objects(user_id=user_id, id=ObjectId(workout_id)).first()
+    if not workout:
+        return jsonify({"error": "Workout not found"}), 404
+
+    data = request.get_json()
+    if not data['exercise_name']:
+            return jsonify({"error": "Exercise not found,in request data"}), 418
+
+    details = WorkoutExerciseInfo(exercise_name=data['exercise_name'])
+    workout.delete_exercise(details)
+    return jsonify({"workout id": str(workout.id), "exercise deleted": str(details.exercise_name)}), 200
