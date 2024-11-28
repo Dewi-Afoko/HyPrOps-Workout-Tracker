@@ -90,3 +90,55 @@ class WorkoutExerciseInfo(EmbeddedDocument):
             "performance_notes": self.performance_notes,
             "complete": self.complete
         }
+    
+    def delete_details(self, reps_index=None,
+                    loading_index=None,
+                    rest_index=None,
+                    performance_notes_index=None):
+        response = {}
+
+        # Delete entries from reps
+        if reps_index is not None:
+            for index in sorted(reps_index, reverse=True):  # Sort indices in reverse to avoid shifting issues
+                if 0 <= index < len(self.reps):
+                    del self.reps[index]
+                else:
+                    response['reps_error'] = f"Index {index} out of range for reps"
+            if 'reps_error' not in response:
+                response['updated_reps'] = f"Indices {reps_index} deleted from reps"
+
+        # Delete entries from loading
+        if loading_index is not None:
+            for index in sorted(loading_index, reverse=True):
+                if 0 <= index < len(self.loading):
+                    del self.loading[index]
+                else:
+                    response['loading_error'] = f"Index {index} out of range for loading"
+            if 'loading_error' not in response:
+                response['updated_loading'] = f"Indices {loading_index} deleted from loading"
+
+        # Delete entries from rest
+        if rest_index is not None:
+            for index in sorted(rest_index, reverse=True):
+                if 0 <= index < len(self.rest):
+                    del self.rest[index]
+                else:
+                    response['rest_error'] = f"Index {index} out of range for rest"
+            if 'rest_error' not in response:
+                response['updated_rest'] = f"Indices {rest_index} deleted from rest"
+
+        # Delete entries from performance_notes
+        if performance_notes_index is not None:
+            for index in sorted(performance_notes_index, reverse=True):
+                if 0 <= index < len(self.performance_notes):
+                    del self.performance_notes[index]
+                else:
+                    response['performance_notes_error'] = f"Index {index} out of range for performance notes"
+            if 'performance_notes_error' not in response:
+                response['updated_performance_notes'] = f"Indices {performance_notes_index} deleted from performance notes"
+
+        # If no updates were made
+        if not response:
+            response['message'] = 'No valid details to delete or indices out of range'
+
+        return response

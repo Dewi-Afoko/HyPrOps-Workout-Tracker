@@ -99,6 +99,23 @@ Success = {
     updated_rest: rest[rest_index] = rest_value,
     updated_performance_notes: performance_notes[performance_notes_index] = performance_notes_value}, 200 (success)
 
+# Delete details in nested exercise
+
+DELETE request to /workouts/<user_id>/<workout_id>/delete_details
+
+Body = {reps_index: reps_index,
+        loading_index: loading_index,
+        rest_index: rest_index,
+        performance_notes_index: performance_notes_index,
+        }
+Failures =  {message: No details to delete provided or indices out of range}, 400 (bad request)
+            {message: $field_value_array[index] out of range for $field}, 400 (bad request)
+Success = {
+    updated_reps: reps_array[reps_index] = deleted,
+    updated_loading: loading_array[loading_index] = deleted,
+    updated_rest: rest_array[rest_index] = deleted,
+    updated_performance_notes: performance_notes_array[performance_notes_index] = deleted}, 200 (success)
+
 # Misc Auth Functions
 
 GET request to /token/token_check

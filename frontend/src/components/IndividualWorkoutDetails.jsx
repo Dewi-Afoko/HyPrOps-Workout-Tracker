@@ -5,11 +5,14 @@ import { Table } from "react-bootstrap";
 import AddDetailsToExercise from "./AddDetailsToExercise";
 import AddExerciseToWorkout from "./AddExerciseToWorkout";
 import CompleteSet from "./MarkExerciseComplete";
+import DeleteDetails from "./DeleteExerciseDetails";
 
 const IndividualWorkoutDetails = () => {
     const [thisWorkout, setThisWorkout] = useState({
         exercise_list: [],
     });
+
+    const [selectedData, setSelectedData] = useState({}); // Tracks selected data for each exercise
 
     const getThisWorkout = async () => {
         const token = localStorage.getItem("token");
@@ -37,24 +40,63 @@ const IndividualWorkoutDetails = () => {
         }
     };
 
-    useEffect(() => {
-        getThisWorkout();
-    }, []);
-
     const handleNewExercise = async () => {
         await getThisWorkout();
     };
 
-    const handleCompleteStatusChange = (exerciseName, newCompleteStatus) => {
-        // Update the local state for the specific exercise
-        setThisWorkout((prevWorkout) => {
-            const updatedExerciseList = prevWorkout.exercise_list.map((exercise) =>
-                exercise.exercise_name === exerciseName
-                    ? { ...exercise, complete: newCompleteStatus }
-                    : exercise
+    useEffect(() => {
+        getThisWorkout();
+    }, []);
+
+    const isSelected = (exerciseName, column, valueIndex) => {
+        const localStorageKey = `payload_${exerciseName}`;
+        const existingPayload = JSON.parse(localStorage.getItem(localStorageKey)) || {};
+        return Array.isArray(existingPayload[column]) && existingPayload[column].includes(valueIndex);
+    };
+    
+
+    const handleButtonClick = (exerciseName, column, valueIndex) => {
+        const localStorageKey = `payload_${exerciseName}`;
+        const existingPayload = JSON.parse(localStorage.getItem(localStorageKey)) || { exercise_name: exerciseName };
+    
+        if (!Array.isArray(existingPayload[column])) {
+            existingPayload[column] = [];
+        }
+    
+        const columnData = existingPayload[column];
+    
+        if (columnData.includes(valueIndex)) {
+            existingPayload[column] = columnData.filter((index) => index !== valueIndex);
+        } else {
+            columnData.push(valueIndex);
+        }
+    
+        if (Object.keys(existingPayload).length === 1 && existingPayload.exercise_name) {
+            localStorage.removeItem(localStorageKey);
+        } else {
+            localStorage.setItem(localStorageKey, JSON.stringify(existingPayload));
+        }
+    
+        // Update the selectedData state to match the new localStorage
+        setSelectedData((prev) => ({ ...prev }));
+    };
+    
+
+    const renderButton = (data, exerciseName, column, index) => {
+        if (data && data[index] !== undefined) {
+            return (
+                <button
+                    className={`btn btn-sm ${
+                        isSelected(exerciseName, column, index) ? "btn-success" : "btn-primary"
+                    }`}
+                    style={{ marginLeft: "10px" }}
+                    onClick={() => handleButtonClick(exerciseName, column, index)}
+                >
+                    {isSelected(exerciseName, column, index) ? "Selected" : "Select"}
+                </button>
             );
-            return { ...prevWorkout, exercise_list: updatedExerciseList };
-        });
+        }
+        return null; // Do not render the button if the data is invalid
     };
 
     return (
@@ -76,8 +118,12 @@ const IndividualWorkoutDetails = () => {
                         <CompleteSet
                             exerciseName={exercise.exercise_name}
                             currentComplete={exercise.complete}
-                            onCompleteStatusChange={handleCompleteStatusChange}
+                            onCompleteStatusChange={() => getThisWorkout()}
                         />
+<DeleteDetails
+    exerciseName={exercise.exercise_name}
+    onDeleteSuccess={getThisWorkout}
+/>
                         <Table striped bordered hover>
                             <thead>
                                 <tr>
@@ -87,6 +133,7 @@ const IndividualWorkoutDetails = () => {
                                     <th>Rest Interval</th>
                                     <th>Complete?</th>
                                     <th>Notes</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -101,11 +148,33 @@ const IndividualWorkoutDetails = () => {
                                     return Array.from({ length: maxLength }).map((_, index) => (
                                         <tr key={`exercise-${exerciseIndex}-entry-${index}`}>
                                             <td>{index + 1}</td>
-                                            <td>{exercise.reps?.[index] || ""}</td>
-                                            <td>{exercise.loading?.[index] || "Bodyweight"}</td>
-                                            <td>{exercise.rest?.[index] || ""}</td>
+                                            <td>
+                                                {exercise.reps?.[index] || ""}
+                                                {renderButton(exercise.reps, exercise.exercise_name, "reps_index", index)}
+                                            </td>
+                                            <td>
+                                                {exercise.loading?.[index] || "Bodyweight"}
+                                                {renderButton(
+                                                    exercise.loading,
+                                                    exercise.exercise_name,
+                                                    "loading_index",
+                                                    index
+                                                )}
+                                            </td>
+                                            <td>
+                                                {exercise.rest?.[index] || ""}
+                                                {renderButton(exercise.rest, exercise.exercise_name, "rest_index", index)}
+                                            </td>
                                             <td>{exercise.complete.toString()}</td>
-                                            <td>{exercise.performance_notes?.[index] || ""}</td>
+                                            <td>
+                                                {exercise.performance_notes?.[index] || ""}
+                                                {renderButton(
+                                                    exercise.performance_notes,
+                                                    exercise.exercise_name,
+                                                    "performance_notes_index",
+                                                    index
+                                                )}
+                                            </td>
                                         </tr>
                                     ));
                                 })()}
