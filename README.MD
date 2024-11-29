@@ -15,6 +15,10 @@
         - localStorage set whenever exercise or workout clicked
             - Also when you click into a field on the details component
 
+- Split view for individual workout with exercise tables in complete/incomplete columns
+
+- Deletion of all details (individually or collectively) and exercises possible
+
 - State and Navigation added in some places, but not comprehensive
     - Need to start removing alerts/console logs from debugging
 
@@ -26,8 +30,14 @@
 ## Known issues:
 
 - Adding details to exercises not _quite_ right
-    - Currently "Bodyweight" is a visual placeholder on the frontend only
+    - ~~Currently "Bodyweight" is a visual placeholder on the frontend only~~ Zero is zero!
         - Means adding more loading overwrites the first empty value, ie. replaces bodyweight with new loading
+            - This logic is still a problem
+                - Potentially looking at a redesign of data structures of workouts
+                - Want to be able to mark a set as complete.
+
+- Deleting fields doesn't always have intended effect, depending on length of other arrays
+    - Solve with nested dictionaries?
 
 - Inconsistent styling
     - Aesthetics are a mess, I know this, we'll get back to it later
