@@ -153,7 +153,7 @@ const SplitIndividualWorkoutDetails = () => {
                                             {renderButton(exercise.reps, exercise.exercise_name, "reps_index", index)}
                                         </td>
                                         <td>
-                                            {exercise.loading?.[index] || "Bodyweight"}
+                                            {exercise.loading?.[index] || ""}
                                             {renderButton(
                                                 exercise.loading,
                                                 exercise.exercise_name,
