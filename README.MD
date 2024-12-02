@@ -1,5 +1,9 @@
 # This isn't an actual read me, this is just so I can remember the last thing I did... 😅
 
+### Update:
+So after getting everything up and running and using it to track one of my workouts, I've realised I don't like the data structures, etc. that I started out with – so I'm rebuilding... Basically everything as a result. When this message disappears, I've merged the changes to the main branch.
+
+
 ## **Where We're At...**
 
 - Workout components all functional
