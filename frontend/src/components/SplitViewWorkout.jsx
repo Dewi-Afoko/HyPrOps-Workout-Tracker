@@ -133,7 +133,6 @@ const SplitIndividualWorkoutDetails = () => {
                                 <th>Rest Interval</th>
                                 <th>Complete?</th>
                                 <th>Notes</th>
-                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -180,7 +179,9 @@ const SplitIndividualWorkoutDetails = () => {
                             })()}
                         </tbody>
                     </Table>
-                    <AddDetailsToExercise exerciseName={exercise.exercise_name} onUpdate={getThisWorkout} />
+                    {!exercise.complete && (
+    <AddDetailsToExercise exerciseName={exercise.exercise_name} onUpdate={getThisWorkout} />
+)}
                 </div>
             ))}
         </div>

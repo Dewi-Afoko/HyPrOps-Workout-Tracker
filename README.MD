@@ -27,6 +27,29 @@
 
 - Navbar added with all relevant paths
 
+## Backend data structure redesign!
+
+- Adding reps should add a set which adds a dictionary to a list of exercise details.
+    - Each dictionary should have each field available that details does.
+    - Should allow for no value
+    - Add "Set type", ie. Drop set, super set, pyramid set, warm up, finisher, normal/working, etc.
+- Benefits:
+    - Keeps info about a set/entry together
+    - Allows for marking a set complete
+    - Creates functionality for live tracker being useful
+
+- Should sets and breaks be separate dictionaries?
+    - Can visually represent rest times/periods more accurately
+    - Can have notes made during break and sets
+    - Makes logic slightly more complex
+        - Unsure this is a bad thing
+    - Thoughts/feeling between sets, exhaustion level, suggestions, etc.
+
+- Workouts can have names
+    - How do we display workout overviews?
+    - Changes needed in the model? Or just in React/JS components?
+
+
 ## Known issues:
 
 - Adding details to exercises not _quite_ right
