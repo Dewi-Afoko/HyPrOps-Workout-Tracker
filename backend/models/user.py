@@ -1,10 +1,13 @@
-from mongoengine import Document, StringField, ListField
+from mongoengine import Document, StringField, ListField, EmbeddedDocumentField
 from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(Document):
     username = StringField(required=True, unique=True)
     password = StringField(required=True)  # Stores hashed password
     workout_list = ListField()
+    personal_data = EmbeddedDocumentField()
+
+    #TODO: Create personal_data for weight, height, age/dob, potentially name, location, etc.
 
     def save(self, *args, **kwargs):
         # Check if the password is already hashed
