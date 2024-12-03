@@ -7,9 +7,8 @@ from xprocess import ProcessStarter
 from flask_jwt_extended import create_access_token
 from lib.database_connection import initialize_db, close_db
 from app import create_app
-from models.user import User
-from models.workout import Workout
-from models.workout_exercise_info import WorkoutExerciseInfo
+# from models.user import User
+# from models.workout import Workout
 from mongoengine import connect, disconnect
 
 
@@ -35,16 +34,6 @@ def web_client(app):
     with app.test_client() as client:
         yield client
 
-@pytest.fixture(autouse=True)
-def clean_database(app):
-    """Clean the test database before each test."""
-    with app.app_context():
-        print("Cleaning database...")  # Debugging output
-        for model in [User, Workout, WorkoutExerciseInfo]:
-            if hasattr(model, "objects"):
-                print(f"Clearing data for {model.__name__}")  # Debugging output
-                model.objects.delete()
-
 
 @pytest.fixture
 def auth_token(app, sample_user):
@@ -52,56 +41,6 @@ def auth_token(app, sample_user):
     with app.app_context():  # Use the session-scoped app fixture
         token = create_access_token(identity=sample_user.username)
         return token
-
-
-@pytest.fixture
-def sample_user():
-    """Create a sample user for testing."""
-    user = User(username="testuser", password="plainpassword")  # Plain text password
-    user.save()  # Password will be hashed during save()
-    yield user
-    user.delete()
-
-
-@pytest.fixture
-def sample_workout(sample_user):
-    """Create a sample workout for the sample user."""
-    workout = Workout(user_id=sample_user.id)
-    workout.save()
-    yield workout
-    workout.delete()
-
-
-@pytest.fixture
-def sample_workout_with_exercise(sample_user):
-    """Create a sample workout with an exercise for the sample user."""
-    workout = Workout(user_id=sample_user.id)
-    exercise_info = WorkoutExerciseInfo(
-        exercise_name="Push-ups",
-        reps=[10, 12],
-        performance_notes=["Good form"]
-    )
-    workout.exercise_list.append(exercise_info)
-    workout.save()
-    yield workout
-    workout.delete()
-
-
-@pytest.fixture
-def sample_user_with_workout():
-    """Create a sample user with a linked workout."""
-    user = User(username="testuser", password="hashedpassword")
-    user.save()
-
-    workout = Workout(user_id=user.id)
-    workout.save()
-
-    user.workout_list.append(workout)
-    user.save()
-
-    yield user
-    user.delete()
-    workout.delete()
 
 
 @pytest.fixture(scope="session", autouse=True)

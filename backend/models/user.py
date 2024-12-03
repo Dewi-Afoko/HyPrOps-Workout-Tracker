@@ -4,8 +4,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 class User(Document):
     username = StringField(required=True, unique=True)
     password = StringField(required=True)  # Stores hashed password
-    workout_list = ListField()
-    personal_data = EmbeddedDocumentField()
+    workout_list = ListField(required=False)
+    personal_data = EmbeddedDocumentField(required=False)
 
     #TODO: Create personal_data for weight, height, age/dob, potentially name, location, etc.
 
