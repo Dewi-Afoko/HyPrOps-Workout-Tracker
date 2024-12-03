@@ -1,13 +1,13 @@
 from mongoengine import Document, StringField, ListField, ReferenceField, BooleanField, EmbeddedDocument, IntField, FloatField
 
 class SetDicts(EmbeddedDocument):
-    set_order = IntField()
+    set_order = IntField() # Total sets of all exercises in performance order
     exercise_name = StringField(required=True)
-    set_number = IntField() #TODO: Check how we can make this indicate the number of SetDicts with this exercise name - len(some_function(exercise_name))...?
-    set_type = StringField()
+    set_number = IntField() # This should be a count of how many sets for each exercise
+    set_type = StringField() # Warm up, working/normal, dropset, superset, partials, 21s, finisher, etc.
     reps = IntField()
     loading = FloatField()
-    focus = StringField()
+    focus = StringField() # Max load, form, ROM, patterning movement
     rest = FloatField()
     notes = StringField()
-    complete = BooleanField()
+    complete = BooleanField() # Has the set been performed
