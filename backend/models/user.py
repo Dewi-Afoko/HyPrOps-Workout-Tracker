@@ -5,7 +5,7 @@ from models.workout import Workout
 
 class User(Document):
     username = StringField(required=True, unique=True)
-    password = StringField(required=True)  # Hash this
+    _password = StringField(required=True)  #TODO: Hash this
     workout_list = EmbeddedDocumentListField(Workout)
     personal_data = EmbeddedDocumentField(PersonalData)
 
