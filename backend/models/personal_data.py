@@ -1,6 +1,6 @@
 from mongoengine import EmbeddedDocument, StringField, DateField, FloatField
 
-class PersonalData(EmbeddedeDocument):
+class PersonalData(EmbeddedDocument):
     name = StringField()
     dob = DateField()
     height = FloatField()
