@@ -7,9 +7,11 @@ class Workout(Document):
     workout_name = StringField()
     date = DateTimeField(default=datetime.now)
     complete = BooleanField(default=False)
-    set_list = ListField(EmbeddedDocumentField(), default=list)
+    set_dicts_list = ListField(EmbeddedDocumentField(), default=list)
+    user_stats = EmbeddedDocumentField()
+    notes = ListField(StringField(), default=list)
     
-#TODO: Create the logic for this blueprint to follow
+#TODO: Create the logic for this blueprint to follow - user_stats is height, weight, sleep, etc.
 
     def toggle_complete(self):
         if self.complete == False:
