@@ -1,3 +1,5 @@
 from .workout import Workout
-from .workout_exercise_info import WorkoutExerciseInfo
+from .user_stats import UserStats
 from .user import User
+from .personal_data import PersonalData
+from .set_dicts import SetDicts
