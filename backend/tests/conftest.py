@@ -7,9 +7,16 @@ from xprocess import ProcessStarter
 from flask_jwt_extended import create_access_token
 from lib.database_connection import initialize_db, close_db
 from app import create_app
-# from models.user import User
-# from models.workout import Workout
+from models.user import User
+from models.workout import Workout
+from models.personal_data import PersonalData
 from mongoengine import connect, disconnect
+from dotenv import load_dotenv
+from datetime import datetime
+
+load_dotenv()
+
+test_password = os.getenv("TEST_PASSWORD")
 
 
 
@@ -84,3 +91,26 @@ def empty_auth_token(app):
     with app.app_context():
         token = create_access_token(identity="nonexistent_user")
         return token
+
+@pytest.fixture(autouse=True)
+def clear_db():
+    User.objects.delete()
+
+
+@pytest.fixture
+def spoofed_user():
+    spoofed_user = User(username="Test", password=test_password)
+    spoofed_user.hash_password()
+    spoofed_user.save()
+    yield spoofed_user
+
+@pytest.fixture
+def spoofed_empty_workout(spoofed_user):
+    new_workout = Workout(user_id=spoofed_user.id, workout_name="First Try")
+    spoofed_user.save()
+    yield new_workout
+
+@pytest.fixture
+def spoofed_personal_data():
+    new_data = PersonalData(name="Burrito", dob=datetime(2021, 11, 12), height=25, weight=25)
+    yield new_data
