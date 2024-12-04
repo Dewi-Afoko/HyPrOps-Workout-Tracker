@@ -13,11 +13,11 @@ class User(Document):
         self.password = generate_password_hash(self.password)
         self.save()
 
-    def add_workout(self, workout):
+    def add_workout(self, workout): # Workout object
         self.workout_list.append(workout)
         self.save()
 
-    def add_personal_data(self, personal_data):
+    def add_personal_data(self, personal_data): # PersonalData object
         self.personal_data = personal_data
 
     def to_dict(self):

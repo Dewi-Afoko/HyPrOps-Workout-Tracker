@@ -15,6 +15,21 @@ class Workout(EmbeddedDocument):
     user_stats = EmbeddedDocumentField(UserStats)
     notes = ListField(StringField(), default=list)
 
+    def add_set_dict(self, set_dict): # SetDict object
+        self.set_dicts_list.append(set_dict)
+
+    def toggle_complete(self):
+        if self.complete == False:
+            self.complete = True
+        elif self.complete == True:
+            self.complete = False
+
+    def add_stats(self, user_stats): # UserStats object
+        self.user_stats = user_stats
+
+    def add_notes(self, notes): # notes is a string
+        self.notes.append(notes)
+
     def to_dict(self):
         workout_id = str(self.id)
         user_id = str(self.user_id.id)

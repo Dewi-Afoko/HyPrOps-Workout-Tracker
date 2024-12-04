@@ -15,3 +15,14 @@ def test_personal_data_creation():
     assert new_data.dob == 11-12-2023
     assert new_data.weight == 25
     assert new_data.height == 25
+
+def test_update_personal_data(spoofed_personal_data):
+    assert spoofed_personal_data.name == "Burrito"
+    assert spoofed_personal_data.dob.strftime('%Y/%m/%d') == "2021/11/12"
+    assert spoofed_personal_data.weight == 25
+    assert spoofed_personal_data.height == 25
+    spoofed_personal_data.update_personal_details("Zan Ji", None, 23, 20)
+    assert spoofed_personal_data.name == "Zan Ji"
+    assert spoofed_personal_data.dob.strftime('%Y/%m/%d') == "2021/11/12"
+    assert spoofed_personal_data.weight == 20
+    assert spoofed_personal_data.height == 23

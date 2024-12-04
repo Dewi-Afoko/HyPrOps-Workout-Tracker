@@ -14,3 +14,14 @@ class PersonalData(EmbeddedDocument):
             'height': self.height,
             'weight': self.weight,
         }
+    
+    def update_personal_details(self, name=None, dob=None, height=None, weight=None):
+        if name != None:
+            self.name = name
+        if dob != None:
+            self.dob = dob
+        if height != None:
+            self.height = height
+        if weight != None: # If this is accessed, we need to update UserStats
+            self.weight = weight
+        
