@@ -9,6 +9,7 @@ from lib.database_connection import initialize_db, close_db
 from app import create_app
 from models.user import User
 from models.workout import Workout
+from models.user_stats import UserStats
 from models.personal_data import PersonalData
 from mongoengine import connect, disconnect
 from dotenv import load_dotenv
@@ -114,3 +115,13 @@ def spoofed_empty_workout(spoofed_user):
 def spoofed_personal_data():
     new_data = PersonalData(name="Burrito", dob=datetime(2021, 11, 12), height=25, weight=25)
     yield new_data
+
+@pytest.fixture
+def spoofed_personal_data_2():
+    new_data = PersonalData(name="Burrito", dob=datetime(2021, 11, 12), height=25, weight=250)
+    yield new_data
+
+@pytest.fixture
+def spoofed_user_stats(spoofed_personal_data):
+        stats = UserStats(weight=spoofed_personal_data, sleep_score=80, sleep_quality="Great", notes="Ready to start!")
+        yield stats
