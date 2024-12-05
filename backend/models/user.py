@@ -17,8 +17,17 @@ class User(Document):
         self.workout_list.append(workout)
         self.save()
 
+    def delete_workout(self, workout):
+        self.workout_list.remove(workout)
+        self.save()
+
     def add_personal_data(self, personal_data): # PersonalData object
         self.personal_data = personal_data
+        self.save()
+
+    def delete_personal_data(self):
+        self.personal_data = None
+        self.save()
 
     def to_dict(self):
         return {
@@ -28,6 +37,9 @@ class User(Document):
             'personal_data' : str(self.personal_data),
         }
 
+    def update_password(self, password):
+        self.password = generate_password_hash(password)
+        self.save()
 
 
     

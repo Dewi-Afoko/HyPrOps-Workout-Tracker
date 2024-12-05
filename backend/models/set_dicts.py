@@ -20,3 +20,6 @@ class SetDicts(EmbeddedDocument):
 
     def add_notes(self, notes):
         self.notes = notes
+
+    def delete_notes(self):
+        self.notes = None

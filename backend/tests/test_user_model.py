@@ -41,3 +41,20 @@ def test_to_dict_with_all_properties(spoofed_user, spoofed_personal_data, spoofe
             'workout_list' : spoofed_user.workout_list,
             'personal_data' : str(spoofed_user.personal_data),
         }
+
+def test_update_password(spoofed_user):
+    spoofed_user.update_password('newPassWord')
+    assert check_password_hash(spoofed_user.password, 'newPassWord') == True
+
+def test_delete_workout(spoofed_user, spoofed_empty_workout):
+    spoofed_user.add_workout(spoofed_empty_workout)
+    spoofed_user.add_workout(spoofed_empty_workout)
+    assert spoofed_user.workout_list == [spoofed_empty_workout, spoofed_empty_workout]
+    spoofed_user.delete_workout(spoofed_empty_workout)
+    assert spoofed_user.workout_list == [spoofed_empty_workout]
+
+def test_deleting_personal_data(spoofed_user, spoofed_personal_data):
+    spoofed_user.add_personal_data(spoofed_personal_data)
+    assert spoofed_user.personal_data == spoofed_personal_data
+    spoofed_user.delete_personal_data()
+    assert spoofed_user.personal_data == None

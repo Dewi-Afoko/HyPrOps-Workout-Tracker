@@ -18,6 +18,9 @@ class Workout(EmbeddedDocument):
     def add_set_dict(self, set_dict): # SetDict object
         self.set_dicts_list.append(set_dict)
 
+    def delete_set_dict(self, set_dict):
+        self.set_dicts_list.remove(set_dict)
+
     def toggle_complete(self):
         if self.complete == False:
             self.complete = True
@@ -29,6 +32,9 @@ class Workout(EmbeddedDocument):
 
     def add_notes(self, notes): # notes is a string
         self.notes.append(notes)
+
+    def delete_note(self, note_index):
+        del self.notes[note_index]
 
     def to_dict(self):
         workout_id = str(self.id)

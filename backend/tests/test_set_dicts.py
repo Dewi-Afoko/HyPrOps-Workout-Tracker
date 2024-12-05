@@ -36,3 +36,9 @@ def test_toggle_complete_twice(spoof_arnold_press_dict):
 def test_add_notes(spoof_arnold_press_dict):
     spoof_arnold_press_dict.add_notes("Let's go!")
     assert spoof_arnold_press_dict.notes == "Let's go!"
+
+def test_delete_notes(spoof_arnold_press_dict):
+    spoof_arnold_press_dict.add_notes("Let's go!")
+    assert spoof_arnold_press_dict.notes == "Let's go!"
+    spoof_arnold_press_dict.delete_notes()
+    assert spoof_arnold_press_dict.notes == None

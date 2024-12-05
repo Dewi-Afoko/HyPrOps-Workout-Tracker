@@ -70,3 +70,21 @@ def test_to_dict_method(spoofed_empty_workout, spoofed_user_stats, spoof_arnold_
             "user_stats": spoofed_empty_workout.user_stats,
             "notes": spoofed_empty_workout.notes,
         }
+    
+def test_delete_set_dict(spoofed_empty_workout, spoof_arnold_press_dict):
+    spoofed_empty_workout.add_set_dict(spoof_arnold_press_dict)
+    spoofed_empty_workout.add_set_dict(spoof_arnold_press_dict)
+    assert spoofed_empty_workout.set_dicts_list == [spoof_arnold_press_dict, spoof_arnold_press_dict]
+    spoofed_empty_workout.delete_set_dict(spoof_arnold_press_dict)
+    assert spoofed_empty_workout.set_dicts_list == [spoof_arnold_press_dict]
+
+def test_delete_workout_notes(spoofed_empty_workout):
+    note_1 = "Feel pretty good..."
+    note_2 = "Feel pretty mid..."
+    note_3 = "Feel pretty bad..."
+    spoofed_empty_workout.add_notes(note_1)
+    spoofed_empty_workout.add_notes(note_2)
+    spoofed_empty_workout.add_notes(note_3)
+    spoofed_empty_workout.delete_note(0)
+    spoofed_empty_workout.delete_note(-1)
+    assert spoofed_empty_workout.notes == ["Feel pretty mid..."]
