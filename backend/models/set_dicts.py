@@ -10,4 +10,13 @@ class SetDicts(EmbeddedDocument):
     focus = StringField() # Max load, form, ROM, patterning movement
     rest = FloatField()
     notes = StringField()
-    complete = BooleanField() # Has the set been performed
+    complete = BooleanField(default=False) # Has the set been performed
+
+    def toggle_complete(self):
+        if self.complete == False:
+            self.complete = True
+        elif self.complete == True:
+            self.complete = False
+
+    def add_notes(self, notes):
+        self.notes = notes

@@ -10,6 +10,7 @@ from app import create_app
 from models.user import User
 from models.workout import Workout
 from models.user_stats import UserStats
+from models.set_dicts import SetDicts
 from models.personal_data import PersonalData
 from mongoengine import connect, disconnect
 from dotenv import load_dotenv
@@ -125,3 +126,8 @@ def spoofed_personal_data_2():
 def spoofed_user_stats(spoofed_personal_data):
         stats = UserStats(weight=spoofed_personal_data, sleep_score=80, sleep_quality="Great", notes="Ready to start!")
         yield stats
+
+@pytest.fixture
+def spoof_arnold_press_dict():
+        set_dict = SetDicts(set_order=1, exercise_name="Arnold Press", set_number=1, set_type="Working", reps=10, loading=20, focus="Form", rest=60, notes="Good form and tempo")
+        yield set_dict

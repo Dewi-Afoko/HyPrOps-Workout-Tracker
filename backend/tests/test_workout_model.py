@@ -46,3 +46,27 @@ def test_add_workout_notes(spoofed_empty_workout):
     note = "Feel pretty good..."
     spoofed_empty_workout.add_notes(note)
     assert spoofed_empty_workout.notes == ["Feel pretty good..."]
+
+def test_adding_sets_dict_object(spoofed_empty_workout, spoof_arnold_press_dict):
+    spoofed_empty_workout.add_set_dict(spoof_arnold_press_dict)
+    assert spoofed_empty_workout.set_dicts_list == [spoof_arnold_press_dict]
+
+def test_adding_sets_dict_object_twice(spoofed_empty_workout, spoof_arnold_press_dict):
+    set_dict = SetDicts(set_order=1, exercise_name="Arnold Press", set_number=1, set_type="Warm up", reps=12, loading=13.5, focus="Form", rest=60, notes="Shoulder warm up")
+    spoofed_empty_workout.add_set_dict(spoof_arnold_press_dict)
+    spoofed_empty_workout.add_set_dict(set_dict)
+    assert spoofed_empty_workout.set_dicts_list == [spoof_arnold_press_dict, set_dict]
+
+def test_to_dict_method(spoofed_empty_workout, spoofed_user_stats, spoof_arnold_press_dict):
+    spoofed_empty_workout.add_stats(spoofed_user_stats)
+    spoofed_empty_workout.add_set_dict(spoof_arnold_press_dict)
+    assert spoofed_empty_workout.to_dict() == {
+            "id": str(spoofed_empty_workout.id),
+            "user_id": str(spoofed_empty_workout.user_id.id),
+            "workout_name": spoofed_empty_workout.workout_name,
+            "date": spoofed_empty_workout.date,
+            "complete": spoofed_empty_workout.complete,
+            "sets_dict_list": [spoof_arnold_press_dict],
+            "user_stats": spoofed_empty_workout.user_stats,
+            "notes": spoofed_empty_workout.notes,
+        }
