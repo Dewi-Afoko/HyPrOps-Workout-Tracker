@@ -3,6 +3,10 @@
 ### Update:
 So after getting everything up and running and using it to track one of my workouts, I've realised I don't like the data structures, etc. that I started out with – so I'm rebuilding... Basically everything as a result. When this message disappears, I've merged the changes to the main branch.
 
+All work currently being done on Feature-SetDicts branch
+    - New models all completed, TDDed to 100% coverage
+    - Next stage: routes for MongoDB
+
 
 ## **Where We're At...**
 
