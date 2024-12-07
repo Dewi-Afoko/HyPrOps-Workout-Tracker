@@ -20,6 +20,10 @@ load_dotenv()
 
 test_password = os.getenv("TEST_PASSWORD")
 
+@pytest.fixture
+def testing_password():
+    test_password = os.getenv("TEST_PASSWORD")
+    return test_password
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -131,3 +135,9 @@ def spoofed_user_stats(spoofed_personal_data):
 def spoof_arnold_press_dict():
         set_dict = SetDicts(set_order=1, exercise_name="Arnold Press", set_number=1, set_type="Working", reps=10, loading=20, focus="Form", rest=60, notes="Good form and tempo")
         yield set_dict
+
+@pytest.fixture
+def auth_token(spoofed_user):
+    access_token = create_access_token(identity=spoofed_user.username)
+    yield access_token
+
