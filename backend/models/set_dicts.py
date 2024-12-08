@@ -23,3 +23,17 @@ class SetDicts(EmbeddedDocument):
 
     def delete_notes(self):
         self.notes = None
+
+    def to_dict(self):
+        return {
+                'set_order' : self.set_order,
+            'exercise_name' : self.exercise_name,
+            'set_number' : self.set_number,
+            'set_type' : self.set_type,
+            'reps' : self.reps,
+            'loading' : self.loading,
+            'focus' : self.focus,
+            'rest' : self.rest,
+            'notes' : self.notes,
+            'complete' : self.complete
+        }

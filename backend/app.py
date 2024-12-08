@@ -3,6 +3,7 @@ from lib.database_connection import initialize_db
 from dotenv import load_dotenv
 from flask_cors import CORS
 from models.user import User
+from models.set_dicts import SetDicts
 from models.workout import Workout
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from werkzeug.security import check_password_hash
@@ -77,8 +78,6 @@ def create_app():
                 'token' : access_token}), 200
 
 
-
-
     """
                                 JWT routes
     """       
@@ -101,17 +100,50 @@ def create_app():
         username = get_jwt_identity()
         user = User.objects(username=username).first()
         if not user:
-            return jsonify({'error' : 'User not found'})
+            return jsonify({'error' : 'User not found'}), 400
         
         workout = Workout(user_id=user.id, workout_name=data['workout_name'])
 
         user.add_workout(workout)
-        user.save()
 
         return jsonify({'message' : f'{workout.workout_name} created by {username}'}), 201
         
+                ### SET DICTS ROUTES ###
 
+    @app.route('/workouts/add_set', methods=['POST'])
+    @jwt_required()
+    def add_set_dict():
+        data = request.get_json()
+        if 'exercise_name' not in data.keys():
+            return jsonify({'error' : 'You need to specify an exercise'}), 400
+        
+        username = get_jwt_identity()
+        user = User.objects(username=username).first()
+        if not user:
+            return jsonify({'error' : 'User not found'}), 400
+        
+        
+        workout_name = data['workout_name']
+        workout = next((workout for workout in user.workout_list if workout.workout_name == workout_name), None)
+        if not workout:
+            return jsonify({'error' : 'Workout not found'}), 400
+        
+        set_order = (len(workout.set_dicts_list) + 1)
+        set_number = len([set for set in workout.set_dicts_list if set.exercise_name == data['exercise_name']])
 
+        set_dict = SetDicts(set_order=set_order, exercise_name=data['exercise_name'], set_number=set_number, set_type=data['set_type'], reps=data['reps'], loading=data['loading'], focus=data['focus'], rest=data['rest'], notes=data['notes'])
+        if not set_dict:
+            return jsonify({'error' : 'Failure to create set dictionary'}), 400      
+        
+        workout.add_set_dict(set_dict)
+        print(f'{workout.set_dicts_list =}')
+        print(f'{set_dict.to_dict() =}')
+        print(f'{workout.to_dict() =}')
+        print(f'{user.to_dict() =}')
+
+        return jsonify({'message': f'Set info for {set_dict.exercise_name} created and added to {workout.workout_name}'}), 201
+
+        
 
 
 

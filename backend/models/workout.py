@@ -15,6 +15,7 @@ class Workout(EmbeddedDocument):
     user_stats = EmbeddedDocumentField(UserStats)
     notes = ListField(StringField(), default=list)
 
+
     def add_set_dict(self, set_dict): # SetDict object
         self.set_dicts_list.append(set_dict)
 

@@ -137,4 +137,41 @@ def test_workout_creates_correctly(web_client, clear_db, spoofed_user, auth_toke
 
     assert user.workout_list == [workout]
 
-#TODO: Check logic on failure branches of workouts POST route
+def test_workout_fails_with_no_name(web_client, clear_db, spoofed_user, auth_token):
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    payload = {'incorrect key' : 'invalid value'}
+
+    response = web_client.post('/workouts', headers=headers, json=payload)
+    assert response.status_code == 400
+    assert response.json['error'] == "You need to name your workout"
+
+def test_workout_fails_with_no_name(web_client, clear_db, bad_token):
+    headers = {"Authorization": f"Bearer {bad_token}"}
+    payload = {
+            'workout_name' : "Push"
+            }
+
+    response = web_client.post('/workouts', headers=headers, json=payload)
+    assert response.status_code == 400
+    assert response.json['error'] == "User not found"
+
+def test_adding_set_dict_success(web_client, clear_db, auth_token, spoofed_user, spoofed_empty_workout, spoof_arnold_press_dict):
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    payload = {
+                'workout_name' : spoofed_empty_workout.workout_name,
+                'exercise_name': spoof_arnold_press_dict.exercise_name,
+                'set_type' : spoof_arnold_press_dict.set_type,
+                'reps': spoof_arnold_press_dict.reps,
+                'loading': spoof_arnold_press_dict.loading,
+                'focus' : spoof_arnold_press_dict.focus,
+                'rest' : spoof_arnold_press_dict.rest,
+                'notes' :spoof_arnold_press_dict.notes
+            }
+    web_client.post('/workouts', headers=headers, json={'workout_name' : 'First Try'})
+    response = web_client.post('/workouts/add_set', headers=headers, json=payload)
+    assert response.json['message'] == f"Set info for {payload['exercise_name']} created and added to {payload['workout_name']}"
+    assert response.status_code == 201
+
+
+    workout_to_check = next((workout for workout in spoofed_user.workout_list if workout.workout_name == payload['workout_name']), None)
+    assert workout_to_check.set_dicts_list == [spoof_arnold_press_dict] #TODO: Fix this test, currently not persisting set_dict whenadded.

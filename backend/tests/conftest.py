@@ -91,12 +91,6 @@ def setup_test_database():
     yield
     disconnect(alias="default")  # Cleanly disconnect after tests
 
-@pytest.fixture
-def empty_auth_token(app):
-    """Generate a valid JWT token for a non-existent user."""
-    with app.app_context():
-        token = create_access_token(identity="nonexistent_user")
-        return token
 
 @pytest.fixture(autouse=True)
 def clear_db():
@@ -141,3 +135,8 @@ def auth_token(spoofed_user):
     access_token = create_access_token(identity=spoofed_user.username)
     yield access_token
 
+
+@pytest.fixture
+def bad_token():
+    access_token = create_access_token(identity="Invalid")
+    yield access_token
