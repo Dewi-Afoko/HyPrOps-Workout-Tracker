@@ -37,3 +37,4 @@ class SetDicts(EmbeddedDocument):
             'notes' : self.notes,
             'complete' : self.complete
         }
+    

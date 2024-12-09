@@ -8,7 +8,7 @@ from models.workout import Workout
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from werkzeug.security import check_password_hash
 import os
-from mongoengine.errors import NotUniqueError
+from mongoengine.errors import NotUniqueError, ValidationError
 
 load_dotenv()
 
@@ -110,41 +110,70 @@ def create_app():
         
                 ### SET DICTS ROUTES ###
 
-    @app.route('/workouts/add_set', methods=['POST'])
+    @app.route('/workouts/<workout_id>/add_set', methods=['POST'])
     @jwt_required()
-    def add_set_dict():
+    def add_set_dict(workout_id):
+
         data = request.get_json()
+
         if 'exercise_name' not in data.keys():
             return jsonify({'error' : 'You need to specify an exercise'}), 400
         
         username = get_jwt_identity()
+
         user = User.objects(username=username).first()
         if not user:
             return jsonify({'error' : 'User not found'}), 400
         
         
-        workout_name = data['workout_name']
-        workout = next((workout for workout in user.workout_list if workout.workout_name == workout_name), None)
+        workout = next((workout for workout in user.workout_list if str(workout.id) == workout_id), None)
+
+
         if not workout:
             return jsonify({'error' : 'Workout not found'}), 400
         
         set_order = (len(workout.set_dicts_list) + 1)
+        
         set_number = len([set for set in workout.set_dicts_list if set.exercise_name == data['exercise_name']])
 
-        set_dict = SetDicts(set_order=set_order, exercise_name=data['exercise_name'], set_number=set_number, set_type=data['set_type'], reps=data['reps'], loading=data['loading'], focus=data['focus'], rest=data['rest'], notes=data['notes'])
-        if not set_dict:
-            return jsonify({'error' : 'Failure to create set dictionary'}), 400      
-        
-        workout.add_set_dict(set_dict)
-        print(f'{workout.set_dicts_list =}')
-        print(f'{set_dict.to_dict() =}')
-        print(f'{workout.to_dict() =}')
-        print(f'{user.to_dict() =}')
+        try:
+            set_dict = SetDicts(set_order=set_order, exercise_name=data.get('exercise_name'), set_number=set_number, set_type=data.get('set_type'), reps=data.get('reps'), loading=data.get('loading'), focus=data.get('focus'), rest=data.get('rest'), notes=data.get('notes'))
 
-        return jsonify({'message': f'Set info for {set_dict.exercise_name} created and added to {workout.workout_name}'}), 201
+            workout.add_set_dict(set_dict)
+            user.save()
 
+            return jsonify({'message': f'Set info for {set_dict.exercise_name} created and added to {workout.workout_name}'}), 201
+
+        except(ValidationError):
+            return jsonify({'error' : 'Failure to create set dictionary'}), 400     
         
 
+    @app.route('/workouts/<workout_id>/<set_order>/mark_complete', methods=['PATCH'])
+    @jwt_required()
+    def toggle_set_complete(workout_id, set_order):
+
+        username = get_jwt_identity()
+
+        user = User.objects(username=username).first()
+        if not user:
+            return jsonify({'error' : 'User not found'}), 400
+        
+        
+        workout = next((workout for workout in user.workout_list if str(workout.id) == workout_id), None)
+
+        if not workout:
+            return jsonify({'error' : 'Workout not found'}), 400
+
+        set_dict = next((set for set in workout.set_dicts_list if set.set_order == int(set_order)), None)
+
+        set_dict.toggle_complete()
+        user.save()
+        if set_dict.complete == True:
+            return jsonify({'message' : 'Set marked complete'}), 201
+        elif set_dict.complete == False:
+            return jsonify({'message' : 'Set marked incomplete'}), 201
+        
+#TODO: Refactor all routes to use id/name in the API endpoint, instead of in the payload.
 
 
     return app

@@ -6,7 +6,7 @@ from bson import ObjectId
 
 
 class Workout(EmbeddedDocument):
-    id = ObjectIdField(required=True, default=ObjectId)
+    id = ObjectIdField(required=True, default=ObjectId, primary_key=True)
     user_id = ReferenceField('User', required=True)
     workout_name = StringField()
     date = DateTimeField(default=datetime.now)
