@@ -19,3 +19,12 @@ class UserStats(EmbeddedDocument): # Embed in workout
             self.sleep_quality = sleep_quality
         if notes != None:
             self.notes = notes
+
+    def to_dict(self):
+        weight = str(self.weight.weight)
+        return {
+            'weight': weight,
+            'sleep_score': self.sleep_score,
+            'sleep_quality': self.sleep_quality,
+            'notes': self.notes
+        }

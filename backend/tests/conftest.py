@@ -140,3 +140,12 @@ def auth_token(spoofed_user):
 def bad_token():
     access_token = create_access_token(identity="Invalid")
     yield access_token
+
+@pytest.fixture
+def spoofed_populated_user(spoof_arnold_press_dict, spoofed_user, spoofed_personal_data, spoofed_user_stats, spoofed_empty_workout):
+    spoofed_empty_workout.add_set_dict(spoof_arnold_press_dict)
+    spoofed_empty_workout.add_stats(spoofed_user_stats)
+    spoofed_user.add_personal_data(spoofed_personal_data)
+    spoofed_user.add_workout(spoofed_empty_workout)
+    spoofed_populated_user = spoofed_user.reload()
+    yield spoofed_populated_user

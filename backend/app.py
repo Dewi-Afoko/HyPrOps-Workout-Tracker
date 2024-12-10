@@ -173,7 +173,6 @@ def create_app():
         elif set_dict.complete == False:
             return jsonify({'message' : 'Set marked incomplete'}), 201
         
-#TODO: Refactor all routes to use id/name in the API endpoint, instead of in the payload.
 
 
     return app
