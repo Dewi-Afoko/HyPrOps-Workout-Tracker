@@ -129,6 +129,67 @@ def create_app():
         'workouts': workouts
     }), 200
 
+    @app.route('/workouts/<workout_id>', methods=['GET'])
+    @jwt_required()
+    def get_single_workout(workout_id):
+        username = get_jwt_identity()
+        user = User.objects(username=username).first()
+        
+        if not user:
+            return jsonify({'error' : 'User not found'}), 400
+        
+        workout = next((workout.to_dict() for workout in user.workout_list if str(workout.id) == workout_id), None)
+
+        if not workout:
+            return jsonify({'error' : 'No workouts found'}), 400
+        
+        return jsonify({
+        'message': f'Here are the details for workout ID: {workout_id}',
+        'workout': workout
+    }), 200
+
+    @app.route('/workouts/<workout_id>/add_notes', methods=['PATCH'])
+    @jwt_required()
+    def add_workout_notes(workout_id):
+        data = request.get_json()
+        username = get_jwt_identity()
+        user = User.objects(username=username).first()
+
+        if not user:
+            return jsonify({'error' : 'User not found'}), 400
+        
+        workout = next((workout for workout in user.workout_list if str(workout.id) == workout_id), None)
+
+        if not workout:
+            return jsonify({'error' : 'No workouts found'}), 400
+        
+        workout.add_notes(data.get('notes'))
+        user.save()
+        return jsonify({'message' : f'{data.get("notes")}: added to workout notes'}), 202
+    
+    @app.route('/workouts/<workout_id>/delete_note/<note_index>', methods=['DELETE'])
+    @jwt_required()
+    def delete_workout_note(workout_id, note_index):
+
+        username = get_jwt_identity()
+        user = User.objects(username=username).first()
+
+        if not user:
+            return jsonify({'error' : 'User not found'}), 400
+        
+        workout = next((workout for workout in user.workout_list if str(workout.id) == workout_id), None)
+
+        if not workout:
+            return jsonify({'error' : 'No workouts found'}), 400
+        
+        workout.delete_note(note_index)
+        user.save()
+
+        return jsonify({'message' : 'Note successfully deleted'}), 202
+        
+
+    #TODO: Toggle complete, add_stats
+
                 ### SET DICTS ROUTES ###
 
     @app.route('/workouts/<workout_id>/add_set', methods=['POST'])

@@ -167,11 +167,85 @@ def test_getting_user_workouts_success(web_client, clear_db, auth_token, spoofed
         assert response.status_code == 200
 
                     
-def test_getting_workouts_fails_with_no_workouts():
-    pass                   
+def test_getting_workouts_fails_with_no_workouts(web_client, clear_db, auth_token, spoofed_user):
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        response = web_client.get('/workouts', headers=headers)    
+
+        assert response.json['error'] == 'No workouts found'
+        assert response.status_code == 400         
                     
                     
                     
+def test_getting_single_workout_success(web_client, clear_db, auth_token, spoofed_populated_user):
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        workout_id = str(spoofed_populated_user.workout_list[0].id)
+        response = web_client.get(f'/workouts/{workout_id}', headers=headers)
+
+        assert response.json['message'] == f'Here are the details for workout ID: {workout_id}'
+        assert response.json['workout'] == spoofed_populated_user.workout_list[0].to_dict()
+        assert response.status_code == 200   
+
+def test_getting_single_workout_success_with_multiple_workouts(web_client, clear_db, auth_token, spoofed_populated_user):
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        workout_id = str(spoofed_populated_user.workout_list[0].id)
+        web_client.post('/workouts', headers=headers, json={'workout_name' : 'Workout2'})
+        web_client.post('/workouts', headers=headers, json={'workout_name' : 'Workout3'})
+        spoofed_populated_user.reload()
+
+        assert len(spoofed_populated_user.workout_list) == 3
+
+        response = web_client.get(f'/workouts/{workout_id}', headers=headers)
+
+        assert response.json['message'] == f'Here are the details for workout ID: {workout_id}'
+        assert response.json['workout'] == spoofed_populated_user.workout_list[0].to_dict()
+        assert response.status_code == 200   
+
+def test_add_notes_to_workout(web_client, clear_db, auth_token, spoofed_populated_user):
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        workout_id = str(spoofed_populated_user.workout_list[0].id)
+        payload = {'notes' : 'Adding more notes'}
+
+        assert len(spoofed_populated_user.workout_list[0].notes) == 0
+
+        response = web_client.patch(f'/workouts/{workout_id}/add_notes', headers=headers, json=payload)
+
+        assert response.json['message'] == f'{payload["notes"]}: added to workout notes'
+        assert response.status_code == 202
+
+        spoofed_populated_user.reload()
+
+        assert len(spoofed_populated_user.workout_list[0].notes) == 1
+
+def test_delete_notes_from_workout(web_client, clear_db, auth_token, spoofed_populated_user):
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        workout_id = str(spoofed_populated_user.workout_list[0].id)
+        payload = {'notes' : 'Adding more notes'}
+
+        assert len(spoofed_populated_user.workout_list[0].notes) == 0
+        web_client.patch(f'/workouts/{workout_id}/add_notes', headers=headers, json={'notes' : 'Persist these notes'})
+        response = web_client.patch(f'/workouts/{workout_id}/add_notes', headers=headers, json=payload)
+        web_client.patch(f'/workouts/{workout_id}/add_notes', headers=headers, json={'notes' : 'Persist these notes'})
+
+        spoofed_populated_user.reload()
+
+        assert response.json['message'] == f'{payload["notes"]}: added to workout notes'
+        assert response.status_code == 202
+        assert len(spoofed_populated_user.workout_list[0].notes) == 3
+
+        spoofed_populated_user.reload()
+        note_index = 1
+        response = web_client.delete(f'/workouts/{workout_id}/delete_note/{note_index}', headers=headers)
+        assert response.status_code == 202
+        assert response.json['message'] == 'Note successfully deleted'
+
+
+        spoofed_populated_user.reload()
+        assert len(spoofed_populated_user.workout_list[0].notes) == 2
+        assert spoofed_populated_user.workout_list[0].notes[0] == 'Persist these notes'
+        assert spoofed_populated_user.workout_list[0].notes[1] == 'Persist these notes'
+
+
+
                     
                     ### Workout x SetDict Tests
 

@@ -35,7 +35,7 @@ class Workout(EmbeddedDocument):
         self.notes.append(notes)
 
     def delete_note(self, note_index):
-        del self.notes[note_index]
+        del self.notes[int(note_index)]
 
     def to_dict(self):
         workout_id = str(self.id)
