@@ -108,6 +108,27 @@ def create_app():
 
         return jsonify({'message' : f'{workout.workout_name} created by {username}'}), 201
         
+    @app.route('/workouts', methods=['GET'])
+    @jwt_required()
+    def get_all_workouts():
+        username = get_jwt_identity()
+        user = User.objects(username=username).first()
+        if not user:
+            return jsonify({'error' : 'User not found'}), 400
+        
+        workouts = []
+        for workout in user.workout_list:
+            workout_dict = workout.to_dict()  # Ensure this method exists
+            workouts.append(workout_dict)
+
+        if not workouts:
+            return jsonify({'error' : 'No workouts found'}), 400
+
+        return jsonify({
+        'message': 'Here are your workouts:',
+        'workouts': workouts
+    }), 200
+
                 ### SET DICTS ROUTES ###
 
     @app.route('/workouts/<workout_id>/add_set', methods=['POST'])

@@ -60,16 +60,20 @@ def test_adding_sets_dict_object_twice(spoofed_empty_workout, spoof_arnold_press
 def test_to_dict_method(spoofed_empty_workout, spoofed_user_stats, spoof_arnold_press_dict):
     spoofed_empty_workout.add_stats(spoofed_user_stats)
     spoofed_empty_workout.add_set_dict(spoof_arnold_press_dict)
-    assert spoofed_empty_workout.to_dict() == {
-            "id": str(spoofed_empty_workout.id),
-            "user_id": str(spoofed_empty_workout.user_id.id),
-            "workout_name": spoofed_empty_workout.workout_name,
-            "date": spoofed_empty_workout.date,
-            "complete": spoofed_empty_workout.complete,
-            "sets_dict_list": [spoof_arnold_press_dict],
-            "user_stats": spoofed_empty_workout.user_stats,
-            "notes": spoofed_empty_workout.notes,
-        }
+
+    expected_output = {
+        "id": str(spoofed_empty_workout.id),
+        "user_id": str(spoofed_empty_workout.user_id.id),
+        "workout_name": spoofed_empty_workout.workout_name,
+        "date": spoofed_empty_workout.date.isoformat() if spoofed_empty_workout.date else None,
+        "complete": spoofed_empty_workout.complete,
+        "sets_dict_list": [spoof_arnold_press_dict.to_dict()],
+        "user_stats": spoofed_empty_workout.user_stats.to_dict() if spoofed_empty_workout.user_stats else None,
+        "notes": spoofed_empty_workout.notes,
+    }
+
+    assert spoofed_empty_workout.to_dict() == expected_output
+
     
 def test_delete_set_dict(spoofed_empty_workout, spoof_arnold_press_dict):
     spoofed_empty_workout.add_set_dict(spoof_arnold_press_dict)

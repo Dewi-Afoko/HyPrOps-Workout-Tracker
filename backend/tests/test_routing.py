@@ -158,21 +158,17 @@ def test_workout_fails_with_bad_user_token(web_client, clear_db, bad_token):
 
 # GET User Workouts
 
-def test_getting_user_workout_success(web_client, clear_db, auth_token, spoofed_populated_user, spoof_arnold_press_dict, spoofed_empty_workout, spoofed_personal_data):
-    print(f'\n\n{spoofed_populated_user.to_dict() =}\n\n')
-    print(f'\n\n{spoofed_populated_user.workout_list[0].to_dict() =}\n\n')
-    print(f'\n\n{spoofed_populated_user.workout_list[0].set_dicts_list[0].to_dict() =}\n\n')
-    print(f'\n\n{spoofed_populated_user.personal_data.to_dict() =}\n\n')
-    print(f'\n\n{spoofed_populated_user.workout_list[0].user_stats.to_dict() =}\n\n')
+def test_getting_user_workouts_success(web_client, clear_db, auth_token, spoofed_populated_user, spoof_arnold_press_dict, spoofed_empty_workout):
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        response = web_client.get('/workouts', headers=headers)
+
+        assert response.json['message'] == 'Here are your workouts:'
+        assert 'workouts' in response.json
+        assert response.status_code == 200
 
                     
-                    
-                    
-                    
-                    
-                    
-                    
-                    
+def test_getting_workouts_fails_with_no_workouts():
+    pass                   
                     
                     
                     

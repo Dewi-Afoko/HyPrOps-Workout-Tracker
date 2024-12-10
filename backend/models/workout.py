@@ -40,14 +40,14 @@ class Workout(EmbeddedDocument):
     def to_dict(self):
         workout_id = str(self.id)
         user_id = str(self.user_id.id)
-        workout_dict =  {
+        workout_dict = {
             "id": workout_id,
             "user_id": user_id,
             "workout_name": self.workout_name,
-            "date": self.date,
+            "date": self.date.isoformat() if self.date else None,  # Properly serialize date
             "complete": self.complete,
-            "sets_dict_list": self.set_dicts_list,
-            "user_stats": self.user_stats,
+            "sets_dict_list": [set_dict.to_dict() for set_dict in self.set_dicts_list],
+            "user_stats": self.user_stats.to_dict() if self.user_stats else None,
             "notes": self.notes,
         }
         return workout_dict
