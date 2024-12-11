@@ -418,14 +418,34 @@ def test_set_dict_toggle_complete_twice(web_client, clear_db, auth_token, spoofe
 
 
 
-# def test_set_dict_add_notes_twice():
-#     pass
+def test_set_dict_add_notes(web_client, auth_token, clear_db, spoofed_populated_user):
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    payload = {'notes' : 'Until failure'}
+    workout_id = str(spoofed_populated_user.workout_list[0].id)
+    set_order = spoofed_populated_user.workout_list[0].set_dicts_list[0].set_order
+    og_notes = spoofed_populated_user.workout_list[0].set_dicts_list[0].notes
 
-# def test_set_dict_add_invalid_notes_fails():
-#     pass
+    assert og_notes == 'Good form and tempo'
+    response = web_client.patch(f'/workouts/{workout_id}/{set_order}/add_notes', headers=headers, json=payload)
+    assert response.json['message'] == "Notes added to set"
+    assert response.status_code == 201
 
-# def test_set_dict_delete_notes():
-#     pass
+    spoofed_populated_user.reload()
+    updated_notes = spoofed_populated_user.workout_list[0].set_dicts_list[0].notes
+    assert updated_notes == "Until failure"
 
-# def test_set_dict_to_dict_method():
-#     pass
+def test_set_dict_delete_notes(web_client, auth_token, clear_db, spoofed_populated_user):
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    workout_id = str(spoofed_populated_user.workout_list[0].id)
+    set_order = spoofed_populated_user.workout_list[0].set_dicts_list[0].set_order
+    og_notes = spoofed_populated_user.workout_list[0].set_dicts_list[0].notes
+
+    assert og_notes == 'Good form and tempo'
+    response = web_client.delete(f'/workouts/{workout_id}/{set_order}/delete_notes', headers=headers)
+    assert response.json['message'] == "Notes deleted"
+    assert response.status_code == 200
+
+    spoofed_populated_user.reload()
+    assert spoofed_populated_user.workout_list[0].set_dicts_list[0].notes == None
+
+#TODO for SetDicts: Tests that should fail
