@@ -158,7 +158,7 @@ def test_workout_fails_with_bad_user_token(web_client, clear_db, bad_token):
 
 # GET User Workouts
 
-def test_getting_user_workouts_success(web_client, clear_db, auth_token, spoofed_populated_user, spoof_arnold_press_dict, spoofed_empty_workout):
+def test_getting_user_workouts_success(web_client, clear_db, spoofed_populated_user, auth_token):
         headers = {"Authorization": f"Bearer {auth_token}"}
         response = web_client.get('/workouts', headers=headers)
 
@@ -167,7 +167,7 @@ def test_getting_user_workouts_success(web_client, clear_db, auth_token, spoofed
         assert response.status_code == 200
 
                     
-def test_getting_workouts_fails_with_no_workouts(web_client, clear_db, auth_token, spoofed_user):
+def test_getting_workouts_fails_with_no_workouts(web_client, clear_db, auth_token):
         headers = {"Authorization": f"Bearer {auth_token}"}
         response = web_client.get('/workouts', headers=headers)    
 
@@ -245,8 +245,37 @@ def test_delete_notes_from_workout(web_client, clear_db, auth_token, spoofed_pop
         assert spoofed_populated_user.workout_list[0].notes[1] == 'Persist these notes'
 
 
-
+def test_toggling_workout_complete(web_client, clear_db, auth_token, spoofed_populated_user):
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        workout_id = str(spoofed_populated_user.workout_list[0].id)
+        assert spoofed_populated_user.workout_list[0].complete == False
+        response = web_client.patch(f'/workouts/{workout_id}/mark_complete', headers=headers)
+        spoofed_populated_user.reload()
+        assert response.json['message'] == "Workout marked as complete"
+        assert response.status_code == 201
+        assert spoofed_populated_user.workout_list[0].complete == True
+        response = web_client.patch(f'/workouts/{workout_id}/mark_complete', headers=headers)
+        assert response.json['message'] == "Workout marked as incomplete"
+        assert response.status_code == 201
+        spoofed_populated_user.reload()
+        assert spoofed_populated_user.workout_list[0].complete == False
                     
+
+def test_adding_userstats_to_workout(web_client, clear_db, auth_token, spoofed_populated_user, alt_spoofed_user_stats, spoofed_user_stats):
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    workout_id = str(spoofed_populated_user.workout_list[0].id)
+    assert spoofed_populated_user.workout_list[0].user_stats == spoofed_user_stats
+    print(f'{alt_spoofed_user_stats.to_dict() =}')
+    payload = alt_spoofed_user_stats.to_dict()
+    response = web_client.put(f'/workouts/{workout_id}/add_stats', headers=headers, json=payload)
+    assert response.json['message'] == 'Stats added to workout'
+    assert response.status_code == 201
+    spoofed_populated_user.reload()
+    assert spoofed_populated_user.workout_list[0].user_stats == alt_spoofed_user_stats
+
+
+
+
                     ### Workout x SetDict Tests
 
 def test_adding_set_dict_success(web_client, clear_db, auth_token, spoofed_user, spoof_arnold_press_dict):

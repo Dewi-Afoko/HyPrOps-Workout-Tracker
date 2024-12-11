@@ -52,6 +52,3 @@ class Workout(EmbeddedDocument):
         }
         return workout_dict
     
-
-    def __eq__(self, other):
-        return super().__eq__(other)

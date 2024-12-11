@@ -149,3 +149,8 @@ def spoofed_populated_user(spoof_arnold_press_dict, spoofed_user, spoofed_person
     spoofed_user.add_workout(spoofed_empty_workout)
     spoofed_populated_user = spoofed_user.reload()
     yield spoofed_populated_user
+
+@pytest.fixture
+def alt_spoofed_user_stats(spoofed_personal_data):
+        stats = UserStats(weight=spoofed_personal_data, sleep_score=75, sleep_quality="Ok", notes="A little tired...")
+        yield stats

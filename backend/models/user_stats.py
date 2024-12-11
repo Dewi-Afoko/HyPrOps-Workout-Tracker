@@ -21,7 +21,7 @@ class UserStats(EmbeddedDocument): # Embed in workout
             self.notes = notes
 
     def to_dict(self):
-        weight = str(self.weight.weight)
+        weight = int(self.weight.weight)
         return {
             'weight': weight,
             'sleep_score': self.sleep_score,

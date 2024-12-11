@@ -5,6 +5,8 @@ from flask_cors import CORS
 from models.user import User
 from models.set_dicts import SetDicts
 from models.workout import Workout
+from models.user_stats import UserStats
+from models.personal_data import PersonalData
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from werkzeug.security import check_password_hash
 import os
@@ -186,9 +188,64 @@ def create_app():
         user.save()
 
         return jsonify({'message' : 'Note successfully deleted'}), 202
-        
 
-    #TODO: Toggle complete, add_stats
+    @app.route('/workouts/<workout_id>/mark_complete', methods=['PATCH'])
+    @jwt_required()
+    def toggle_workout_complete(workout_id):
+        
+        username = get_jwt_identity()
+        user = User.objects(username=username).first()
+
+        if not user:
+            return jsonify({'error' : 'User not found'}), 400
+        
+        workout = next((workout for workout in user.workout_list if str(workout.id) == workout_id), None)
+
+        if not workout:
+            return jsonify({'error' : 'No workouts found'}), 400
+        
+        workout.toggle_complete()
+        user.save()
+        if workout.complete == True:
+            status = "complete"
+        elif workout.complete == False:
+            status = "incomplete"
+
+        return jsonify({'message' : f'Workout marked as {status}'}), 201
+    
+    @app.route('/workouts/<workout_id>/add_stats', methods=['PUT'])
+    @jwt_required()
+    def add_stats_to_workout(workout_id):
+        data = request.get_json()
+        
+        username = get_jwt_identity()
+        user = User.objects(username=username).first()
+
+        if not user:
+            return jsonify({'error' : 'User not found'}), 400
+        
+        workout = next((workout for workout in user.workout_list if str(workout.id) == workout_id), None)
+
+        if not workout:
+            return jsonify({'error' : 'No workouts found'}), 400
+        
+        if user.personal_data != None:
+            personal_data = user.personal_data
+
+        if not personal_data:
+            return jsonify({'error' : 'No personal data found'}), 400
+
+        user_stats = UserStats(weight=personal_data, sleep_score=data.get('sleep_score'), sleep_quality=data.get('sleep_quality'), notes=data.get('notes'))
+
+        if not user_stats:
+            return jsonify({'error' : 'No personal data found'}), 400
+
+        workout.add_stats(user_stats)
+        user.save()
+
+        return jsonify({'message' : 'Stats added to workout'}), 201
+    
+    
 
                 ### SET DICTS ROUTES ###
 
