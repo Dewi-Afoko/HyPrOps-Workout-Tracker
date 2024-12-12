@@ -11,6 +11,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from werkzeug.security import check_password_hash
 import os
 from mongoengine.errors import NotUniqueError, ValidationError
+from lib.utilities.api_functions import find_user_from_jwt, tuple_checker, get_credentials
 
 load_dotenv()
 
@@ -39,44 +40,33 @@ def create_app():
     def register():
         data = request.get_json()
 
-        username = data.get('username')
-        password = data.get('password')
-
-        if username == None:
-            return jsonify({'error': 'Username not provided'}), 400
-        if password == None:
-            return jsonify({'error': 'Password not provided'}), 400
-        
-        else:
-            try:
-                user = User(username=data['username'], password=data['password'])
-                user.hash_password()
-                return jsonify({'message' : f'{user.username} successfully registered!'}), 201
+        credentials = get_credentials(data)
+        if tuple_checker(credentials):
+            return credentials
+        try:
+            user = User(username=credentials['username'], password=credentials['password'])
+            user.hash_password()
+            return jsonify({'message' : f'{user.username} successfully registered!'}), 201
             
-            except NotUniqueError:
-                return jsonify({'error' : 'Username unavailable'}), 409
+        except NotUniqueError:
+            return jsonify({'error' : 'Username unavailable'}), 409
             
     @app.route('/login', methods=['POST'])
     def login():
 
         data = request.get_json()
 
-        username = data.get('username')
-        password = data.get('password')
-
-        if username == None:
-            return jsonify({'error': 'Username not provided'}), 400
-        if password == None:
-            return jsonify({'error': 'Password not provided'}), 400
-        
+        credentials = get_credentials(data)
+        if tuple_checker(credentials):
+            return credentials
         else:
-            user = User.objects(username=username).first()
-            if not user or not check_password_hash(user.password, password):
+            user = User.objects(username=credentials['username']).first()
+            if not user or not check_password_hash(user.password, credentials['password']):
                 return jsonify({'error' : 'Invalid login credentials'}), 401
             
-            access_token = create_access_token(identity=username)
+            access_token = create_access_token(identity=credentials['username'])
             return jsonify({
-                'message' : f'Login successful, welcome {username}',
+                'message' : f'Login successful, welcome {credentials["username"]}',
                 'token' : access_token}), 200
 
 
@@ -99,16 +89,15 @@ def create_app():
         data = request.get_json()
         if 'workout_name' not in data.keys():
             return jsonify({'error' : 'You need to name your workout'}), 400
-        username = get_jwt_identity()
-        user = User.objects(username=username).first()
-        if not user:
-            return jsonify({'error' : 'User not found'}), 400
-        
-        workout = Workout(user_id=user.id, workout_name=data['workout_name'])
+        user = find_user_from_jwt()
+        if tuple_checker(user):
+            return user
+
+        workout = Workout(user_id=str(user.id), workout_name=data['workout_name'])
 
         user.add_workout(workout)
 
-        return jsonify({'message' : f'{workout.workout_name} created by {username}'}), 201
+        return jsonify({'message' : f'{workout.workout_name} created by {user.username}'}), 201
         
     @app.route('/workouts', methods=['GET'])
     @jwt_required()
@@ -120,7 +109,7 @@ def create_app():
         
         workouts = []
         for workout in user.workout_list:
-            workout_dict = workout.to_dict()  # Ensure this method exists
+            workout_dict = workout.to_dict()
             workouts.append(workout_dict)
 
         if not workouts:

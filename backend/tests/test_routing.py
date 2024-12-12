@@ -153,7 +153,8 @@ def test_workout_fails_with_bad_user_token(web_client, clear_db, bad_token):
 
     response = web_client.post('/workouts', headers=headers, json=payload)
     assert response.status_code == 400
-    assert response.json['error'] == "User not found"
+    assert response.json['error'] == 'User not found'
+
 
 
 # GET User Workouts
