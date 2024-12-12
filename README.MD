@@ -6,8 +6,8 @@ So after getting everything up and running and using it to track one of my worko
 All work currently being done on Feature-SetDicts branch
     
     - New models all completed, TDDed to 100% coverage
-    - Next stage: routes for MongoDB
-    - Currently: TDDing the most RESTful backend API possible!
+    - API routes TDDed for success, still need to cover edge cases/exceptions
+    - Currently: Making routes DRY and creating API functions module
 
 
 ## **Where We're At...**
