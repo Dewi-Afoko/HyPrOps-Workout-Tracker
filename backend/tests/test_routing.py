@@ -215,6 +215,7 @@ def test_add_notes_to_workout(web_client, clear_db, auth_token, spoofed_populate
 
         spoofed_populated_user.reload()
 
+
         assert len(spoofed_populated_user.workout_list[0].notes) == 1
 
 def test_delete_notes_from_workout(web_client, clear_db, auth_token, spoofed_populated_user):
@@ -266,7 +267,6 @@ def test_adding_userstats_to_workout(web_client, clear_db, auth_token, spoofed_p
     headers = {"Authorization": f"Bearer {auth_token}"}
     workout_id = str(spoofed_populated_user.workout_list[0].id)
     assert spoofed_populated_user.workout_list[0].user_stats == spoofed_user_stats
-    print(f'{alt_spoofed_user_stats.to_dict() =}')
     payload = alt_spoofed_user_stats.to_dict()
     response = web_client.put(f'/workouts/{workout_id}/add_stats', headers=headers, json=payload)
     assert response.json['message'] == 'Stats added to workout'

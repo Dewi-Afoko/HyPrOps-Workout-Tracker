@@ -32,6 +32,8 @@ class Workout(EmbeddedDocument):
         self.user_stats = user_stats
 
     def add_notes(self, notes): # notes is a string
+        if not self.notes:
+            self.notes = []
         self.notes.append(notes)
 
     def delete_note(self, note_index):

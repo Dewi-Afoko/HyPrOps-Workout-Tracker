@@ -11,7 +11,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from werkzeug.security import check_password_hash
 import os
 from mongoengine.errors import NotUniqueError, ValidationError
-from lib.utilities.api_functions import find_user_from_jwt, tuple_checker, get_credentials
+from lib.utilities.api_functions import find_user_from_jwt, tuple_checker, get_credentials, find_single_workout, find_user_workouts_list, workouts_as_dict
 
 load_dotenv()
 
@@ -102,78 +102,74 @@ def create_app():
     @app.route('/workouts', methods=['GET'])
     @jwt_required()
     def get_all_workouts():
-        username = get_jwt_identity()
-        user = User.objects(username=username).first()
-        if not user:
-            return jsonify({'error' : 'User not found'}), 400
+        user = find_user_from_jwt()
+        if tuple_checker(user):
+            return user
         
-        workouts = []
-        for workout in user.workout_list:
-            workout_dict = workout.to_dict()
-            workouts.append(workout_dict)
+        workouts = find_user_workouts_list()
+        workouts_dicts = workouts_as_dict(workouts)
 
-        if not workouts:
-            return jsonify({'error' : 'No workouts found'}), 400
+        if tuple_checker(workouts_dicts):
+            return workouts_dicts
 
         return jsonify({
         'message': 'Here are your workouts:',
-        'workouts': workouts
+        'workouts': workouts_dicts
     }), 200
 
     @app.route('/workouts/<workout_id>', methods=['GET'])
     @jwt_required()
     def get_single_workout(workout_id):
-        username = get_jwt_identity()
-        user = User.objects(username=username).first()
+        user = find_user_from_jwt()
+        if tuple_checker(user):
+            return user
         
-        if not user:
-            return jsonify({'error' : 'User not found'}), 400
-        
-        workout = next((workout.to_dict() for workout in user.workout_list if str(workout.id) == workout_id), None)
-
-        if not workout:
-            return jsonify({'error' : 'No workouts found'}), 400
+        workout = find_single_workout(workout_id)
+        if tuple_checker(workout):
+            return workout
         
         return jsonify({
         'message': f'Here are the details for workout ID: {workout_id}',
-        'workout': workout
+        'workout': workout.to_dict()
     }), 200
 
     @app.route('/workouts/<workout_id>/add_notes', methods=['PATCH'])
     @jwt_required()
     def add_workout_notes(workout_id):
         data = request.get_json()
-        username = get_jwt_identity()
-        user = User.objects(username=username).first()
-
-        if not user:
-            return jsonify({'error' : 'User not found'}), 400
+        user = find_user_from_jwt()
+        if tuple_checker(user):
+            return user
         
-        workout = next((workout for workout in user.workout_list if str(workout.id) == workout_id), None)
-
-        if not workout:
-            return jsonify({'error' : 'No workouts found'}), 400
-        
+        workout = find_single_workout(workout_id)
+        if tuple_checker(workout):
+            return workout
         workout.add_notes(data.get('notes'))
+            # Update the workout in the user's workout_list and save the user
+        for i, w in enumerate(user.workout_list):
+            if str(w.id) == workout_id:
+                user.workout_list[i] = workout  # Update the workout in the list
+                break
         user.save()
         return jsonify({'message' : f'{data.get("notes")}: added to workout notes'}), 202
     
     @app.route('/workouts/<workout_id>/delete_note/<note_index>', methods=['DELETE'])
     @jwt_required()
     def delete_workout_note(workout_id, note_index):
-
-        username = get_jwt_identity()
-        user = User.objects(username=username).first()
-
-        if not user:
-            return jsonify({'error' : 'User not found'}), 400
+        user = find_user_from_jwt()
+        if tuple_checker(user):
+            return user
         
-        workout = next((workout for workout in user.workout_list if str(workout.id) == workout_id), None)
-
-        if not workout:
-            return jsonify({'error' : 'No workouts found'}), 400
+        workout = find_single_workout(workout_id)
+        if tuple_checker(workout):
+            return workout
         
         workout.delete_note(note_index)
+            # Update the workout in the user's workout_list
+        for i, w in enumerate(user.workout_list):
+            if str(w.id) == workout_id:
+                user.workout_list[i] = workout  # Reassign the updated workout
+                break
         user.save()
 
         return jsonify({'message' : 'Note successfully deleted'}), 202
@@ -182,18 +178,19 @@ def create_app():
     @jwt_required()
     def toggle_workout_complete(workout_id):
         
-        username = get_jwt_identity()
-        user = User.objects(username=username).first()
-
-        if not user:
-            return jsonify({'error' : 'User not found'}), 400
+        user = find_user_from_jwt()
+        if tuple_checker(user):
+            return user
         
-        workout = next((workout for workout in user.workout_list if str(workout.id) == workout_id), None)
-
-        if not workout:
-            return jsonify({'error' : 'No workouts found'}), 400
+        workout = find_single_workout(workout_id)
+        if tuple_checker(workout):
+            return workout
         
         workout.toggle_complete()
+        for i, w in enumerate(user.workout_list):
+            if str(w.id) == workout_id:
+                user.workout_list[i] = workout  # Reassign the updated workout
+                break
         user.save()
         if workout.complete == True:
             status = "complete"
@@ -206,17 +203,14 @@ def create_app():
     @jwt_required()
     def add_stats_to_workout(workout_id):
         data = request.get_json()
-        
-        username = get_jwt_identity()
-        user = User.objects(username=username).first()
 
-        if not user:
-            return jsonify({'error' : 'User not found'}), 400
+        user = find_user_from_jwt()
+        if tuple_checker(user):
+            return user
         
-        workout = next((workout for workout in user.workout_list if str(workout.id) == workout_id), None)
-
-        if not workout:
-            return jsonify({'error' : 'No workouts found'}), 400
+        workout = find_single_workout(workout_id)
+        if tuple_checker(workout):
+            return workout
         
         if user.personal_data != None:
             personal_data = user.personal_data
@@ -230,6 +224,10 @@ def create_app():
             return jsonify({'error' : 'No personal data found'}), 400
 
         workout.add_stats(user_stats)
+        for i, w in enumerate(user.workout_list):
+            if str(w.id) == workout_id:
+                user.workout_list[i] = workout  # Reassign the updated workout
+                break
         user.save()
 
         return jsonify({'message' : 'Stats added to workout'}), 201

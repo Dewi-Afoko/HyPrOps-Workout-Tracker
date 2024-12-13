@@ -25,26 +25,42 @@ def find_user_from_jwt():
     
 def find_user_workouts_list():
     user = find_user_from_jwt()
+    if tuple_checker(user):
+        return user
     workouts = []
-    for workout in user.workout_list:
-        workout_dict = workout.to_dict()  
-        workouts.append(workout_dict)
+    for _ in user.workout_list:
+        entry = next((item for item in user.workout_list if item not in workouts), None)
+        if entry != None:
+            workouts.append(entry)
 
-        if not workouts:
-            return jsonify({'error' : 'No workouts found'}), 400
-        
+    if not workouts:
+        return jsonify({'error' : 'No workouts found'}), 400
+
     return workouts
+
+def workouts_as_dict(workouts):
+    try:
+        workout_dicts = [workout.to_dict() for workout in workouts]
+        return workout_dicts
+    except AttributeError:
+        return jsonify({'error' : 'No workouts found'}), 400
+
+
 
 def find_single_workout(workout_id):
     workouts = find_user_workouts_list()
+    if tuple_checker(workouts):
+        return workouts
     for workout in workouts:
-        if workout.id == workout_id:
+        if str(workout.id) == workout_id:
             return workout
-    if not workout:
-            return jsonify({'error' : 'Workout not found'}), 400
+        break
+    return jsonify({'error' : 'Workout not found'}), 400
     
 def find_set_dicts(workout_id):
     workout = find_single_workout(workout_id)
+    if tuple_checker(workout):
+        return workout
     set_dicts = []
     for set in workout.set_dicts_list:
             set_dicts.append(set.to_dict())
@@ -53,7 +69,11 @@ def find_set_dicts(workout_id):
 
 def find_single_set_dict(workout_id, set_order):
     set_dicts = find_set_dicts(workout_id)
+    if tuple_checker(set_dicts):
+        return set_dicts
     for set in set_dicts:
         if set.set_order == set_order:
             return set
     return jsonify({'error' : 'No sets not found'}), 400
+
+
