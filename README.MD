@@ -7,7 +7,8 @@ All work currently being done on Feature-SetDicts branch
     
     - New models all completed, TDDed to 100% coverage
     - API routes TDDed for success, still need to cover edge cases/exceptions
-    - Currently: Making routes DRY and creating API functions module
+    - All User and Workout API routes use functions module and are DRY
+    - Currently: Finishing making current routes DRY and completing functions module
 
 
 ## **Where We're At...**
