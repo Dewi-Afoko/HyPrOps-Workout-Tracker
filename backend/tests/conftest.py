@@ -48,13 +48,6 @@ def web_client(app):
         yield client
 
 
-@pytest.fixture
-def auth_token(app, sample_user):
-    """Generate a valid JWT token for the sample_user."""
-    with app.app_context():  # Use the session-scoped app fixture
-        token = create_access_token(identity=sample_user.username)
-        return token
-
 
 @pytest.fixture(scope="session", autouse=True)
 def mongo_connection():
@@ -101,13 +94,11 @@ def clear_db():
 def spoofed_user():
     spoofed_user = User(username="Test", password=test_password)
     spoofed_user.hash_password()
-    spoofed_user.save()
     yield spoofed_user
 
 @pytest.fixture
 def spoofed_empty_workout(spoofed_user):
     new_workout = Workout(user_id=spoofed_user.id, workout_name="First Try")
-    spoofed_user.save()
     yield new_workout
 
 @pytest.fixture

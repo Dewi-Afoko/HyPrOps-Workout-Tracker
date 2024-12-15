@@ -68,11 +68,12 @@ def test_successful_login_with_token(web_client, clear_db, spoofed_user, testing
     }
     response = web_client.post('/login', json=payload)
 
+
     assert response.status_code == 200
     assert response.json['message'] == f"Login successful, welcome {spoofed_user.username}"
     assert 'token' in response.json
 
-def test_login_fails_with_bad_credentials(web_client, clear_db, testing_password):
+def test_login_fails_with_bad_username(web_client, clear_db, testing_password):
     payload = {
         'username' : "Johnny",
         'password' : testing_password
@@ -80,7 +81,7 @@ def test_login_fails_with_bad_credentials(web_client, clear_db, testing_password
     response = web_client.post('/login', json=payload)
 
     assert response.status_code == 401
-    assert response.json['error'] == "Invalid login credentials"
+    assert response.json['error'] == "User not found"
     assert 'token' not in response.json
 
 def test_login_fails_no_username(web_client, clear_db, spoofed_user, testing_password):
@@ -132,10 +133,11 @@ def test_workout_creates_correctly(web_client, clear_db, spoofed_user, auth_toke
     assert response.status_code == 201
     assert response.json['message'] == f"{payload['workout_name']} created by {spoofed_user.username}"
 
-    user = User.objects(username=spoofed_user.username).first()
-    workout = next((workout for workout in user.workout_list if workout.workout_name == "Push"), None)
+    spoofed_user.reload()
+    workout = Workout.objects(user_id=str(spoofed_user.id)).first()
+    workout.save()
 
-    assert user.workout_list == [workout]
+    assert spoofed_user.workout_list == [workout]
 
 def test_workout_fails_with_no_name(web_client, clear_db, spoofed_user, auth_token):
     headers = {"Authorization": f"Bearer {auth_token}"}
@@ -158,7 +160,7 @@ def test_workout_fails_with_bad_user_token(web_client, clear_db, bad_token):
 
 
 # GET User Workouts
-
+#TODO: Re-start refactoring routes on TDD principles here
 def test_getting_user_workouts_success(web_client, clear_db, spoofed_populated_user, auth_token):
         headers = {"Authorization": f"Bearer {auth_token}"}
         response = web_client.get('/workouts', headers=headers)

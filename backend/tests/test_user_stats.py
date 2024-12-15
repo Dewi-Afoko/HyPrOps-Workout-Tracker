@@ -11,20 +11,19 @@ from pymongo.errors import DuplicateKeyError
 
 def test_user_stats_creation(spoofed_personal_data):
     stats = UserStats(weight=spoofed_personal_data, sleep_score=80, sleep_quality="Great", notes="Ready to get it!")
-    stats.set_weight()
     assert stats.weight == 25
     assert stats.sleep_score == 80
     assert stats.sleep_quality == "Great"
     assert stats.notes == "Ready to get it!"
 
 def test_update_user_stats(spoofed_user_stats, spoofed_personal_data_2):
-    assert spoofed_user_stats.weight.weight == 25
+    assert spoofed_user_stats.weight == 25
     assert spoofed_user_stats.notes == "Ready to start!"
     assert spoofed_user_stats.sleep_quality == "Great"
     assert spoofed_user_stats.sleep_score == 80
 
     spoofed_user_stats.update_user_stats(notes="We good", weight=spoofed_personal_data_2, sleep_score=65, sleep_quality="Bad")
-    assert spoofed_user_stats.weight.weight == 250
+    assert spoofed_user_stats.weight == 250
     assert spoofed_user_stats.notes == "We good"
     assert spoofed_user_stats.sleep_quality == "Bad"
     assert spoofed_user_stats.sleep_score == 65

@@ -61,7 +61,10 @@ def create_app():
             return credentials
         else:
             user = User.objects(username=credentials['username']).first()
-            if not user or not check_password_hash(user.password, credentials['password']):
+            if not user:
+                return jsonify({'error' : 'User not found'}), 401
+            
+            if not check_password_hash(user.password, credentials['password']):
                 return jsonify({'error' : 'Invalid login credentials'}), 401
             
             access_token = create_access_token(identity=credentials['username'])
@@ -94,8 +97,10 @@ def create_app():
             return user
 
         workout = Workout(user_id=str(user.id), workout_name=data['workout_name'])
+        workout.save()
 
         user.add_workout(workout)
+        user.save()
 
         return jsonify({'message' : f'{workout.workout_name} created by {user.username}'}), 201
         
