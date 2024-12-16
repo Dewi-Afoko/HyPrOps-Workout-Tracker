@@ -311,21 +311,21 @@ def create_app():
     @jwt_required()
     def add_notes_to_set(workout_id, set_order):
         data = request.get_json()
-        username = get_jwt_identity()
-
-        user = User.objects(username=username).first()
-        if not user:
-            return jsonify({'error' : 'User not found'}), 400
+        user = find_user_from_jwt()
+        if tuple_checker(user):
+            return user
         
+        workout = find_single_workout(workout_id)
+        if tuple_checker(workout):
+            return workout
         
-        workout = next((workout for workout in user.workout_list if str(workout.id) == workout_id), None)
-
         if not workout:
             return jsonify({'error' : 'Workout not found'}), 400
 
         set_dict = next((set for set in workout.set_dicts_list if set.set_order == int(set_order)), None)
 
         set_dict.add_notes(data.get('notes'))
+        workout.save()
         user.save()
 
         return jsonify({'message' : 'Notes added to set'}), 201
@@ -333,21 +333,21 @@ def create_app():
     @app.route('/workouts/<workout_id>/<set_order>/delete_notes', methods=['DELETE'])
     @jwt_required()
     def delete_set_notes(workout_id, set_order):
-        username = get_jwt_identity()
-
-        user = User.objects(username=username).first()
-        if not user:
-            return jsonify({'error' : 'User not found'}), 400
+        user = find_user_from_jwt()
+        if tuple_checker(user):
+            return user
         
+        workout = find_single_workout(workout_id)
+        if tuple_checker(workout):
+            return workout
         
-        workout = next((workout for workout in user.workout_list if str(workout.id) == workout_id), None)
-
         if not workout:
             return jsonify({'error' : 'Workout not found'}), 400
 
         set_dict = next((set for set in workout.set_dicts_list if set.set_order == int(set_order)), None)
 
         set_dict.delete_notes()
+        workout.save()
         user.save()
 
         return jsonify({'message' : 'Notes deleted'}), 200

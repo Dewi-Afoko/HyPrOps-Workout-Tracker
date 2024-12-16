@@ -401,7 +401,6 @@ def test_set_dict_toggle_complete_twice(web_client, clear_db, auth_token, spoofe
 
 
 
-#TODO fix tests from here!
 def test_set_dict_add_notes(web_client, auth_token, clear_db, spoofed_populated_user):
     headers = {"Authorization": f"Bearer {auth_token}"}
     payload = {'notes' : 'Until failure'}
