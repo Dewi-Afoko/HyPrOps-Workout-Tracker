@@ -6,7 +6,7 @@ from models.workout import Workout
 class User(Document):
     username = StringField(required=True, unique=True)
     password = StringField(required=True)
-    workout_list = ListField(ReferenceField('Workout'))
+    workout_list = ListField(ReferenceField('Workout')) #TODO: Consider whether this should be a function, not a property of user.
     personal_data = EmbeddedDocumentField(PersonalData, required=False)
 
 
@@ -39,6 +39,13 @@ class User(Document):
 
     def update_password(self, password):
         self.password = generate_password_hash(password)
+        self.save()
+
+    def refresh_workout_list(self):
+        workouts = []
+        for entry in Workout.objects(user_id=str(self.id)):
+            workouts.append(entry)
+        self.workout_list = workouts
         self.save()
 
 

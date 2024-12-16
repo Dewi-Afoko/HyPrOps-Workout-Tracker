@@ -84,6 +84,17 @@ def test_login_fails_with_bad_username(web_client, clear_db, testing_password):
     assert response.json['error'] == "User not found"
     assert 'token' not in response.json
 
+def test_login_fails_with_bad_password(web_client, clear_db, spoofed_user):
+    payload = {
+        'username' : str(spoofed_user.username),
+        'password' : "Not the password"
+    }
+    response = web_client.post('/api/login', json=payload)
+
+    assert response.status_code == 401
+    assert response.json['error'] == "Invalid login credentials"
+    assert 'token' not in response.json
+
 def test_login_fails_no_username(web_client, clear_db, spoofed_user, testing_password):
     payload = {'password' : testing_password}
     response = web_client.post('/api/login', json=payload)

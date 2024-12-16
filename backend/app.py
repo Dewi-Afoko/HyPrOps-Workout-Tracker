@@ -8,6 +8,8 @@ from routes import user_bp, auth_bp, workouts_bp
 
 load_dotenv()
 
+#TODO: Decide whether the enumerate functions should be simplified in the models.
+
 def create_app():
     app = Flask(__name__)
     CORS(app)
