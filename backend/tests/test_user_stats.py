@@ -10,7 +10,7 @@ from mongoengine.errors import ValidationError, NotUniqueError
 from pymongo.errors import DuplicateKeyError
 
 def test_user_stats_creation(spoofed_personal_data):
-    stats = UserStats(weight=spoofed_personal_data, sleep_score=80, sleep_quality="Great", notes="Ready to get it!")
+    stats = UserStats(weight=25, sleep_score=80, sleep_quality="Great", notes="Ready to get it!")
     assert stats.weight == 25
     assert stats.sleep_score == 80
     assert stats.sleep_quality == "Great"

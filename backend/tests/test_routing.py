@@ -164,7 +164,7 @@ def test_workout_fails_with_bad_user_token(web_client, clear_db, bad_token):
 def test_getting_user_workouts_success(web_client, clear_db, spoofed_populated_user, auth_token):
         headers = {"Authorization": f"Bearer {auth_token}"}
         response = web_client.get('/workouts', headers=headers)
-
+        
         assert response.json['message'] == 'Here are your workouts:'
         assert 'workouts' in response.json
         assert response.status_code == 200
@@ -192,6 +192,7 @@ def test_getting_single_workout_success_with_multiple_workouts(web_client, clear
         headers = {"Authorization": f"Bearer {auth_token}"}
         workout_id = str(spoofed_populated_user.workout_list[0].id)
         web_client.post('/workouts', headers=headers, json={'workout_name' : 'Workout2'})
+        spoofed_populated_user.reload()
         web_client.post('/workouts', headers=headers, json={'workout_name' : 'Workout3'})
         spoofed_populated_user.reload()
 
@@ -264,12 +265,13 @@ def test_toggling_workout_complete(web_client, clear_db, auth_token, spoofed_pop
         spoofed_populated_user.reload()
         assert spoofed_populated_user.workout_list[0].complete == False
                     
-
 def test_adding_userstats_to_workout(web_client, clear_db, auth_token, spoofed_populated_user, alt_spoofed_user_stats, spoofed_user_stats):
     headers = {"Authorization": f"Bearer {auth_token}"}
     workout_id = str(spoofed_populated_user.workout_list[0].id)
+
     assert spoofed_populated_user.workout_list[0].user_stats == spoofed_user_stats
     payload = alt_spoofed_user_stats.to_dict()
+
     response = web_client.put(f'/workouts/{workout_id}/add_stats', headers=headers, json=payload)
     assert response.json['message'] == 'Stats added to workout'
     assert response.status_code == 201
@@ -381,46 +383,25 @@ def test_creation_of_set_dict_fails_with_invalid_inputs(web_client, clear_db, sp
     assert response.status_code == 400
 
 
-def test_set_dict_toggle_complete_twice(web_client, clear_db, auth_token, spoofed_user, spoofed_empty_workout, spoof_arnold_press_dict):
+def test_set_dict_toggle_complete_twice(web_client, clear_db, auth_token, spoofed_populated_user):
     headers = {"Authorization": f"Bearer {auth_token}"}
-    web_client.post('/workouts', headers=headers, json={'workout_name' : 'First Try'}) # Create Workout
-    spoofed_user.reload()
-    workout = next((workout for workout in spoofed_user.workout_list if workout.workout_name == 'First Try'), None)
-    workout_id = str(workout.id)
-    payload = {
-        'workout_name': spoofed_empty_workout.workout_name,
-        'exercise_name': spoof_arnold_press_dict.exercise_name,
-        'set_type': spoof_arnold_press_dict.set_type,
-        'reps': spoof_arnold_press_dict.reps,
-        'loading': spoof_arnold_press_dict.loading,
-        'focus': spoof_arnold_press_dict.focus,
-        'rest': spoof_arnold_press_dict.rest,
-        'notes': spoof_arnold_press_dict.notes,
-    }
-    web_client.post(f'/workouts/{workout_id}/add_set', headers=headers, json=payload)  # Create SetDict
-    spoofed_user.reload()
-    workout = next((workout for workout in spoofed_user.workout_list if workout.workout_name == 'First Try'), None)
-    set_dict = next((set for set in workout.set_dicts_list if set.set_order == 1), None)
-    set_order = set_dict.set_order
-
+    assert spoofed_populated_user.workout_list[0].complete == False
+    workout_id = spoofed_populated_user.workout_list[0].id
+    set_order = 1
     response = web_client.patch(f'/workouts/{workout_id}/{set_order}/mark_complete', headers=headers)
-    spoofed_user.reload()
-    workout = next((workout for workout in spoofed_user.workout_list if workout.workout_name == 'First Try'), None)
-    set_dict = next((set for set in workout.set_dicts_list if set.set_order == 1), None)
-    assert response.json['message'] == "Set marked complete"
-    assert set_dict.complete is True
-
-    # Second toggle (to incomplete)
+    assert response.json['message'] == 'Set marked complete'
+    assert response.status_code == 201
+    spoofed_populated_user.reload()
+    assert spoofed_populated_user.workout_list[0].set_dicts_list[0].complete == True
     response = web_client.patch(f'/workouts/{workout_id}/{set_order}/mark_complete', headers=headers)
-    spoofed_user.reload()
-    workout = next((workout for workout in spoofed_user.workout_list if workout.workout_name == 'First Try'), None)
-    set_dict = next((set for set in workout.set_dicts_list if set.set_order == 1), None)
-
-    assert response.json['message'] == "Set marked incomplete"
-    assert set_dict.complete is False
+    assert response.json['message'] == 'Set marked incomplete'
+    assert response.status_code == 201
+    spoofed_populated_user.reload()
+    assert spoofed_populated_user.workout_list[0].set_dicts_list[0].complete == False
 
 
 
+#TODO fix tests from here!
 def test_set_dict_add_notes(web_client, auth_token, clear_db, spoofed_populated_user):
     headers = {"Authorization": f"Bearer {auth_token}"}
     payload = {'notes' : 'Until failure'}

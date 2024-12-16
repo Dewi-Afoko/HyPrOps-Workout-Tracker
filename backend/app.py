@@ -101,6 +101,8 @@ def create_app():
 
         user.add_workout(workout)
         user.save()
+        # print(f'app - {str(workout.user_id) =}')
+        # print(f'app - {user.id =}')
 
         return jsonify({'message' : f'{workout.workout_name} created by {user.username}'}), 201
         
@@ -223,7 +225,7 @@ def create_app():
         if not personal_data:
             return jsonify({'error' : 'No personal data found'}), 400
 
-        user_stats = UserStats(weight=personal_data, sleep_score=data.get('sleep_score'), sleep_quality=data.get('sleep_quality'), notes=data.get('notes'))
+        user_stats = UserStats(weight=personal_data.weight, sleep_score=data.get('sleep_score'), sleep_quality=data.get('sleep_quality'), notes=data.get('notes'))
 
         if not user_stats:
             return jsonify({'error' : 'No personal data found'}), 400
@@ -283,21 +285,21 @@ def create_app():
     @jwt_required()
     def toggle_set_complete(workout_id, set_order):
 
-        username = get_jwt_identity()
-
-        user = User.objects(username=username).first()
-        if not user:
-            return jsonify({'error' : 'User not found'}), 400
+        user = find_user_from_jwt()
+        if tuple_checker(user):
+            return user
         
+        workout = find_single_workout(workout_id)
+        if tuple_checker(workout):
+            return workout
         
-        workout = next((workout for workout in user.workout_list if str(workout.id) == workout_id), None)
-
         if not workout:
             return jsonify({'error' : 'Workout not found'}), 400
 
         set_dict = next((set for set in workout.set_dicts_list if set.set_order == int(set_order)), None)
 
         set_dict.toggle_complete()
+        workout.save()
         user.save()
         if set_dict.complete == True:
             return jsonify({'message' : 'Set marked complete'}), 201

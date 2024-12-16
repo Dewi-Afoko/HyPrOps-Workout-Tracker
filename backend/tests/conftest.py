@@ -112,8 +112,8 @@ def spoofed_personal_data_2():
     yield new_data
 
 @pytest.fixture
-def spoofed_user_stats(spoofed_personal_data):
-        stats = UserStats(weight=spoofed_personal_data, sleep_score=80, sleep_quality="Great", notes="Ready to start!")
+def spoofed_user_stats():
+        stats = UserStats(weight=25.0, sleep_score=80, sleep_quality="Great", notes="Ready to start!")
         yield stats
 
 @pytest.fixture
@@ -138,10 +138,10 @@ def spoofed_populated_user(spoof_arnold_press_dict, spoofed_user, spoofed_person
     spoofed_empty_workout.add_stats(spoofed_user_stats)
     spoofed_user.add_personal_data(spoofed_personal_data)
     spoofed_user.add_workout(spoofed_empty_workout)
-    spoofed_populated_user = spoofed_user.reload()
-    yield spoofed_populated_user
+    spoofed_user.save()
+    yield spoofed_user
 
 @pytest.fixture
-def alt_spoofed_user_stats(spoofed_personal_data):
-        stats = UserStats(weight=spoofed_personal_data, sleep_score=75, sleep_quality="Ok", notes="A little tired...")
+def alt_spoofed_user_stats():
+        stats = UserStats(weight=250.0, sleep_score=75, sleep_quality="Ok", notes="A little tired...")
         yield stats

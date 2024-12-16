@@ -27,12 +27,8 @@ def find_user_workouts_list():
     user = find_user_from_jwt()
     if tuple_checker(user):
         return user
-    workouts = []
-    for _ in user.workout_list:
-        entry = next((item for item in user.workout_list if item not in workouts), None)
-        if entry != None:
-            workouts.append(entry)
-
+    workouts = Workout.objects(user_id=user.id)
+    workouts = list(workouts)
     if not workouts:
         return jsonify({'error' : 'No workouts found'}), 400
 
@@ -43,6 +39,7 @@ def workouts_as_dict(workouts):
         workout_dicts = [workout.to_dict() for workout in workouts]
         return workout_dicts
     except AttributeError:
+        print('Debug')
         return jsonify({'error' : 'No workouts found'}), 400
 
 

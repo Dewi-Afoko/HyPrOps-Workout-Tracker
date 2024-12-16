@@ -8,7 +8,7 @@ from bson import ObjectId
 class Workout(Document):
     user_id = ReferenceField('User', required=True)
     workout_name = StringField(require=True)
-    date = DateTimeField(default=datetime.now)
+    date = DateTimeField(default=datetime.now().replace(second=0, microsecond=0))
     complete = BooleanField(default=False)
     set_dicts_list = EmbeddedDocumentListField(SetDicts)
     user_stats = EmbeddedDocumentField(UserStats)
