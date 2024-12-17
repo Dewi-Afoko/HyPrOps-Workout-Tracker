@@ -22,6 +22,6 @@ class PersonalData(EmbeddedDocument):
             self.dob = dob
         if height != None:
             self.height = height
-        if weight != None: # If this is accessed, we need to update UserStats
+        if weight != None: 
             self.weight = weight
         

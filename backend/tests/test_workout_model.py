@@ -33,14 +33,12 @@ def test_adding_sets_dicts(spoofed_empty_workout):
     spoofed_empty_workout.add_set_dict(set_dict)
     assert spoofed_empty_workout.set_dicts_list == [set_dict]
 
-def test_adding_user_stats(spoofed_empty_workout, spoofed_personal_data):
-    stats = UserStats(weight=spoofed_personal_data, sleep_score=80, sleep_quality="Good!", notes="Feeling it today!")
-    # stats.set_weight()
+def test_adding_user_stats(spoofed_empty_workout):
+    stats = UserStats(weight=25, sleep_score=80, sleep_quality="Good!", notes="Feeling it today!")
     spoofed_empty_workout.add_stats(stats)
     assert spoofed_empty_workout.user_stats == stats
-    assert spoofed_empty_workout.user_stats.weight.weight == 25
-    stats.set_weight()
-    assert stats.weight == 25
+    assert spoofed_empty_workout.user_stats.weight == 25
+
 
 def test_add_workout_notes(spoofed_empty_workout):
     note = "Feel pretty good..."

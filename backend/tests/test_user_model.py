@@ -25,8 +25,8 @@ def test_new_user_has_id(spoofed_user):
     assert len(str(spoofed_user.id)) > 1
 
 def test_adding_workout_to_list(spoofed_user, spoofed_empty_workout):
-    spoofed_user.add_workout(spoofed_empty_workout)
-    assert spoofed_user.workout_list == [spoofed_empty_workout]
+    spoofed_user.add_workout(spoofed_empty_workout.id)
+    assert spoofed_user.workout_list == [spoofed_empty_workout.id]
 
 def test_adding_personal_data(spoofed_user, spoofed_personal_data):
     spoofed_user.add_personal_data(spoofed_personal_data)
@@ -47,11 +47,11 @@ def test_update_password(spoofed_user):
     assert check_password_hash(spoofed_user.password, 'newPassWord') == True
 
 def test_delete_workout(spoofed_user, spoofed_empty_workout):
-    spoofed_user.add_workout(spoofed_empty_workout)
-    spoofed_user.add_workout(spoofed_empty_workout)
-    assert spoofed_user.workout_list == [spoofed_empty_workout, spoofed_empty_workout]
-    spoofed_user.delete_workout(spoofed_empty_workout)
-    assert spoofed_user.workout_list == [spoofed_empty_workout]
+    spoofed_user.add_workout(spoofed_empty_workout.id)
+    spoofed_user.add_workout(spoofed_empty_workout.id)
+    assert spoofed_user.workout_list == [spoofed_empty_workout.id, spoofed_empty_workout.id]
+    spoofed_user.delete_workout(spoofed_empty_workout.id)
+    assert spoofed_user.workout_list == [spoofed_empty_workout.id]
 
 def test_deleting_personal_data(spoofed_user, spoofed_personal_data):
     spoofed_user.add_personal_data(spoofed_personal_data)

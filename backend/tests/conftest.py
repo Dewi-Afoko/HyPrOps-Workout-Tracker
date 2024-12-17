@@ -48,13 +48,6 @@ def web_client(app):
         yield client
 
 
-@pytest.fixture
-def auth_token(app, sample_user):
-    """Generate a valid JWT token for the sample_user."""
-    with app.app_context():  # Use the session-scoped app fixture
-        token = create_access_token(identity=sample_user.username)
-        return token
-
 
 @pytest.fixture(scope="session", autouse=True)
 def mongo_connection():
@@ -101,13 +94,11 @@ def clear_db():
 def spoofed_user():
     spoofed_user = User(username="Test", password=test_password)
     spoofed_user.hash_password()
-    spoofed_user.save()
     yield spoofed_user
 
 @pytest.fixture
 def spoofed_empty_workout(spoofed_user):
     new_workout = Workout(user_id=spoofed_user.id, workout_name="First Try")
-    spoofed_user.save()
     yield new_workout
 
 @pytest.fixture
@@ -121,8 +112,8 @@ def spoofed_personal_data_2():
     yield new_data
 
 @pytest.fixture
-def spoofed_user_stats(spoofed_personal_data):
-        stats = UserStats(weight=spoofed_personal_data, sleep_score=80, sleep_quality="Great", notes="Ready to start!")
+def spoofed_user_stats():
+        stats = UserStats(weight=25.0, sleep_score=80, sleep_quality="Great", notes="Ready to start!")
         yield stats
 
 @pytest.fixture
@@ -147,10 +138,10 @@ def spoofed_populated_user(spoof_arnold_press_dict, spoofed_user, spoofed_person
     spoofed_empty_workout.add_stats(spoofed_user_stats)
     spoofed_user.add_personal_data(spoofed_personal_data)
     spoofed_user.add_workout(spoofed_empty_workout)
-    spoofed_populated_user = spoofed_user.reload()
-    yield spoofed_populated_user
+    spoofed_user.save()
+    yield spoofed_user
 
 @pytest.fixture
-def alt_spoofed_user_stats(spoofed_personal_data):
-        stats = UserStats(weight=spoofed_personal_data, sleep_score=75, sleep_quality="Ok", notes="A little tired...")
+def alt_spoofed_user_stats():
+        stats = UserStats(weight=250.0, sleep_score=75, sleep_quality="Ok", notes="A little tired...")
         yield stats
