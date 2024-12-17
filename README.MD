@@ -1,14 +1,8 @@
 # This isn't an actual read me, this is just so I can remember the last thing I did... 😅
 
 ### Update:
-So after getting everything up and running and using it to track one of my workouts, I've realised I don't like the data structures, etc. that I started out with – so I'm rebuilding... Basically everything as a result. When this message disappears, I've merged the changes to the main branch.
-
-All work currently being done on Feature-SetDicts branch
-    
-    - New models all completed, TDDed to 100% coverage
-    - API routes TDDed for success, still need to cover edge cases/exceptions
-    - All User and Workout API routes use functions module and are DRY
-    - Currently: Finishing making current routes DRY and completing functions module
+New backend TDDed, DRY and RESTful AF! 
+Currently: Refactoring frontend components
 
 
 ## **Where We're At...**
