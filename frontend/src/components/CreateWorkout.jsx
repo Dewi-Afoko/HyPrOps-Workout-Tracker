@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import Button from "react-bootstrap/Button";
 import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
@@ -6,6 +6,11 @@ import { useNavigate } from "react-router-dom";
 
 const CreateWorkout = () => {
     const navigate = useNavigate();
+    const [workoutName, setWorkoutName] = useState();
+
+    const handleWorkoutName = (e) => {
+        setWorkoutName(e.target.value);
+    };
 
     const handleButtonClick = async () => {
         const user_id = localStorage.getItem('user_id');
@@ -17,8 +22,8 @@ const CreateWorkout = () => {
         try {
             // Make the POST request with token in headers
             const response = await axios.post(
-                `http://127.0.0.1:5000/workouts/${user_id}`, 
-                {}, // Assuming no body is required, otherwise replace with the request payload
+                `http://127.0.0.1:5000/api/workouts`, 
+                {'workout_name' : workoutName}, 
                 {
                     headers: {
                         Authorization: `Bearer ${token}` // Add token to Authorization header
@@ -35,6 +40,20 @@ const CreateWorkout = () => {
     };
 
     return (
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+
+        <input
+        type="text"
+        value={workoutName}
+        onChange={handleWorkoutName}
+        placeholder="Enter workout name"
+        style={{
+            padding: "10px",
+            borderRadius: "5px",
+            border: "1px solid #ccc",
+            fontSize: "16px",
+        }}
+    />
         <Button 
             onClick={handleButtonClick} 
             variant="dark" 
@@ -48,6 +67,7 @@ const CreateWorkout = () => {
         >
             Create Workout
         </Button>
+        </div>
     );
 };
 

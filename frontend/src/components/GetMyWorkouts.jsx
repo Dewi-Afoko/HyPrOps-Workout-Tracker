@@ -18,14 +18,15 @@ const GetWorkouts = ({ onRefresh }) => {
         }
         try {
             const response = await axios.get(
-                `http://127.0.0.1:5000/workouts/${user_id}`,
+                `http://127.0.0.1:5000/api/workouts`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 }
             );
-            setMyWorkouts(response.data);
+            setMyWorkouts(response.data.workouts);
+            console.log(response.data.workouts)
         } catch (error) {
             console.error("Error making API call:", error);
             alert("Failed to fetch data. Check console for details.");
@@ -56,9 +57,9 @@ const GetWorkouts = ({ onRefresh }) => {
     return (
         <div style={{ textAlign: "center", marginTop: "20px" }}>
             <ul style={{ listStyleType: "none", padding: 0, marginTop: "20px" }}>
-                {myWorkouts.map((workout, index) => (
+                {myWorkouts.map((workout) => (
                     <li
-                        key={index}
+                        key={workout}
                         style={{
                             backgroundColor: "#f8f9fa",
                             margin: "10px auto",
@@ -75,7 +76,7 @@ const GetWorkouts = ({ onRefresh }) => {
                                 navigate('/thisworkout');
                             }}
                         >
-                            {`Workout ${index + 1}`}
+                            {`Workout ${workout}`}
                         </h3>
                         {`Created: ${workout.date}`}
                         <br />
@@ -100,7 +101,7 @@ const GetWorkouts = ({ onRefresh }) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {workout.exercise_list.map((exercise, exerciseIndex) => {
+                                {workout.set_dicts_list.map((exercise) => {
                                     const exerciseName = exercise.exercise_name;
                                     const loading = exercise.loading.join(", ");
                                     const rest = exercise.rest.join(", ");
