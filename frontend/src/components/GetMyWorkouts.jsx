@@ -57,9 +57,9 @@ const GetWorkouts = ({ onRefresh }) => {
     return (
         <div style={{ textAlign: "center", marginTop: "20px" }}>
             <ul style={{ listStyleType: "none", padding: 0, marginTop: "20px" }}>
-                {myWorkouts.map((workout) => (
+                {myWorkouts.map((workout, index) => (
                     <li
-                        key={workout}
+                        key={index}
                         style={{
                             backgroundColor: "#f8f9fa",
                             margin: "10px auto",
@@ -76,7 +76,7 @@ const GetWorkouts = ({ onRefresh }) => {
                                 navigate('/thisworkout');
                             }}
                         >
-                            {`Workout ${workout}`}
+                            {`Workout: ${workout.workout_name}`}
                         </h3>
                         {`Created: ${workout.date}`}
                         <br />
@@ -93,6 +93,9 @@ const GetWorkouts = ({ onRefresh }) => {
                             <thead>
                                 <tr>
                                     <th>Exercise</th>
+                                    <th>Set Number</th>
+                                    <th>Set Type</th>
+                                    <th>Focus</th>
                                     <th>Loading</th>
                                     <th>Rest Interval</th>
                                     <th>Reps</th>
@@ -101,16 +104,20 @@ const GetWorkouts = ({ onRefresh }) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {workout.set_dicts_list.map((exercise) => {
-                                    const exerciseName = exercise.exercise_name;
-                                    const loading = exercise.loading.join(", ");
-                                    const rest = exercise.rest.join(", ");
-                                    const reps = exercise.reps.join(", ");
-                                    const complete = exercise.complete.toString();
-                                    const notes = exercise.performance_notes.join(", ");
+                                {workout.sets_dict_list.map((set) => {
+                                    const exerciseName = set.exercise_name;
+                                    const loading = set.loading;
+                                    const rest = set.rest;
+                                    const reps = set.reps;
+                                    const complete = set.complete.toString();
+                                    const notes = set.performance_notes;
+                                    const setIndex = set.set_order 
+                                    const setNumber = set.set_number;
+                                    const focus = set.focus;
+                                    const setType = set.set_type;
 
                                     return (
-                                        <tr key={`${index}-${exerciseIndex}`}>
+                                        <tr key={`${index}-${setIndex}`}>
                                             <td
                                                 style={{ cursor: "pointer", color: "red" }}
                                                 onClick={() => {
@@ -121,6 +128,9 @@ const GetWorkouts = ({ onRefresh }) => {
                                             >
                                                 {exerciseName}
                                             </td>
+                                            <td>{setNumber + 1}</td>
+                                            <td>{setType}</td>
+                                            <td>{focus}</td>
                                             <td>{loading}</td>
                                             <td>{rest}</td>
                                             <td>{reps}</td>
