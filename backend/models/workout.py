@@ -1,42 +1,61 @@
-from mongoengine import Document, StringField, ListField, ReferenceField, DateTimeField, BooleanField, EmbeddedDocumentField
+from mongoengine import Document, StringField, ListField, ReferenceField, DateTimeField, BooleanField, EmbeddedDocumentField, EmbeddedDocumentListField, EmbeddedDocument, ObjectIdField
 from datetime import datetime
-from .workout_exercise_info import WorkoutExerciseInfo
+from models.set_dicts import SetDicts
+from models.user_stats import UserStats
+from bson import ObjectId
+
 
 class Workout(Document):
-    user_id = ReferenceField('User', required=True) 
-    date = DateTimeField(default=datetime.now)
+    user_id = ReferenceField('User', required=True)
+    workout_name = StringField(require=True)
+    date = DateTimeField(default=datetime.now().replace(second=0, microsecond=0))
     complete = BooleanField(default=False)
-    exercise_list = ListField(EmbeddedDocumentField(WorkoutExerciseInfo), default=list)
-    
+    set_dicts_list = EmbeddedDocumentListField(SetDicts)
+    user_stats = EmbeddedDocumentField(UserStats)
+    notes = ListField(StringField(), default=list)
 
-    def add_exercise(self, exercise_info):
-        self.exercise_list.append(exercise_info)
+
+    def add_set_dict(self, set_dict): # SetDict object
+        self.set_dicts_list.append(set_dict)
         self.save()
-    
-    def delete_exercise(self, exercise_info):
-        if exercise_info in self.exercise_list:
-            self.exercise_list.remove(exercise_info)
-            self.save()
 
-    def mark_complete(self):
+    def delete_set_dict(self, set_dict):
+        self.set_dicts_list.remove(set_dict)
+        self.save()
+
+    def toggle_complete(self):
         if self.complete == False:
             self.complete = True
-            self.save()
         elif self.complete == True:
             self.complete = False
-            self.save()
+        self.save()
 
-    def __repr__(self):
-        return f"Workout(user_id={self.user_id}, exercise_list={self.exercise_list})"
-    
-    def __eq__(self, other):
-        return self.__dict__ == other.__dict__
-    
+    def add_stats(self, user_stats): # UserStats object
+        self.user_stats = user_stats
+        self.save()
+
+    def add_notes(self, notes): # notes is a string
+        if not self.notes:
+            self.notes = []
+        self.notes.append(notes)
+        self.save()
+
+    def delete_note(self, note_index):
+        del self.notes[int(note_index)]
+        self.save()
+
     def to_dict(self):
-        return {
-            "id": str(self.id), 
-            "user_id": str(self.user_id), 
-            "exercise_list": [exercise.to_dict() for exercise in self.exercise_list],
+        workout_id = str(self.id)
+        user_id = str(self.user_id.id)
+        workout_dict = {
+            "id": workout_id,
+            "user_id": user_id,
+            "workout_name": self.workout_name,
+            "date": self.date.isoformat() if self.date else None,  # Properly serialize date
             "complete": self.complete,
-            "date": self.date,
+            "sets_dict_list": [set_dict.to_dict() for set_dict in self.set_dicts_list],
+            "user_stats": self.user_stats.to_dict() if self.user_stats else None,
+            "notes": self.notes,
         }
+        return workout_dict
+    

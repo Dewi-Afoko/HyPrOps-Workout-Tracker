@@ -1,39 +1,53 @@
-from mongoengine import Document, StringField, ListField
+from mongoengine import Document, StringField, ListField, EmbeddedDocumentField, EmbeddedDocumentListField, ReferenceField
 from werkzeug.security import generate_password_hash, check_password_hash
+from models.personal_data import PersonalData
+from models.workout import Workout
 
 class User(Document):
     username = StringField(required=True, unique=True)
-    password = StringField(required=True)  # Stores hashed password
-    workout_list = ListField()
-
-    def save(self, *args, **kwargs):
-        # Check if the password is already hashed
-        if not self.password.startswith('scrypt:'):
-            self.password = generate_password_hash(self.password)
-        super().save(*args, **kwargs)
+    password = StringField(required=True)
+    workout_list = ListField(ReferenceField('Workout')) #TODO: Consider whether this should be a function, not a property of user.
+    personal_data = EmbeddedDocumentField(PersonalData, required=False)
 
 
-    def update_password(self, password):
-        # Hash the new password before updating
-        self.password = generate_password_hash(password)
+    def hash_password(self):
+        self.password = generate_password_hash(self.password)
+        self.save()
 
-    def verify_password(self, password):
-        # Verify the given password against the stored hashed password
-        return check_password_hash(self.password, password)
-
-    def add_workout(self, workout):
+    def add_workout(self, workout): # Workout object (referenced)
         self.workout_list.append(workout)
 
-    def __repr__(self):
-        return f"User(username={self.username}, workout_list={self.workout_list})"
+    def delete_workout(self, workout):
+        self.workout_list.remove(workout)
+
+
+    def add_personal_data(self, personal_data): # PersonalData object
+        self.personal_data = personal_data
+        self.save()
+
+    def delete_personal_data(self):
+        self.personal_data = None
+        self.save()
 
     def to_dict(self):
         return {
-            "username": self.username,
-            "workout_list": self.workout_list
+            'id' : str(self.id),
+            'username' : self.username,
+            'workout_list' : self.workout_list,
+            'personal_data' : str(self.personal_data),
         }
 
-    def __eq__(self, other):
-        if isinstance(other, User):
-            return self.__dict__ == other.__dict__
-        return False
+    def update_password(self, password):
+        self.password = generate_password_hash(password)
+        self.save()
+
+    def refresh_workout_list(self):
+        workouts = []
+        for entry in Workout.objects(user_id=str(self.id)):
+            workouts.append(entry)
+        self.workout_list = workouts
+        self.save()
+
+
+    
+

@@ -9,9 +9,21 @@ from lib.database_connection import initialize_db, close_db
 from app import create_app
 from models.user import User
 from models.workout import Workout
-from models.workout_exercise_info import WorkoutExerciseInfo
+from models.user_stats import UserStats
+from models.set_dicts import SetDicts
+from models.personal_data import PersonalData
 from mongoengine import connect, disconnect
+from dotenv import load_dotenv
+from datetime import datetime
 
+load_dotenv()
+
+test_password = os.getenv("TEST_PASSWORD")
+
+@pytest.fixture
+def testing_password():
+    test_password = os.getenv("TEST_PASSWORD")
+    return test_password
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -35,73 +47,6 @@ def web_client(app):
     with app.test_client() as client:
         yield client
 
-@pytest.fixture(autouse=True)
-def clean_database(app):
-    """Clean the test database before each test."""
-    with app.app_context():
-        print("Cleaning database...")  # Debugging output
-        for model in [User, Workout, WorkoutExerciseInfo]:
-            if hasattr(model, "objects"):
-                print(f"Clearing data for {model.__name__}")  # Debugging output
-                model.objects.delete()
-
-
-@pytest.fixture
-def auth_token(app, sample_user):
-    """Generate a valid JWT token for the sample_user."""
-    with app.app_context():  # Use the session-scoped app fixture
-        token = create_access_token(identity=sample_user.username)
-        return token
-
-
-@pytest.fixture
-def sample_user():
-    """Create a sample user for testing."""
-    user = User(username="testuser", password="plainpassword")  # Plain text password
-    user.save()  # Password will be hashed during save()
-    yield user
-    user.delete()
-
-
-@pytest.fixture
-def sample_workout(sample_user):
-    """Create a sample workout for the sample user."""
-    workout = Workout(user_id=sample_user.id)
-    workout.save()
-    yield workout
-    workout.delete()
-
-
-@pytest.fixture
-def sample_workout_with_exercise(sample_user):
-    """Create a sample workout with an exercise for the sample user."""
-    workout = Workout(user_id=sample_user.id)
-    exercise_info = WorkoutExerciseInfo(
-        exercise_name="Push-ups",
-        reps=[10, 12],
-        performance_notes=["Good form"]
-    )
-    workout.exercise_list.append(exercise_info)
-    workout.save()
-    yield workout
-    workout.delete()
-
-
-@pytest.fixture
-def sample_user_with_workout():
-    """Create a sample user with a linked workout."""
-    user = User(username="testuser", password="hashedpassword")
-    user.save()
-
-    workout = Workout(user_id=user.id)
-    workout.save()
-
-    user.workout_list.append(workout)
-    user.save()
-
-    yield user
-    user.delete()
-    workout.delete()
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -139,9 +84,64 @@ def setup_test_database():
     yield
     disconnect(alias="default")  # Cleanly disconnect after tests
 
+
+@pytest.fixture(autouse=True)
+def clear_db():
+    User.objects.delete()
+
+
 @pytest.fixture
-def empty_auth_token(app):
-    """Generate a valid JWT token for a non-existent user."""
-    with app.app_context():
-        token = create_access_token(identity="nonexistent_user")
-        return token
+def spoofed_user():
+    spoofed_user = User(username="Test", password=test_password)
+    spoofed_user.hash_password()
+    yield spoofed_user
+
+@pytest.fixture
+def spoofed_empty_workout(spoofed_user):
+    new_workout = Workout(user_id=spoofed_user.id, workout_name="First Try")
+    yield new_workout
+
+@pytest.fixture
+def spoofed_personal_data():
+    new_data = PersonalData(name="Burrito", dob=datetime(2021, 11, 12), height=25, weight=25)
+    yield new_data
+
+@pytest.fixture
+def spoofed_personal_data_2():
+    new_data = PersonalData(name="Burrito", dob=datetime(2021, 11, 12), height=25, weight=250)
+    yield new_data
+
+@pytest.fixture
+def spoofed_user_stats():
+        stats = UserStats(weight=25.0, sleep_score=80, sleep_quality="Great", notes="Ready to start!")
+        yield stats
+
+@pytest.fixture
+def spoof_arnold_press_dict():
+        set_dict = SetDicts(set_order=1, exercise_name="Arnold Press", set_number=1, set_type="Working", reps=10, loading=20, focus="Form", rest=60, notes="Good form and tempo")
+        yield set_dict
+
+@pytest.fixture
+def auth_token(spoofed_user):
+    access_token = create_access_token(identity=spoofed_user.username)
+    yield access_token
+
+
+@pytest.fixture
+def bad_token():
+    access_token = create_access_token(identity="Invalid")
+    yield access_token
+
+@pytest.fixture
+def spoofed_populated_user(spoof_arnold_press_dict, spoofed_user, spoofed_personal_data, spoofed_user_stats, spoofed_empty_workout):
+    spoofed_empty_workout.add_set_dict(spoof_arnold_press_dict)
+    spoofed_empty_workout.add_stats(spoofed_user_stats)
+    spoofed_user.add_personal_data(spoofed_personal_data)
+    spoofed_user.add_workout(spoofed_empty_workout)
+    spoofed_user.save()
+    yield spoofed_user
+
+@pytest.fixture
+def alt_spoofed_user_stats():
+        stats = UserStats(weight=250.0, sleep_score=75, sleep_quality="Ok", notes="A little tired...")
+        yield stats
