@@ -1,9 +1,11 @@
 # This isn't an actual read me, this is just so I can remember the last thing I did... 😅
 
 ### Update:
-New backend TDDed, DRY and RESTful AF! 
+New backend TDDed, DRY and RESTful-ish - some work still to be done.
 
 Currently: Refactoring frontend components
+
+Next: Fix API documentation to reflect new backend routes
 
 
 ## **Where We're At...**
