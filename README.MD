@@ -5,7 +5,7 @@ New backend TDDed, DRY and RESTful-ish - some work still to be done.
 
 Currently: Refactoring frontend components
 
-Next: Fix API documentation to reflect new backend routes
+Next: Fix API documentation to reflect new backend routes, update this README so it reflects where v2 of the project is at.
 
 
 ## **Where We're At...**
