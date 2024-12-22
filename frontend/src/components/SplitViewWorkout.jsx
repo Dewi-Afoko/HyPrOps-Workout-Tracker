@@ -25,7 +25,7 @@ const SplitIndividualWorkoutDetails = () => {
         }
         try {
             const response = await axios.get(
-                `http://127.0.0.1:5000/workouts/${user_id}/${workout_id}`,
+                `http://127.0.0.1:5000/api/workouts/${workout_id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -186,8 +186,8 @@ const SplitIndividualWorkoutDetails = () => {
         </div>
     );
 
-    const completeExercises = thisWorkout.exercise_list.filter((exercise) => exercise.complete);
-    const incompleteExercises = thisWorkout.exercise_list.filter((exercise) => !exercise.complete);
+    const completeExercises = thisWorkout.set_dicts_list.filter((exercise) => exercise.complete);
+    const incompleteExercises = thisWorkout.set_dicts_list.filter((exercise) => !exercise.complete);
 
     return (
 
