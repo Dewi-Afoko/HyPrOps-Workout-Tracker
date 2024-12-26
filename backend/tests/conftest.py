@@ -96,3 +96,8 @@ def user_burrito(testing_password):
     burrito.hash_password()
     burrito.save()
     yield burrito
+
+@pytest.fixture
+def auth_token(user_burrito):
+    token = create_access_token(str(user_burrito.username))
+    yield token

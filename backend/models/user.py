@@ -35,7 +35,7 @@ class User(Document):
 
     def to_dict(self):
         payload = {
-            'id' : self.id,
+            'id' : str(self.id),
             'username' : self.username,
             'name': self.name,
             'height': self.height,
