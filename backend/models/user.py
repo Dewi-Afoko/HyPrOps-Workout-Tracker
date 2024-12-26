@@ -1,53 +1,69 @@
-from mongoengine import Document, StringField, ListField, EmbeddedDocumentField, EmbeddedDocumentListField, ReferenceField
+from mongoengine import Document, StringField, ListField, EmbeddedDocumentField, EmbeddedDocumentListField, ReferenceField, DateField, FloatField
 from werkzeug.security import generate_password_hash, check_password_hash
-from models.personal_data import PersonalData
 from models.workout import Workout
+from datetime import datetime
 
 class User(Document):
     username = StringField(required=True, unique=True)
     password = StringField(required=True)
-    workout_list = ListField(ReferenceField('Workout')) #TODO: Consider whether this should be a function, not a property of user.
-    personal_data = EmbeddedDocumentField(PersonalData, required=False)
+    name = StringField(required=False)
+    height = FloatField(required=False)
+    weight = FloatField(required=False)
+    dob = DateField(required=False)
 
 
     def hash_password(self):
         self.password = generate_password_hash(self.password)
         self.save()
 
-    def add_workout(self, workout): # Workout object (referenced)
-        self.workout_list.append(workout)
-
-    def delete_workout(self, workout):
-        self.workout_list.remove(workout)
-
-
-    def add_personal_data(self, personal_data): # PersonalData object
-        self.personal_data = personal_data
-        self.save()
-
-    def delete_personal_data(self):
-        self.personal_data = None
-        self.save()
-
-    def to_dict(self):
-        return {
-            'id' : str(self.id),
-            'username' : self.username,
-            'workout_list' : self.workout_list,
-            'personal_data' : str(self.personal_data),
-        }
-
     def update_password(self, password):
         self.password = generate_password_hash(password)
         self.save()
 
-    def refresh_workout_list(self):
-        workouts = []
-        for entry in Workout.objects(user_id=str(self.id)):
-            workouts.append(entry)
-        self.workout_list = workouts
-        self.save()
+    def update_personal_details(self, name=None, dob=None, height=None, weight=None):
+        if name is not None:
+            try:
+                self.name = self._validate_name(name)
+            except AttributeError:
+                raise AttributeError("Name must be a string")
+        if dob is not None:
+            self.dob = self._validate_dob(dob)  
+        if height is not None:
+            self.height = self._validate_is_number(height, "height") 
+        if weight is not None:
+            self.weight = self._validate_is_number(weight, "weight")
+
+    def to_dict(self):
+        payload = {
+            'id' : self.id,
+            'username' : self.username,
+            'name': self.name,
+            'height': self.height,
+            'weight': self.weight,
+            }
+        if self.dob != None:
+            payload['dob'] = self.dob.strftime('%Y/%m/%d')
+        return payload
+
+    def _validate_name(self, name):
+        if isinstance(name, str) and len(name.strip()) > 0:
+            return name
+        raise ValueError(f"Name must be a string, got {type(name).__name__}")
+
+    def _validate_dob(self, dob):
+        if isinstance(dob, str):
+            try:
+                return datetime.strptime(dob, "%Y/%m/%d")
+            except ValueError:
+                raise ValueError(f"Date of birth must be in YYYY/MM/DD format, got {dob}")
+        raise ValueError(f"Date of birth must be a string, got {type(dob).__name__}")
+
+    def _validate_is_number(self, value, field_name):
+        try:
+            return float(value)
+        except ValueError:
+            raise ValueError(f"{field_name} must be a number, got {value}")
 
 
-    
+        
 

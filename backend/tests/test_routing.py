@@ -5,6 +5,7 @@ from models.workout import Workout
 from flask_jwt_extended import create_access_token
 from bson import ObjectId
 from werkzeug.security import generate_password_hash
+from lib.utilities.api_functions import find_single_workout
 
 
 """ 
@@ -18,7 +19,7 @@ def test_register_user(web_client, clear_db):
         "username": "Route_Testah", 
         "password" : "hashDAT"
         }
-    response = web_client.post('/api/user', json=payload)
+    response = web_client.post('/api/users', json=payload)
 
     assert response.status_code == 201
     assert response.json == {"message" : "Route_Testah successfully registered!"}
@@ -31,12 +32,12 @@ def test_duplicate_user_registration(web_client, clear_db):
         "username": "Route_Testah", 
         "password" : "hashDAT"
         }
-    response = web_client.post('/api/user', json=payload)
+    response = web_client.post('/api/users', json=payload)
 
     assert response.status_code == 201
     assert response.json == {"message" : "Route_Testah successfully registered!"}
 
-    response = web_client.post('/api/user', json=payload)
+    response = web_client.post('/api/users', json=payload)
     assert response.status_code == 409
     assert response.json['error'] == 'Username unavailable'
 
@@ -44,7 +45,7 @@ def test_no_password_registration_fails(web_client, clear_db):
     payload = {
         "username" : "A_User"
     }
-    response = web_client.post('/api/user', json=payload)
+    response = web_client.post('/api/users', json=payload)
     assert response.status_code == 400
     assert response.json['error'] == 'Password not provided'
 
@@ -52,7 +53,7 @@ def test_no_username_registration_fails(web_client, clear_db):
     payload = {
         "password" : "failure"
     }
-    response = web_client.post('/api/user', json=payload)
+    response = web_client.post('/api/users', json=payload)
     assert response.status_code == 400
     assert response.json['error'] == 'Username not provided'
 
@@ -165,7 +166,7 @@ def test_workout_fails_with_bad_user_token(web_client, clear_db, bad_token):
             }
 
     response = web_client.post('/api/workouts', headers=headers, json=payload)
-    assert response.status_code == 400
+    assert response.status_code == 404
     assert response.json['error'] == 'User not found'
 
 
@@ -186,7 +187,7 @@ def test_getting_workouts_fails_with_no_workouts(web_client, clear_db, auth_toke
         response = web_client.get('/api/workouts', headers=headers)    
 
         assert response.json['error'] == 'No workouts found'
-        assert response.status_code == 400         
+        assert response.status_code == 404     
                     
                     
                     
@@ -225,7 +226,7 @@ def test_add_notes_to_workout(web_client, clear_db, auth_token, spoofed_populate
         response = web_client.patch(f'/api/workouts/{workout_id}/add_notes', headers=headers, json=payload)
 
         assert response.json['message'] == f'{payload["notes"]}: added to workout notes'
-        assert response.status_code == 202
+        assert response.status_code == 200
 
         spoofed_populated_user.reload()
 
@@ -245,13 +246,13 @@ def test_delete_notes_from_workout(web_client, clear_db, auth_token, spoofed_pop
         spoofed_populated_user.reload()
 
         assert response.json['message'] == f'{payload["notes"]}: added to workout notes'
-        assert response.status_code == 202
+        assert response.status_code == 200
         assert len(spoofed_populated_user.workout_list[0].notes) == 3
 
         spoofed_populated_user.reload()
         note_index = 1
         response = web_client.delete(f'/api/workouts/{workout_id}/delete_note/{note_index}', headers=headers)
-        assert response.status_code == 202
+        assert response.status_code == 200
         assert response.json['message'] == 'Note successfully deleted'
 
 
@@ -268,11 +269,11 @@ def test_toggling_workout_complete(web_client, clear_db, auth_token, spoofed_pop
         response = web_client.patch(f'/api/workouts/{workout_id}/mark_complete', headers=headers)
         spoofed_populated_user.reload()
         assert response.json['message'] == "Workout marked as complete"
-        assert response.status_code == 201
+        assert response.status_code == 200
         assert spoofed_populated_user.workout_list[0].complete == True
         response = web_client.patch(f'/api/workouts/{workout_id}/mark_complete', headers=headers)
         assert response.json['message'] == "Workout marked as incomplete"
-        assert response.status_code == 201
+        assert response.status_code == 200
         spoofed_populated_user.reload()
         assert spoofed_populated_user.workout_list[0].complete == False
                     
@@ -401,12 +402,12 @@ def test_set_dict_toggle_complete_twice(web_client, clear_db, auth_token, spoofe
     set_order = 1
     response = web_client.patch(f'/api/workouts/{workout_id}/{set_order}/mark_complete', headers=headers)
     assert response.json['message'] == 'Set marked complete'
-    assert response.status_code == 201
+    assert response.status_code == 200
     spoofed_populated_user.reload()
     assert spoofed_populated_user.workout_list[0].set_dicts_list[0].complete == True
     response = web_client.patch(f'/api/workouts/{workout_id}/{set_order}/mark_complete', headers=headers)
     assert response.json['message'] == 'Set marked incomplete'
-    assert response.status_code == 201
+    assert response.status_code == 200
     spoofed_populated_user.reload()
     assert spoofed_populated_user.workout_list[0].set_dicts_list[0].complete == False
 
@@ -442,4 +443,46 @@ def test_set_dict_delete_notes(web_client, auth_token, clear_db, spoofed_populat
     spoofed_populated_user.reload()
     assert spoofed_populated_user.workout_list[0].set_dicts_list[0].notes == None
 
-#TODO for SetDicts: Tests that should fail
+#TODO Missing routes: PersonalData and integration with UserStats weight
+
+def test_adding_personal_data_to_user(web_client, auth_token, clear_db, spoofed_user, spoofed_personal_data):
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    payload = spoofed_personal_data.to_dict()
+    assert len(str(spoofed_user.personal_data)) > 1
+    response = web_client.post('/api/users/add_personal_data', headers=headers, json=payload)
+    assert response.json['message'] == "Personal data updated"
+    assert response.status_code == 201
+    spoofed_user.reload()
+    assert spoofed_user.personal_data == spoofed_personal_data
+
+def test_create_incomplete_personal_data(web_client, auth_token, clear_db, spoofed_user):
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    payload = {"name" : "Nope"}
+    response = web_client.post('/api/users/add_personal_data', headers=headers, json=payload)
+    assert response.status_code == 201
+    assert response.json['message'] == "Personal data updated"
+    spoofed_user.reload()
+    assert spoofed_user.personal_data.name == "Nope"
+
+def test_failure_with_invalid_inputs_for_personal_data(web_client, auth_token, clear_db, spoofed_user):
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    payload = {"name" : 1}
+    response = web_client.post('/api/users/add_personal_data', headers=headers, json=payload)
+    assert response.status_code == 400
+    assert response.json['error'] == "Failed to create Personal Data"
+
+def test_adding_user_stats_to_workout_gets_weight_from_personal_data(web_client, spoofed_populated_user, auth_token, clear_db, spoofed_personal_data_2):
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    payload = spoofed_personal_data_2.to_dict()
+    web_client.post('/api/users/add_personal_data', headers=headers, json=payload)
+    spoofed_populated_user.save()
+    print(f'{spoofed_populated_user.personal_data.to_dict() =}')
+    workout_id = str(spoofed_populated_user.workout_list[0].id)
+    workout = Workout.objects(id=workout_id).first()
+    response = web_client.put(f'/api/workouts/{workout_id}/add_stats', headers=headers, json={"sleep_score" : 55, "sleep_quality" : "Bad", "notes" : "Did not sleep enough, feel ropey"})
+    workout.reload()
+    print(f'{response.json =}')
+    assert response.json['message'] == "Stats added to workout"
+    assert response.status_code == 201
+    assert spoofed_populated_user.personal_data.weight == 250
+    assert spoofed_populated_user.workout_list[0].user_stats.weight == 250
