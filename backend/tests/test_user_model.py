@@ -32,7 +32,7 @@ def test_new_user_has_id_and_fixture_to_dict(user_burrito):
         "username" : "Chaos",
         "name" : "Burrito",
         "height" : 30.0,
-        "weight" : [{"2024/12/27" : 35}],
+        "weight" : {"2024/12/27" : 35},
         "dob" : "2021/10/10"
     }
 
@@ -42,18 +42,15 @@ def test_update_password(user_burrito):
 
 def test_update_some_personal_details(user_burrito):
     assert user_burrito.height == 30
-    assert user_burrito.weight == 35
-    user_burrito.update_personal_details(height=25, weight=30)
+    assert user_burrito.name == "Burrito"
+    user_burrito.update_personal_details(height=25, name="Zan Ji")
     assert user_burrito.height == 25
-    assert user_burrito.weight == 30
+    assert user_burrito.name == "Zan Ji"
 
 def test_update_all_personal_details(user_burrito):
-    assert user_burrito.height == 30
-    assert user_burrito.weight == 35
-    assert user_burrito.name == "Burrito"
     user_burrito.update_personal_details(height=25, weight=30, name="Zan Ji", dob="2020/09/09")
     assert user_burrito.height == 25
-    assert user_burrito.weight == 30
+    assert 30 in user_burrito.weight[-1].values()
     assert user_burrito.name == "Zan Ji"
     assert user_burrito.dob.strftime("%Y/%m/%d") == "2020/09/09"
 

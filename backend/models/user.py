@@ -30,8 +30,9 @@ class User(Document):
         if height is not None:
             self.height = self._validate_is_number(height, "height") 
         if weight is not None:
-            weight_log = {} #TODO: Create logic for making weight_log dict and append instead of setting user weight
-            self.weight = self._validate_is_number(weight, "weight")
+            weight_log = {datetime.now().strftime("%Y/%m/%d") : weight}
+            self.weight.append(weight_log)
+        self.save()
 
     def to_dict(self):
         payload = {
@@ -39,7 +40,7 @@ class User(Document):
             'username' : self.username,
             'name': self.name,
             'height': self.height,
-            'weight': self.weight,
+            'weight': self.weight[-1],
             }
         if self.dob != None:
             payload['dob'] = self.dob.strftime('%Y/%m/%d')
