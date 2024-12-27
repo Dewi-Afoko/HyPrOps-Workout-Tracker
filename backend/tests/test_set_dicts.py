@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 from models.user import User
 from models.workout import Workout
 from models.set_dicts import SetDicts
-from models.user_stats import UserStats
 from mongoengine.errors import ValidationError, NotUniqueError
 from pymongo.errors import DuplicateKeyError
 

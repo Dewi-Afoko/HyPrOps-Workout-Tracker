@@ -1,7 +1,6 @@
-from mongoengine import Document, StringField, ListField, ReferenceField, DateTimeField, BooleanField, EmbeddedDocumentField, EmbeddedDocumentListField, EmbeddedDocument, ObjectIdField
+from mongoengine import Document, StringField, ListField, ReferenceField, DateTimeField, BooleanField, EmbeddedDocumentField, EmbeddedDocumentListField, EmbeddedDocument, ObjectIdField, FloatField, IntField
 from datetime import datetime
 from models.set_dicts import SetDicts
-from models.user_stats import UserStats
 from bson import ObjectId
 
 
@@ -11,7 +10,9 @@ class Workout(Document):
     date = DateTimeField(default=datetime.now().replace(second=0, microsecond=0))
     complete = BooleanField(default=False)
     set_dicts_list = EmbeddedDocumentListField(SetDicts)
-    user_stats = EmbeddedDocumentField(UserStats)
+    user_weight = FloatField()
+    sleep_score = IntField()
+    sleep_quality = StringField()
     notes = ListField(StringField(), default=list)
 
 

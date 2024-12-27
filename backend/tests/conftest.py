@@ -9,7 +9,6 @@ from lib.database_connection import initialize_db, close_db
 from app import create_app
 from models.user import User
 from models.workout import Workout
-from models.user_stats import UserStats
 from models.set_dicts import SetDicts
 from mongoengine import connect, disconnect
 from dotenv import load_dotenv

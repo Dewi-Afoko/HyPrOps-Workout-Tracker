@@ -1,4 +1,4 @@
-from models import User, UserStats, Workout, SetDicts
+from models import User, Workout, SetDicts
 from flask import Flask, jsonify, request, abort
 from flask_jwt_extended import get_jwt_identity
 
