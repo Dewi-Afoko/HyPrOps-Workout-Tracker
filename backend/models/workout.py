@@ -31,10 +31,6 @@ class Workout(Document):
             self.complete = False
         self.save()
 
-    def add_stats(self, user_stats): # UserStats object
-        self.user_stats = user_stats
-        self.save()
-
     def add_notes(self, notes): # notes is a string
         if not self.notes:
             self.notes = []
@@ -60,3 +56,5 @@ class Workout(Document):
         }
         return workout_dict
     
+
+#TODO: Add new properties to to_dict(), create functions to update sleep_score, sleep_quality and to pull last weight/weigh in date from user

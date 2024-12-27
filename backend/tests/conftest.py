@@ -10,6 +10,7 @@ from app import create_app
 from models.user import User
 from models.workout import Workout
 from models.set_dicts import SetDicts
+from models import WeightData
 from mongoengine import connect, disconnect
 from dotenv import load_dotenv
 from datetime import datetime
@@ -91,7 +92,7 @@ def clear_db():
 
 @pytest.fixture
 def user_burrito(testing_password):
-    burrito = User(username="Chaos", password=testing_password, name="Burrito", height=30, weight=35, dob=datetime.strptime("2021/10/10", "%Y/%m/%d"))
+    burrito = User(username="Chaos", password=testing_password, name="Burrito", height=30, weight={"2024/12/27" : 35}, dob=datetime.strptime("2021/10/10", "%Y/%m/%d"))
     burrito.hash_password()
     burrito.save()
     yield burrito
@@ -100,3 +101,6 @@ def user_burrito(testing_password):
 def auth_token(user_burrito):
     token = create_access_token(str(user_burrito.username))
     yield token
+
+@pytest.fixture
+def weight_dict_one()

@@ -1,4 +1,4 @@
-from mongoengine import Document, StringField, ListField, EmbeddedDocumentField, EmbeddedDocumentListField, ReferenceField, DateField, FloatField
+from mongoengine import Document, StringField, ListField, EmbeddedDocumentField, EmbeddedDocumentListField, ReferenceField, DateField, FloatField, DictField
 from werkzeug.security import generate_password_hash, check_password_hash
 from models.workout import Workout
 from datetime import datetime
@@ -8,9 +8,9 @@ class User(Document):
     password = StringField(required=True)
     name = StringField(required=False)
     height = FloatField(required=False)
-    weight = FloatField(required=False)
+    weight = ListField(FloatField)
+    weight_log = ListField(DateField) #TODO Collect when weight added, return with weight for dict of weigh in date and weight
     dob = DateField(required=False)
-
 
     def hash_password(self):
         self.password = generate_password_hash(self.password)
