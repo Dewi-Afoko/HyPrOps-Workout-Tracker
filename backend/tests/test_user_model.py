@@ -28,11 +28,11 @@ def test_create_user_hashed_password(user_burrito):
 def test_new_user_has_id_and_fixture_to_dict(user_burrito):
     assert len(str(user_burrito.id)) > 1
     assert user_burrito.to_dict() == {
-        "id" : user_burrito.id,
+        "id" : str(user_burrito.id),
         "username" : "Chaos",
         "name" : "Burrito",
         "height" : 30.0,
-        "weight" : 35.0,
+        "weight" : [{"2024/12/27" : 35}],
         "dob" : "2021/10/10"
     }
 

@@ -8,8 +8,7 @@ class User(Document):
     password = StringField(required=True)
     name = StringField(required=False)
     height = FloatField(required=False)
-    weight = ListField(FloatField)
-    weight_log = ListField(DateField) #TODO Collect when weight added, return with weight for dict of weigh in date and weight
+    weight = ListField(DictField(), default=list)
     dob = DateField(required=False)
 
     def hash_password(self):
@@ -31,6 +30,7 @@ class User(Document):
         if height is not None:
             self.height = self._validate_is_number(height, "height") 
         if weight is not None:
+            weight_log = {} #TODO: Create logic for making weight_log dict and append instead of setting user weight
             self.weight = self._validate_is_number(weight, "weight")
 
     def to_dict(self):
