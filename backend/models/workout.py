@@ -70,4 +70,19 @@ class Workout(Document):
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
-#TODO: Add function to update various fields
+    def format_workout(self):
+        set_order = 1
+        exercise_count = {}
+        for set in self.set_dicts_list:
+            set.set_order = set_order
+            set_order += 1
+            exercise_name = set.exercise_name
+            if exercise_name in exercise_count:
+                exercise_count[exercise_name] += 1
+            else:
+                exercise_count[exercise_name] = 1
+            set.set_number = exercise_count[exercise_name]
+        self.save()
+
+
+            

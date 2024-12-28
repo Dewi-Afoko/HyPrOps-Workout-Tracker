@@ -100,3 +100,12 @@ def test_dynamic_set_order_and_set_number(burrito_workout, warm_up_shoulder_pres
     assert burrito_workout.set_dicts_list[0].set_order == 1
     assert burrito_workout.set_dicts_list[1].set_order == 2
     assert burrito_workout.set_dicts_list[2].set_order == 3
+
+def test_format_set_dict(burrito_workout, warm_up_shoulder_press):
+    burrito_workout.add_set_dict(warm_up_shoulder_press)
+    burrito_workout.add_set_dict(warm_up_shoulder_press)
+    burrito_workout.delete_set_dict(0)
+    burrito_workout.format_workout()
+    print(f'{burrito_workout.set_dicts_list[0].to_dict() =}')
+    warm_up_saved =  SetDicts(set_order=1, exercise_name="Shoulder Press", set_number=1, set_type="Warm up", reps=12, loading=27.5, rest=45)
+    assert burrito_workout.set_dicts_list == [warm_up_saved]
