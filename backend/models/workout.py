@@ -2,6 +2,7 @@ from mongoengine import Document, StringField, ListField, ReferenceField, DateTi
 from datetime import datetime
 from models.set_dicts import SetDicts
 from bson import ObjectId
+from copy import deepcopy
 
 
 class Workout(Document):
@@ -17,11 +18,19 @@ class Workout(Document):
 
 
     def add_set_dict(self, set_dict): # SetDict object
-        self.set_dicts_list.append(set_dict)
+        set_dict_copy = deepcopy(set_dict)
+        set_order = len(self.set_dicts_list) + 1
+        set_number = 1
+        for set in self.set_dicts_list:
+            if set.exercise_name == set_dict_copy.exercise_name:
+                set_number += 1
+        set_dict_copy.set_order = set_order
+        set_dict_copy.set_number = set_number
+        self.set_dicts_list.append(set_dict_copy)
         self.save()
 
-    def delete_set_dict(self, set_dict):
-        self.set_dicts_list.remove(set_dict)
+    def delete_set_dict(self, set_number):
+        del self.set_dicts_list[set_number]
         self.save()
 
     def toggle_complete(self):
@@ -58,5 +67,7 @@ class Workout(Document):
         }
         return workout_dict
     
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
 
 #TODO: Add function to update various fields

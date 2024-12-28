@@ -30,7 +30,8 @@ def test_toggling_workout_complete_twice(burrito_workout):
 def test_adding_sets_dicts(burrito_workout):
     set_dict = SetDicts(exercise_name="Bench Press")
     burrito_workout.add_set_dict(set_dict)
-    assert burrito_workout.set_dicts_list == [set_dict]
+    set_dict_saved = SetDicts(exercise_name="Bench Press", set_order=1, set_number=1)
+    assert burrito_workout.set_dicts_list[0] == set_dict_saved
 
 
 def test_add_workout_notes(burrito_workout):
@@ -47,7 +48,9 @@ def test_adding_sets_dict_object_twice(burrito_workout, warm_up_shoulder_press):
     set_dict = SetDicts(set_order=1, exercise_name="Arnold Press", set_number=1, set_type="Warm up", reps=12, loading=13.5, focus="Form", rest=60, notes="Shoulder warm up")
     burrito_workout.add_set_dict(warm_up_shoulder_press)
     burrito_workout.add_set_dict(set_dict)
-    assert burrito_workout.set_dicts_list == [warm_up_shoulder_press, set_dict]
+    warm_up_saved =  SetDicts(set_order=1, exercise_name="Shoulder Press", set_number=1, set_type="Warm up", reps=12, loading=27.5, rest=45)
+    set_dict_saved = SetDicts(set_order=2, exercise_name="Arnold Press", set_number=1, set_type="Warm up", reps=12, loading=13.5, focus="Form", rest=60, notes="Shoulder warm up")
+    assert burrito_workout.set_dicts_list == [warm_up_saved, set_dict_saved]
 
 def test_to_dict_method(burrito_workout, warm_up_shoulder_press):
     burrito_workout.add_set_dict(warm_up_shoulder_press)
@@ -71,9 +74,9 @@ def test_to_dict_method(burrito_workout, warm_up_shoulder_press):
 def test_delete_set_dict(burrito_workout, warm_up_shoulder_press):
     burrito_workout.add_set_dict(warm_up_shoulder_press)
     burrito_workout.add_set_dict(warm_up_shoulder_press)
-    assert burrito_workout.set_dicts_list == [warm_up_shoulder_press, warm_up_shoulder_press]
-    burrito_workout.delete_set_dict(warm_up_shoulder_press)
-    assert burrito_workout.set_dicts_list == [warm_up_shoulder_press]
+    burrito_workout.delete_set_dict(0)
+    warm_up_saved =  SetDicts(set_order=2, exercise_name="Shoulder Press", set_number=2, set_type="Warm up", reps=12, loading=27.5, rest=45)
+    assert burrito_workout.set_dicts_list == [warm_up_saved]
 
 def test_delete_workout_notes(burrito_workout):
     note_1 = "Feel pretty good..."
@@ -86,3 +89,14 @@ def test_delete_workout_notes(burrito_workout):
     burrito_workout.delete_note(0)
     burrito_workout.delete_note(-1)
     assert burrito_workout.notes == ["Feel pretty mid..."]
+
+def test_dynamic_set_order_and_set_number(burrito_workout, warm_up_shoulder_press):
+    burrito_workout.add_set_dict(warm_up_shoulder_press)
+    burrito_workout.save()
+    burrito_workout.add_set_dict(warm_up_shoulder_press)
+    burrito_workout.save()
+    burrito_workout.add_set_dict(warm_up_shoulder_press)
+    burrito_workout.save()
+    assert burrito_workout.set_dicts_list[0].set_order == 1
+    assert burrito_workout.set_dicts_list[1].set_order == 2
+    assert burrito_workout.set_dicts_list[2].set_order == 3

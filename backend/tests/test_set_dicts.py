@@ -20,23 +20,23 @@ def test_creation_of_dict_variables():
     assert set_dict.notes == "Shoulder warm up"
     assert set_dict.complete == False
 
-def test_toggle_complete(spoof_arnold_press_dict):
-    spoof_arnold_press_dict.toggle_complete()
-    assert spoof_arnold_press_dict.complete == True
+def test_toggle_complete(warm_up_shoulder_press):
+    warm_up_shoulder_press.toggle_complete()
+    assert warm_up_shoulder_press.complete == True
 
-def test_toggle_complete_twice(spoof_arnold_press_dict):
-    assert spoof_arnold_press_dict.complete == False
-    spoof_arnold_press_dict.toggle_complete()
-    assert spoof_arnold_press_dict.complete == True
-    spoof_arnold_press_dict.toggle_complete()
-    assert spoof_arnold_press_dict.complete == False
+def test_toggle_complete_twice(warm_up_shoulder_press):
+    assert warm_up_shoulder_press.complete == False
+    warm_up_shoulder_press.toggle_complete()
+    assert warm_up_shoulder_press.complete == True
+    warm_up_shoulder_press.toggle_complete()
+    assert warm_up_shoulder_press.complete == False
 
-def test_add_notes(spoof_arnold_press_dict):
-    spoof_arnold_press_dict.add_notes("Let's go!")
-    assert spoof_arnold_press_dict.notes == "Let's go!"
+def test_add_notes(warm_up_shoulder_press):
+    warm_up_shoulder_press.add_notes("Let's go!")
+    assert warm_up_shoulder_press.notes == "Let's go!"
 
-def test_delete_notes(spoof_arnold_press_dict):
-    spoof_arnold_press_dict.add_notes("Let's go!")
-    assert spoof_arnold_press_dict.notes == "Let's go!"
-    spoof_arnold_press_dict.delete_notes()
-    assert spoof_arnold_press_dict.notes == None
+def test_delete_notes(warm_up_shoulder_press):
+    warm_up_shoulder_press.add_notes("Let's go!")
+    assert warm_up_shoulder_press.notes == "Let's go!"
+    warm_up_shoulder_press.delete_notes()
+    assert warm_up_shoulder_press.notes == None
