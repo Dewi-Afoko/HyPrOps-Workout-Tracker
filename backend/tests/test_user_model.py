@@ -68,10 +68,10 @@ def test_updating_details_fails_with_invalid_input(user_burrito):
 
 def test_to_dict_function(user_burrito):
     assert user_burrito.to_dict() == {
-        'id' : user_burrito.id,
+        'id' : str(user_burrito.id),
         'username' : 'Chaos',
         'name' : 'Burrito',
         'height' : 30,
-        'weight' : 35,
+        'weight' : {"2024/12/27" : 35},
         'dob' : '2021/10/10'
     }

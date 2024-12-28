@@ -30,7 +30,7 @@ class User(Document):
         if height is not None:
             self.height = self._validate_is_number(height, "height") 
         if weight is not None:
-            weight_log = {datetime.now().strftime("%Y/%m/%d") : weight}
+            weight_log = {datetime.now().strftime("%Y/%m/%d") : self._validate_is_number(weight, "weight")}
             self.weight.append(weight_log)
         self.save()
 

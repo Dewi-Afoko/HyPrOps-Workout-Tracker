@@ -51,7 +51,9 @@ class Workout(Document):
             "date": self.date.isoformat() if self.date else None,  # Properly serialize date
             "complete": self.complete,
             "sets_dict_list": [set_dict.to_dict() for set_dict in self.set_dicts_list],
-            "user_stats": self.user_stats.to_dict() if self.user_stats else None,
+            "user_weight": float(self.user_weight) if self.user_stats else None,
+            "sleep_score": self.sleep_score,
+            "sleep_quality": self.sleep_quality,
             "notes": self.notes,
         }
         return workout_dict

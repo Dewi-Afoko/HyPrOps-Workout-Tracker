@@ -100,3 +100,14 @@ def user_burrito(testing_password):
 def auth_token(user_burrito):
     token = create_access_token(str(user_burrito.username))
     yield token
+
+@pytest.fixture
+def burrito_workout(user_burrito):
+    _weight = user_burrito.weight[0]
+    print(f'{_weight =}')
+    weight_values = list(_weight.values())
+    print(f'{weight_values =}')
+    weight = weight_values[0]
+    this_workout = Workout(user_id=user_burrito.id, workout_name="Workout Fixture", date=datetime.strptime("2024/12/28", "%Y/%m/%d"), user_weight=weight, sleep_score=80, sleep_quality="Good", notes=["Feeling good"])
+    this_workout.save()
+    yield this_workout
