@@ -38,21 +38,19 @@ def test_add_workout_notes(burrito_workout):
     burrito_workout.add_notes(note)
     assert burrito_workout.notes == ["Feeling good", "Feel pretty good..."]
 
-#TODO Create fixtures for future tests
 
-def test_adding_sets_dict_object(burrito_workout, spoof_arnold_press_dict):
-    burrito_workout.add_set_dict(spoof_arnold_press_dict)
-    assert burrito_workout.set_dicts_list == [spoof_arnold_press_dict]
+def test_adding_sets_dict_object(burrito_workout, warm_up_shoulder_press):
+    burrito_workout.add_set_dict(warm_up_shoulder_press)
+    assert burrito_workout.set_dicts_list == [warm_up_shoulder_press]
 
-def test_adding_sets_dict_object_twice(burrito_workout, spoof_arnold_press_dict):
+def test_adding_sets_dict_object_twice(burrito_workout, warm_up_shoulder_press):
     set_dict = SetDicts(set_order=1, exercise_name="Arnold Press", set_number=1, set_type="Warm up", reps=12, loading=13.5, focus="Form", rest=60, notes="Shoulder warm up")
-    burrito_workout.add_set_dict(spoof_arnold_press_dict)
+    burrito_workout.add_set_dict(warm_up_shoulder_press)
     burrito_workout.add_set_dict(set_dict)
-    assert burrito_workout.set_dicts_list == [spoof_arnold_press_dict, set_dict]
+    assert burrito_workout.set_dicts_list == [warm_up_shoulder_press, set_dict]
 
-def test_to_dict_method(burrito_workout, spoofed_user_stats, spoof_arnold_press_dict):
-    burrito_workout.add_stats(spoofed_user_stats)
-    burrito_workout.add_set_dict(spoof_arnold_press_dict)
+def test_to_dict_method(burrito_workout, warm_up_shoulder_press):
+    burrito_workout.add_set_dict(warm_up_shoulder_press)
 
     expected_output = {
         "id": str(burrito_workout.id),
@@ -60,20 +58,22 @@ def test_to_dict_method(burrito_workout, spoofed_user_stats, spoof_arnold_press_
         "workout_name": burrito_workout.workout_name,
         "date": burrito_workout.date.isoformat() if burrito_workout.date else None,
         "complete": burrito_workout.complete,
-        "sets_dict_list": [spoof_arnold_press_dict.to_dict()],
-        "user_stats": burrito_workout.user_stats.to_dict() if burrito_workout.user_stats else None,
+        "sets_dict_list": [warm_up_shoulder_press.to_dict()],
         "notes": burrito_workout.notes,
+        "sleep_score" : burrito_workout.sleep_score,
+        "sleep_quality" : burrito_workout.sleep_quality,
+        "user_weight" : burrito_workout.user_weight,
     }
 
     assert burrito_workout.to_dict() == expected_output
 
     
-def test_delete_set_dict(burrito_workout, spoof_arnold_press_dict):
-    burrito_workout.add_set_dict(spoof_arnold_press_dict)
-    burrito_workout.add_set_dict(spoof_arnold_press_dict)
-    assert burrito_workout.set_dicts_list == [spoof_arnold_press_dict, spoof_arnold_press_dict]
-    burrito_workout.delete_set_dict(spoof_arnold_press_dict)
-    assert burrito_workout.set_dicts_list == [spoof_arnold_press_dict]
+def test_delete_set_dict(burrito_workout, warm_up_shoulder_press):
+    burrito_workout.add_set_dict(warm_up_shoulder_press)
+    burrito_workout.add_set_dict(warm_up_shoulder_press)
+    assert burrito_workout.set_dicts_list == [warm_up_shoulder_press, warm_up_shoulder_press]
+    burrito_workout.delete_set_dict(warm_up_shoulder_press)
+    assert burrito_workout.set_dicts_list == [warm_up_shoulder_press]
 
 def test_delete_workout_notes(burrito_workout):
     note_1 = "Feel pretty good..."
@@ -82,6 +82,7 @@ def test_delete_workout_notes(burrito_workout):
     burrito_workout.add_notes(note_1)
     burrito_workout.add_notes(note_2)
     burrito_workout.add_notes(note_3)
+    burrito_workout.delete_note(0)
     burrito_workout.delete_note(0)
     burrito_workout.delete_note(-1)
     assert burrito_workout.notes == ["Feel pretty mid..."]
