@@ -59,4 +59,4 @@ class Workout(Document):
         return workout_dict
     
 
-#TODO: Add new properties to to_dict(), create functions to update sleep_score, sleep_quality and to pull last weight/weigh in date from user
+#TODO: Add function to update various fields
