@@ -5,6 +5,7 @@ from models.workout import Workout
 from flask_jwt_extended import create_access_token
 from bson import ObjectId
 from werkzeug.security import generate_password_hash
+from lib.utilities.api_functions import find_single_workout
 
 
 """ 
@@ -18,7 +19,7 @@ def test_register_user(web_client, clear_db):
         "username": "Route_Testah", 
         "password" : "hashDAT"
         }
-    response = web_client.post('/api/user', json=payload)
+    response = web_client.post('/api/users', json=payload)
 
     assert response.status_code == 201
     assert response.json == {"message" : "Route_Testah successfully registered!"}
@@ -31,12 +32,12 @@ def test_duplicate_user_registration(web_client, clear_db):
         "username": "Route_Testah", 
         "password" : "hashDAT"
         }
-    response = web_client.post('/api/user', json=payload)
+    response = web_client.post('/api/users', json=payload)
 
     assert response.status_code == 201
     assert response.json == {"message" : "Route_Testah successfully registered!"}
 
-    response = web_client.post('/api/user', json=payload)
+    response = web_client.post('/api/users', json=payload)
     assert response.status_code == 409
     assert response.json['error'] == 'Username unavailable'
 
@@ -44,7 +45,7 @@ def test_no_password_registration_fails(web_client, clear_db):
     payload = {
         "username" : "A_User"
     }
-    response = web_client.post('/api/user', json=payload)
+    response = web_client.post('/api/users', json=payload)
     assert response.status_code == 400
     assert response.json['error'] == 'Password not provided'
 
@@ -52,7 +53,7 @@ def test_no_username_registration_fails(web_client, clear_db):
     payload = {
         "password" : "failure"
     }
-    response = web_client.post('/api/user', json=payload)
+    response = web_client.post('/api/users', json=payload)
     assert response.status_code == 400
     assert response.json['error'] == 'Username not provided'
 
@@ -61,16 +62,16 @@ def test_no_username_registration_fails(web_client, clear_db):
 
 # Login Routes
 
-def test_successful_login_with_token(web_client, clear_db, spoofed_user, testing_password):
+def test_successful_login_with_token(web_client, clear_db, user_burrito, testing_password):
     payload = {
-        'username' : str(spoofed_user.username),
+        'username' : str(user_burrito.username),
         'password' : testing_password
     }
     response = web_client.post('/api/login', json=payload)
 
 
     assert response.status_code == 200
-    assert response.json['message'] == f"Login successful, welcome {spoofed_user.username}"
+    assert response.json['message'] == f"Login successful, welcome {user_burrito.username}"
     assert 'token' in response.json
 
 def test_login_fails_with_bad_username(web_client, clear_db, testing_password):
@@ -84,9 +85,9 @@ def test_login_fails_with_bad_username(web_client, clear_db, testing_password):
     assert response.json['error'] == "User not found"
     assert 'token' not in response.json
 
-def test_login_fails_with_bad_password(web_client, clear_db, spoofed_user):
+def test_login_fails_with_bad_password(web_client, clear_db, user_burrito):
     payload = {
-        'username' : str(spoofed_user.username),
+        'username' : str(user_burrito.username),
         'password' : "Not the password"
     }
     response = web_client.post('/api/login', json=payload)
@@ -95,7 +96,7 @@ def test_login_fails_with_bad_password(web_client, clear_db, spoofed_user):
     assert response.json['error'] == "Invalid login credentials"
     assert 'token' not in response.json
 
-def test_login_fails_no_username(web_client, clear_db, spoofed_user, testing_password):
+def test_login_fails_no_username(web_client, clear_db, user_burrito, testing_password):
     payload = {'password' : testing_password}
     response = web_client.post('/api/login', json=payload)
 
@@ -103,8 +104,8 @@ def test_login_fails_no_username(web_client, clear_db, spoofed_user, testing_pas
     assert response.json['error'] == "Username not provided"
     assert 'token' not in response.json
 
-def test_login_fails_no_password(web_client, clear_db, spoofed_user):
-    payload = {'username' : spoofed_user.username }
+def test_login_fails_no_password(web_client, clear_db, user_burrito):
+    payload = {'username' : user_burrito.username }
 
     response = web_client.post('/api/login', json=payload)
 
@@ -134,7 +135,9 @@ Workout routes
 
 # Workout creation
 
-def test_workout_creates_correctly(web_client, clear_db, spoofed_user, auth_token):
+# TODO: Refactor tests now workout_list is not a property of User model
+
+def test_workout_creates_correctly(web_client, clear_db, user_burrito, auth_token):
     headers = {"Authorization": f"Bearer {auth_token}"}
     payload = {
             'workout_name' : "Push"
@@ -142,15 +145,15 @@ def test_workout_creates_correctly(web_client, clear_db, spoofed_user, auth_toke
     response = web_client.post('/api/workouts', headers=headers, json=payload)
 
     assert response.status_code == 201
-    assert response.json['message'] == f"{payload['workout_name']} created by {spoofed_user.username}"
+    assert response.json['message'] == f"{payload['workout_name']} created by {user_burrito.username}"
 
-    spoofed_user.reload()
-    workout = Workout.objects(user_id=str(spoofed_user.id)).first()
+    user_burrito.reload()
+    workout = Workout.objects(user_id=str(user_burrito.id)).first()
     workout.save()
 
-    assert spoofed_user.workout_list == [workout]
+    assert user_burrito.workout_list == [workout]
 
-def test_workout_fails_with_no_name(web_client, clear_db, spoofed_user, auth_token):
+def test_workout_fails_with_no_name(web_client, clear_db, user_burrito, auth_token):
     headers = {"Authorization": f"Bearer {auth_token}"}
     payload = {'incorrect key' : 'invalid value'}
 
@@ -165,7 +168,7 @@ def test_workout_fails_with_bad_user_token(web_client, clear_db, bad_token):
             }
 
     response = web_client.post('/api/workouts', headers=headers, json=payload)
-    assert response.status_code == 400
+    assert response.status_code == 404
     assert response.json['error'] == 'User not found'
 
 
@@ -186,7 +189,7 @@ def test_getting_workouts_fails_with_no_workouts(web_client, clear_db, auth_toke
         response = web_client.get('/api/workouts', headers=headers)    
 
         assert response.json['error'] == 'No workouts found'
-        assert response.status_code == 400         
+        assert response.status_code == 404     
                     
                     
                     
@@ -225,7 +228,7 @@ def test_add_notes_to_workout(web_client, clear_db, auth_token, spoofed_populate
         response = web_client.patch(f'/api/workouts/{workout_id}/add_notes', headers=headers, json=payload)
 
         assert response.json['message'] == f'{payload["notes"]}: added to workout notes'
-        assert response.status_code == 202
+        assert response.status_code == 200
 
         spoofed_populated_user.reload()
 
@@ -245,13 +248,13 @@ def test_delete_notes_from_workout(web_client, clear_db, auth_token, spoofed_pop
         spoofed_populated_user.reload()
 
         assert response.json['message'] == f'{payload["notes"]}: added to workout notes'
-        assert response.status_code == 202
+        assert response.status_code == 200
         assert len(spoofed_populated_user.workout_list[0].notes) == 3
 
         spoofed_populated_user.reload()
         note_index = 1
         response = web_client.delete(f'/api/workouts/{workout_id}/delete_note/{note_index}', headers=headers)
-        assert response.status_code == 202
+        assert response.status_code == 200
         assert response.json['message'] == 'Note successfully deleted'
 
 
@@ -268,37 +271,37 @@ def test_toggling_workout_complete(web_client, clear_db, auth_token, spoofed_pop
         response = web_client.patch(f'/api/workouts/{workout_id}/mark_complete', headers=headers)
         spoofed_populated_user.reload()
         assert response.json['message'] == "Workout marked as complete"
-        assert response.status_code == 201
+        assert response.status_code == 200
         assert spoofed_populated_user.workout_list[0].complete == True
         response = web_client.patch(f'/api/workouts/{workout_id}/mark_complete', headers=headers)
         assert response.json['message'] == "Workout marked as incomplete"
-        assert response.status_code == 201
+        assert response.status_code == 200
         spoofed_populated_user.reload()
         assert spoofed_populated_user.workout_list[0].complete == False
                     
-def test_adding_userstats_to_workout(web_client, clear_db, auth_token, spoofed_populated_user, alt_spoofed_user_stats, spoofed_user_stats):
+def test_adding_userstats_to_workout(web_client, clear_db, auth_token, spoofed_populated_user, alt_user_burrito_stats, user_burrito_stats):
     headers = {"Authorization": f"Bearer {auth_token}"}
     workout_id = str(spoofed_populated_user.workout_list[0].id)
 
-    assert spoofed_populated_user.workout_list[0].user_stats == spoofed_user_stats
-    payload = alt_spoofed_user_stats.to_dict()
+    assert spoofed_populated_user.workout_list[0].user_stats == user_burrito_stats
+    payload = alt_user_burrito_stats.to_dict()
 
     response = web_client.put(f'/api/workouts/{workout_id}/add_stats', headers=headers, json=payload)
     assert response.json['message'] == 'Stats added to workout'
     assert response.status_code == 201
     spoofed_populated_user.reload()
-    assert spoofed_populated_user.workout_list[0].user_stats == alt_spoofed_user_stats
+    assert spoofed_populated_user.workout_list[0].user_stats == alt_user_burrito_stats
 
 
 
 
                     ### Workout x SetDict Tests
 
-def test_adding_set_dict_success(web_client, clear_db, auth_token, spoofed_user, spoof_arnold_press_dict):
+def test_adding_set_dict_success(web_client, clear_db, auth_token, user_burrito, spoof_arnold_press_dict):
     headers = {"Authorization": f"Bearer {auth_token}"}
     web_client.post('/api/workouts', headers=headers, json={'workout_name' : 'First Try'}) # Create Workout
-    spoofed_user.reload()
-    workout = next((workout for workout in spoofed_user.workout_list if workout.workout_name == 'First Try'), None)
+    user_burrito.reload()
+    workout = next((workout for workout in user_burrito.workout_list if workout.workout_name == 'First Try'), None)
     workout_id = str(workout.id)
     payload = {
                 'exercise_name': spoof_arnold_press_dict.exercise_name,
@@ -311,22 +314,22 @@ def test_adding_set_dict_success(web_client, clear_db, auth_token, spoofed_user,
             }
     response = web_client.post(f'/api/workouts/{workout_id}/add_set', headers=headers, json=payload) # Create SetDict in workout
 
-    spoofed_user.reload()
+    user_burrito.reload()
 
     assert response.json['message'] == f"Set info for {payload['exercise_name']} created and added to {str(workout.workout_name)}"
     assert response.status_code == 201
-    spoofed_user.reload()
+    user_burrito.reload()
 
-    workout_to_check = next((workout for workout in spoofed_user.workout_list if str(workout.id) == workout_id), None) # Fetch the workout_list from spoofed user embedded listfield
+    workout_to_check = next((workout for workout in user_burrito.workout_list if str(workout.id) == workout_id), None) # Fetch the workout_list from spoofed user embedded listfield
 
     assert len(workout_to_check.set_dicts_list) == 1
     
 
-def test_no_exercise_name_set_dict_fails(web_client, clear_db, spoofed_user, spoof_arnold_press_dict, auth_token):
+def test_no_exercise_name_set_dict_fails(web_client, clear_db, user_burrito, spoof_arnold_press_dict, auth_token):
     headers = {"Authorization": f"Bearer {auth_token}"}
     web_client.post('/api/workouts', headers=headers, json={'workout_name' : 'First Try'}) # Create Workout
-    spoofed_user.reload()
-    workout = next((workout for workout in spoofed_user.workout_list if workout.workout_name == 'First Try'), None)
+    user_burrito.reload()
+    workout = next((workout for workout in user_burrito.workout_list if workout.workout_name == 'First Try'), None)
     workout_id = str(workout.id)
     payload = {
                 'set_type' : spoof_arnold_press_dict.set_type,
@@ -344,11 +347,11 @@ def test_no_exercise_name_set_dict_fails(web_client, clear_db, spoofed_user, spo
 
 
 
-def test_partial_set_dict_creation_succeess(web_client, clear_db, auth_token, spoofed_user, spoofed_empty_workout, spoof_arnold_press_dict):
+def test_partial_set_dict_creation_succeess(web_client, clear_db, auth_token, user_burrito, spoofed_empty_workout, spoof_arnold_press_dict):
     headers = {"Authorization": f"Bearer {auth_token}"}
     web_client.post('/api/workouts', headers=headers, json={'workout_name' : 'First Try'}) # Create Workout
-    spoofed_user.reload()
-    workout = next((workout for workout in spoofed_user.workout_list if workout.workout_name == 'First Try'), None)
+    user_burrito.reload()
+    workout = next((workout for workout in user_burrito.workout_list if workout.workout_name == 'First Try'), None)
     workout_name = str(workout.workout_name)
     workout_id = str(workout.id)
     payload = {
@@ -361,20 +364,20 @@ def test_partial_set_dict_creation_succeess(web_client, clear_db, auth_token, sp
 
     response = web_client.post(f'/api/workouts/{workout_id}/add_set', headers=headers, json=payload) # Create SetDict
 
-    spoofed_user.reload()
+    user_burrito.reload()
 
     assert response.json['message'] == f"Set info for {payload['exercise_name']} created and added to {workout_name}"
     assert response.status_code == 201
 
-    workout_to_check = next((workout for workout in spoofed_user.workout_list if workout.workout_name == 'First Try'), None) # Fetch the workout_list from spoofed user embedded listfield
+    workout_to_check = next((workout for workout in user_burrito.workout_list if workout.workout_name == 'First Try'), None) # Fetch the workout_list from spoofed user embedded listfield
 
     assert len(workout_to_check.set_dicts_list) == 1
 
-def test_creation_of_set_dict_fails_with_invalid_inputs(web_client, clear_db, spoofed_user, auth_token, spoofed_empty_workout, spoof_arnold_press_dict):
+def test_creation_of_set_dict_fails_with_invalid_inputs(web_client, clear_db, user_burrito, auth_token, spoofed_empty_workout, spoof_arnold_press_dict):
     headers = {"Authorization": f"Bearer {auth_token}"}
     web_client.post('/api/workouts', headers=headers, json={'workout_name' : 'First Try'}) # Create Workout
-    spoofed_user.reload()
-    workout = next((workout for workout in spoofed_user.workout_list if workout.workout_name == 'First Try'), None)
+    user_burrito.reload()
+    workout = next((workout for workout in user_burrito.workout_list if workout.workout_name == 'First Try'), None)
     workout_id = str(workout.id)
     payload = {
                 'workout_name' : spoofed_empty_workout.workout_name,
@@ -401,12 +404,12 @@ def test_set_dict_toggle_complete_twice(web_client, clear_db, auth_token, spoofe
     set_order = 1
     response = web_client.patch(f'/api/workouts/{workout_id}/{set_order}/mark_complete', headers=headers)
     assert response.json['message'] == 'Set marked complete'
-    assert response.status_code == 201
+    assert response.status_code == 200
     spoofed_populated_user.reload()
     assert spoofed_populated_user.workout_list[0].set_dicts_list[0].complete == True
     response = web_client.patch(f'/api/workouts/{workout_id}/{set_order}/mark_complete', headers=headers)
     assert response.json['message'] == 'Set marked incomplete'
-    assert response.status_code == 201
+    assert response.status_code == 200
     spoofed_populated_user.reload()
     assert spoofed_populated_user.workout_list[0].set_dicts_list[0].complete == False
 
@@ -442,4 +445,46 @@ def test_set_dict_delete_notes(web_client, auth_token, clear_db, spoofed_populat
     spoofed_populated_user.reload()
     assert spoofed_populated_user.workout_list[0].set_dicts_list[0].notes == None
 
-#TODO for SetDicts: Tests that should fail
+#TODO Missing routes: PersonalData and integration with UserStats weight
+
+def test_adding_personal_data_to_user(web_client, auth_token, clear_db, user_burrito, spoofed_personal_data):
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    payload = spoofed_personal_data.to_dict()
+    assert len(str(user_burrito.personal_data)) > 1
+    response = web_client.post('/api/users/add_personal_data', headers=headers, json=payload)
+    assert response.json['message'] == "Personal data updated"
+    assert response.status_code == 201
+    user_burrito.reload()
+    assert user_burrito.personal_data == spoofed_personal_data
+
+def test_create_incomplete_personal_data(web_client, auth_token, clear_db, user_burrito):
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    payload = {"name" : "Nope"}
+    response = web_client.post('/api/users/add_personal_data', headers=headers, json=payload)
+    assert response.status_code == 201
+    assert response.json['message'] == "Personal data updated"
+    user_burrito.reload()
+    assert user_burrito.personal_data.name == "Nope"
+
+def test_failure_with_invalid_inputs_for_personal_data(web_client, auth_token, clear_db, user_burrito):
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    payload = {"name" : 1}
+    response = web_client.post('/api/users/add_personal_data', headers=headers, json=payload)
+    assert response.status_code == 400
+    assert response.json['error'] == "Failed to create Personal Data"
+
+def test_adding_user_stats_to_workout_gets_weight_from_personal_data(web_client, spoofed_populated_user, auth_token, clear_db, spoofed_personal_data_2):
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    payload = spoofed_personal_data_2.to_dict()
+    web_client.post('/api/users/add_personal_data', headers=headers, json=payload)
+    spoofed_populated_user.save()
+    print(f'{spoofed_populated_user.personal_data.to_dict() =}')
+    workout_id = str(spoofed_populated_user.workout_list[0].id)
+    workout = Workout.objects(id=workout_id).first()
+    response = web_client.put(f'/api/workouts/{workout_id}/add_stats', headers=headers, json={"sleep_score" : 55, "sleep_quality" : "Bad", "notes" : "Did not sleep enough, feel ropey"})
+    workout.reload()
+    print(f'{response.json =}')
+    assert response.json['message'] == "Stats added to workout"
+    assert response.status_code == 201
+    assert spoofed_populated_user.personal_data.weight == 250
+    assert spoofed_populated_user.workout_list[0].user_stats.weight == 250

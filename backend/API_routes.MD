@@ -3,121 +3,150 @@
 
 # Log in
 
-POST request to /token/login
+POST request to /api/login
 
 Body = {username: username, password: password}
-Success = {'token': access_token, "advice": "It's dangerous to go alone, take this with you *hands over a *JWT*"}, 200 (success)
-Failure = {"message": "Invalid username or password"}, 401 (access denied)
+Success = {'message' : 'Login successful, welcome $username', 'token' : $access_token}, 200 (success)
+Failure = {"error": "Invalid login credentials"}, 401 (access denied),
+        {"error" : "Username not provided}, 400 (bad request),
+        {"error" : "Password not provided}, 400 (bad request)
+
 
 # Create a user:
 
-POST request to /users
+POST request to /api/users
 
 Body = {username: username, password: password}
-Success = {id :user.id, username: user.username}, 200 (success)
-Failure = {error: Username already exists}, 400 (bad request)
+Success = {"messgage" : "user.username successfully registered!"}, 201 (created)
+Failure = {"error": "Username already exists"}, 409 (conflict),
+         {"error": "Username not provided"}, 400 (bad request),
+         {"error": "Password not provided"}, 400 (bad request)
 
 # Return all users:
 
-GET request to /users
+GET request to /api/users
 
-Success = [{id: user.id, username: user.username}], 200 (success)
-Failure = {error: No users found!}, 400 (bad request)
+Success = {"message" : [User.to_dict for User in database]}, 200 (success)
+Failure = {"error": "No users found!"}, 404 (not found)
+
+# Add PersonalData to user:
+
+POST request to /api/users/add_personal_data
+
+All fields optional, will only update if value provided
+Body = {
+        "name" : name,
+        "dob" : str(%Y/%m/%d),
+        "height" : height,
+        "weight" : weight
+}
+Success = {"message" : "Personal data updated"}, 201 (created)
 
 ### WOKOUT FUNCTIONS ###
 
 # Return users workouts:
 
-GET request to /workouts/<user_id>
+GET request to /api/workouts
 
-Success = [workout.to_dict()], 200 (success)
-Failure = {error: User not found}, 404 (not found)
-#TODO: Add failure for no workouts
+Success = {"message": "Here are your workouts :", "workouts" : [workout.to_dict()]}, 200 (success)
+Failure = {"error" : "User not found"}, 404 (not found),
+        {"error": "No workouts found"}, 404 (not found)
+
 
 # Return single workout:
 
-GET request to /workouts/<user4_id>/<workout_id>
+GET request to /api/workouts/<workout_id>
 
-Success = {workout: workout.to_dict()}, 200 (success)
-Failure = {"error": "Workout not found"}, 404 (not found)
+Success = {"message": "Here are the details for workout ID: $workout_id", "workout" : workout.to_dict()}, 200 (success)
+Failure = {"error" : "User not found"}, 404 (not found),
+        {"error": "No workouts found"}, 404 (not found),
+        {"error": "Workout not found"}, 404 (not found)
 
 # Create workout:
 
-POST request to /workouts</user_id>
+POST request to /api/workouts
 
-Success = {user_id: user.id, workout_id: workout.id}, 201 (created)
-Failure = {error: User not found}, 404 (not found)
-#TODO: Add failure to create
+Success = {"message" : "$workout.workout_name created by $user.username:}, 201 (created)
+Failure = {"error": User not found}, 404 (not found)
+        {"error": "You need to name your workout"}, 400 (bad request)
 
-Side-effect: Adds workout to user workout_list
 
-# Add exercise to workout
 
-POST request to /workouts/<user_id>/<workout_id>/add_exercise
+# Add notes to workout
 
-Body = {exercise_name: exercise name}
-Success = {workout id: workout.id, exercise added: exercise_name}, 201 (created)
-Failures =  {error: Workout not found}, 404 (not found)
-            {error: Exercise already exists, try adding details!}, 418 (I'm a teapot)
-Success =   {workout id: workout.id, exercised added: exercise_name}, 201 (created)
+PATCH request to /api/workouts/<workout_id>/add_notes
 
-# Add exercise details to nested workout
+Body = {"notes" : notes}
+Success = {"message" : "$notes added to workout notes"}, 200 (succes)
+Failures = User not found: 404, No workouts found: 404,  Workout not found, 404
 
-PATCH request to /workouts/<user_id>/<workout_id>/add_details
+# Delete notes from workout by index position
 
-Body = {exercise_name: exercise name, # Only required field, all others optional
+DELETE request to /api/workouts/<workout_id>/delete_note/<note_index>
+
+Success = {"message": "Note successfully deleted"}, 200 (success)
+Failure = API_functions responses
+
+# Toggle workout complete
+
+PATCH request to /api/workouts/<workout_id>/mark_complete
+
+Success = {"message" : "Workout marked as $status"}, 200 (success)
+Failures = User not found: 404, No workouts found: 404,  Workout not found, 404
+
+# Add UserStats to workout
+
+PUT request to /api/workouts/<workout_id>/add_stats
+
+-- Weight is pulled from PersonalData --
+Requires PersonalData to exist!
+
+Body = {
+        "sleep_score" : sleep_score,
+        "sleep_quality" : sleep_quality, (subjective)
+        "notes" : notes
+        }
+
+Success = {"message" : "Stats added to workout"}, 201 (created)
+Failures = {"error" : "No personal data found"}, 404 (not found),
+        {"error" : "User stats not created"}, 400
+
+# Add SetDict to workout
+
+POST request to /workouts/<workout_id>/add_set
+
+Body = {
+        exercise_name: exercise name,
+        set_type: set_type,
         reps: reps,
-        loading: loading,
+        focus: focus,
         rest: rest,
-        notes: notes}
-Failure = {error: Exercise not found!}, 418 (I'm a teapot)
-Success* =  {reps: reps,
-            loading: loading,
-            rest: rest,
-            notes: notes}, 201 (created)
-            
-            *Only details in body part of response
-
-# Edit exercise details nested in workout
-
-PATCH request to /workouts/<user_id>/<workout_id>/edit_details
-
-Body = {reps_index: reps_index,
-        reps_value: reps_value,
-        loading_index: loading_index,
-        loading_value: loading_value,
-        rest_index: rest_index,
-        rest_value: rest_value,
-        performance_notes_index: performance_notes_index,
-        performance_notes_value: performance_notes_value,
+        notes: notes,
+        loading: loading,
         }
-Failures =  {message: No details to update provided or indices out of range}, 400 (bad request)
-            {message: $field_value[index] out of range for $field}, 400 (bad request)
-Success = {
-    updated_reps: reps[reps_index] = reps_value,
-    updated_loading: loading[loading_index] = loading_value,
-    updated_rest: rest[rest_index] = rest_value,
-    updated_performance_notes: performance_notes[performance_notes_index] = performance_notes_value}, 200 (success)
+Success = {"message" : "Set info for $set_dict.exercise_name created and added to $workout.workout_name}, 201 (created)
+Failures =  {"error" : "Failure to create set dictionary"}, 400 (bad request),
+        {"error" : "You need to specify an exercise}, 400 (bad request)
 
-# Delete details in nested exercise
 
-DELETE request to /workouts/<user_id>/<workout_id>/delete_details
+# Toggle SetDict complete by position in workout
 
-Body = {reps_index: reps_index,
-        loading_index: loading_index,
-        rest_index: rest_index,
-        performance_notes_index: performance_notes_index,
-        }
-Failures =  {message: No details to delete provided or indices out of range}, 400 (bad request)
-            {message: $field_value_array[index] out of range for $field}, 400 (bad request)
-Success = {
-    updated_reps: reps_array[reps_index] = deleted,
-    updated_loading: loading_array[loading_index] = deleted,
-    updated_rest: rest_array[rest_index] = deleted,
-    updated_performance_notes: performance_notes_array[performance_notes_index] = deleted}, 200 (success)
+PATCH request to /api/workouts/<workout_id>/<set_order>/mark_complete
 
-# Misc Auth Functions
+Success = {"message" : "Set marked (in)complete"}, 200 (success)
+Failures = User not found: 404, No workouts found: 404,  Workout not found, 404
 
-GET request to /token/token_check
+# Add/overwrite notes to/in SetDict
 
-Success = {"message": f"Welcome, user {current_user}!", "advice": "It's dangerous to go alone, take this with you *hands over a *JWT*"}, 200 (success)
+PATCH request to /api/workouts/<workout_id>/<set_order>/add_notes
+
+Body = {"notes" : notes}
+Success = {"message" : "Notes added to set"}, 201 (created)
+Failures = API function failures
+
+# Delete SetDict notes
+
+DELETE request to /api/workouts/<workout_id>/<set_order>/delete_notes
+
+Success = {"message" : "Notes deleted"}, 200
+Failures = API function failures

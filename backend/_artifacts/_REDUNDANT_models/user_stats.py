@@ -1,5 +1,4 @@
 from mongoengine import EmbeddedDocument, IntField, ReferenceField, StringField, EmbeddedDocumentField, FloatField
-from models.personal_data import PersonalData
 
 class UserStats(EmbeddedDocument): # Embed in workout
     weight = FloatField()

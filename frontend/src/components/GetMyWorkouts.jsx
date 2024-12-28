@@ -18,14 +18,15 @@ const GetWorkouts = ({ onRefresh }) => {
         }
         try {
             const response = await axios.get(
-                `http://127.0.0.1:5000/workouts/${user_id}`,
+                `http://127.0.0.1:5000/api/workouts`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 }
             );
-            setMyWorkouts(response.data);
+            setMyWorkouts(response.data.workouts);
+            console.log(response.data.workouts)
         } catch (error) {
             console.error("Error making API call:", error);
             alert("Failed to fetch data. Check console for details.");
@@ -75,7 +76,7 @@ const GetWorkouts = ({ onRefresh }) => {
                                 navigate('/thisworkout');
                             }}
                         >
-                            {`Workout ${index + 1}`}
+                            {`Workout: ${workout.workout_name}`}
                         </h3>
                         {`Created: ${workout.date}`}
                         <br />
@@ -92,6 +93,9 @@ const GetWorkouts = ({ onRefresh }) => {
                             <thead>
                                 <tr>
                                     <th>Exercise</th>
+                                    <th>Set Number</th>
+                                    <th>Set Type</th>
+                                    <th>Focus</th>
                                     <th>Loading</th>
                                     <th>Rest Interval</th>
                                     <th>Reps</th>
@@ -100,16 +104,20 @@ const GetWorkouts = ({ onRefresh }) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {workout.exercise_list.map((exercise, exerciseIndex) => {
-                                    const exerciseName = exercise.exercise_name;
-                                    const loading = exercise.loading.join(", ");
-                                    const rest = exercise.rest.join(", ");
-                                    const reps = exercise.reps.join(", ");
-                                    const complete = exercise.complete.toString();
-                                    const notes = exercise.performance_notes.join(", ");
+                                {workout.sets_dict_list.map((set) => {
+                                    const exerciseName = set.exercise_name;
+                                    const loading = set.loading;
+                                    const rest = set.rest;
+                                    const reps = set.reps;
+                                    const complete = set.complete.toString();
+                                    const notes = set.performance_notes;
+                                    const setIndex = set.set_order 
+                                    const setNumber = set.set_number;
+                                    const focus = set.focus;
+                                    const setType = set.set_type;
 
                                     return (
-                                        <tr key={`${index}-${exerciseIndex}`}>
+                                        <tr key={`${index}-${setIndex}`}>
                                             <td
                                                 style={{ cursor: "pointer", color: "red" }}
                                                 onClick={() => {
@@ -120,6 +128,9 @@ const GetWorkouts = ({ onRefresh }) => {
                                             >
                                                 {exerciseName}
                                             </td>
+                                            <td>{setNumber + 1}</td>
+                                            <td>{setType}</td>
+                                            <td>{focus}</td>
                                             <td>{loading}</td>
                                             <td>{rest}</td>
                                             <td>{reps}</td>

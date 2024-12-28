@@ -9,9 +9,7 @@ from lib.database_connection import initialize_db, close_db
 from app import create_app
 from models.user import User
 from models.workout import Workout
-from models.user_stats import UserStats
 from models.set_dicts import SetDicts
-from models.personal_data import PersonalData
 from mongoengine import connect, disconnect
 from dotenv import load_dotenv
 from datetime import datetime
@@ -88,60 +86,32 @@ def setup_test_database():
 @pytest.fixture(autouse=True)
 def clear_db():
     User.objects.delete()
+    Workout.objects.delete()
 
 
 @pytest.fixture
-def spoofed_user():
-    spoofed_user = User(username="Test", password=test_password)
-    spoofed_user.hash_password()
-    yield spoofed_user
+def user_burrito(testing_password):
+    burrito = User(username="Chaos", password=testing_password, name="Burrito", height=30, weight=[{"2024/12/27" : 35}], dob=datetime.strptime("2021/10/10", "%Y/%m/%d"))
+    burrito.hash_password()
+    burrito.save()
+    yield burrito
 
 @pytest.fixture
-def spoofed_empty_workout(spoofed_user):
-    new_workout = Workout(user_id=spoofed_user.id, workout_name="First Try")
-    yield new_workout
+def auth_token(user_burrito):
+    token = create_access_token(str(user_burrito.username))
+    yield token
 
 @pytest.fixture
-def spoofed_personal_data():
-    new_data = PersonalData(name="Burrito", dob=datetime(2021, 11, 12), height=25, weight=25)
-    yield new_data
+def burrito_workout(user_burrito):
+    _weight = user_burrito.weight[0]
+    weight_values = list(_weight.values())
+    weight = weight_values[-1
+    ]
+    this_workout = Workout(user_id=user_burrito.id, workout_name="Workout Fixture", date=datetime.strptime("2024/12/28", "%Y/%m/%d"), user_weight=weight, sleep_score=80, sleep_quality="Good", notes=["Feeling good"])
+    this_workout.save()
+    yield this_workout
 
 @pytest.fixture
-def spoofed_personal_data_2():
-    new_data = PersonalData(name="Burrito", dob=datetime(2021, 11, 12), height=25, weight=250)
-    yield new_data
-
-@pytest.fixture
-def spoofed_user_stats():
-        stats = UserStats(weight=25.0, sleep_score=80, sleep_quality="Great", notes="Ready to start!")
-        yield stats
-
-@pytest.fixture
-def spoof_arnold_press_dict():
-        set_dict = SetDicts(set_order=1, exercise_name="Arnold Press", set_number=1, set_type="Working", reps=10, loading=20, focus="Form", rest=60, notes="Good form and tempo")
-        yield set_dict
-
-@pytest.fixture
-def auth_token(spoofed_user):
-    access_token = create_access_token(identity=spoofed_user.username)
-    yield access_token
-
-
-@pytest.fixture
-def bad_token():
-    access_token = create_access_token(identity="Invalid")
-    yield access_token
-
-@pytest.fixture
-def spoofed_populated_user(spoof_arnold_press_dict, spoofed_user, spoofed_personal_data, spoofed_user_stats, spoofed_empty_workout):
-    spoofed_empty_workout.add_set_dict(spoof_arnold_press_dict)
-    spoofed_empty_workout.add_stats(spoofed_user_stats)
-    spoofed_user.add_personal_data(spoofed_personal_data)
-    spoofed_user.add_workout(spoofed_empty_workout)
-    spoofed_user.save()
-    yield spoofed_user
-
-@pytest.fixture
-def alt_spoofed_user_stats():
-        stats = UserStats(weight=250.0, sleep_score=75, sleep_quality="Ok", notes="A little tired...")
-        yield stats
+def warm_up_shoulder_press():
+    set_dict = SetDicts(set_order=1, exercise_name="Shoulder Press", set_number=1, set_type="Warm up", reps=12, loading=27.5, rest=45)
+    yield set_dict

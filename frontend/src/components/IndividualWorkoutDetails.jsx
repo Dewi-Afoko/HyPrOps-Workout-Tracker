@@ -13,7 +13,7 @@ const IndividualWorkoutDetails = () => {
         exercise_list: [],
     });
 
-    const [selectedData, setSelectedData] = useState({}); // Tracks selected data for each exercise
+    const [selectedData, setSelectedData] = useState({}); 
 
     const getThisWorkout = async () => {
         const token = localStorage.getItem("token");
@@ -25,7 +25,7 @@ const IndividualWorkoutDetails = () => {
         }
         try {
             const response = await axios.get(
-                `http://127.0.0.1:5000/workouts/${user_id}/${workout_id}`,
+                `http://127.0.0.1:5000/api/workouts/${workout_id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

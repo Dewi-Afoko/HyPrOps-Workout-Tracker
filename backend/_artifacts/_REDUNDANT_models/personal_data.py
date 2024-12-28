@@ -8,12 +8,14 @@ class PersonalData(EmbeddedDocument):
     weight = FloatField()
 
     def to_dict(self):
-        return {
+        payload = {
             'name': self.name,
-            'dob': self.dob.strftime('%Y/%m/%d'),
             'height': self.height,
             'weight': self.weight,
-        }
+            }
+        if self.dob != None:
+            payload['dob'] = self.dob.strftime('%Y/%m/%d'),
+        return payload
     
     def update_personal_details(self, name=None, dob=None, height=None, weight=None):
         if name != None:
