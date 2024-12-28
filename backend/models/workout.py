@@ -84,5 +84,15 @@ class Workout(Document):
             set.set_number = exercise_count[exercise_name]
         self.save()
 
-
-            
+    def edit_details(self, name=None, date=None, user_weight=None, sleep_score=None, sleep_quality=None):
+        if name is not None:
+            self.name = name
+        if date is not None:
+            self.date = date
+        if user_weight is not None:
+            self.user_weight = user_weight
+        if sleep_score is not None:
+            self.sleep_score = sleep_score
+        if sleep_quality is not None:
+            self.sleep_quality = sleep_quality
+        self.save()

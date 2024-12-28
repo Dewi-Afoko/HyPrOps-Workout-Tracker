@@ -6,6 +6,7 @@ from models.workout import Workout
 from models.set_dicts import SetDicts
 from mongoengine.errors import ValidationError, NotUniqueError
 from pymongo.errors import DuplicateKeyError
+from datetime import datetime
 
 def test_workout_creation_generates_correctly(user_burrito):
     new_workout = Workout(user_id=user_burrito.id, workout_name="First Try")
@@ -109,3 +110,11 @@ def test_format_set_dict(burrito_workout, warm_up_shoulder_press):
     print(f'{burrito_workout.set_dicts_list[0].to_dict() =}')
     warm_up_saved =  SetDicts(set_order=1, exercise_name="Shoulder Press", set_number=1, set_type="Warm up", reps=12, loading=27.5, rest=45)
     assert burrito_workout.set_dicts_list == [warm_up_saved]
+
+def test_edit_workout_details(burrito_workout):
+    burrito_workout.edit_details(name="Edited Name", date=datetime.strptime("2025/01/01", "%Y/%m/%d"), sleep_score=60, sleep_quality="Meh")
+    assert burrito_workout.name == "Edited Name"
+    assert burrito_workout.date == datetime.strptime("2025/01/01", "%Y/%m/%d")
+    assert burrito_workout.sleep_score == 60
+    assert burrito_workout.sleep_quality == "Meh"
+    assert burrito_workout.user_weight == 35
