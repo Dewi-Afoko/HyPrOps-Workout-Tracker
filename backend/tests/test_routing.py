@@ -147,11 +147,9 @@ def test_workout_creates_correctly(web_client, clear_db, user_burrito, auth_toke
     assert response.status_code == 201
     assert response.json['message'] == f"{payload['workout_name']} created by {user_burrito.username}"
 
-    user_burrito.reload()
     workout = Workout.objects(user_id=str(user_burrito.id)).first()
-    workout.save()
 
-    assert user_burrito.workout_list == [workout]
+    assert workout.user_id == user_burrito
 
 def test_workout_fails_with_no_name(web_client, clear_db, user_burrito, auth_token):
     headers = {"Authorization": f"Bearer {auth_token}"}
@@ -174,11 +172,10 @@ def test_workout_fails_with_bad_user_token(web_client, clear_db, bad_token):
 
 
 # GET User Workouts
-#TODO: Re-start refactoring routes on TDD principles here
-def test_getting_user_workouts_success(web_client, clear_db, spoofed_populated_user, auth_token):
+
+def test_getting_user_workouts_success(web_client, clear_db, user_burrito, burrito_workout, auth_token):
         headers = {"Authorization": f"Bearer {auth_token}"}
-        response = web_client.get('/api/workouts', headers=headers)
-        
+        response = web_client.get('/api/workouts', headers=headers)        
         assert response.json['message'] == 'Here are your workouts:'
         assert 'workouts' in response.json
         assert response.status_code == 200
@@ -193,151 +190,125 @@ def test_getting_workouts_fails_with_no_workouts(web_client, clear_db, auth_toke
                     
                     
                     
-def test_getting_single_workout_success(web_client, clear_db, auth_token, spoofed_populated_user):
+def test_getting_single_workout_success(web_client, clear_db, auth_token, user_burrito, burrito_workout):
         headers = {"Authorization": f"Bearer {auth_token}"}
-        workout_id = str(spoofed_populated_user.workout_list[0].id)
+        workout_id = str(burrito_workout.id)
         response = web_client.get(f'/api/workouts/{workout_id}', headers=headers)
 
         assert response.json['message'] == f'Here are the details for workout ID: {workout_id}'
-        assert response.json['workout'] == spoofed_populated_user.workout_list[0].to_dict()
+        assert response.json['workout'] == burrito_workout.to_dict()
         assert response.status_code == 200   
 
-def test_getting_single_workout_success_with_multiple_workouts(web_client, clear_db, auth_token, spoofed_populated_user):
+def test_getting_single_workout_success_with_multiple_workouts(web_client, clear_db, auth_token, user_burrito, burrito_workout):
         headers = {"Authorization": f"Bearer {auth_token}"}
-        workout_id = str(spoofed_populated_user.workout_list[0].id)
         web_client.post('/api/workouts', headers=headers, json={'workout_name' : 'Workout2'})
-        spoofed_populated_user.reload()
         web_client.post('/api/workouts', headers=headers, json={'workout_name' : 'Workout3'})
-        spoofed_populated_user.reload()
+        workout_id = str(burrito_workout.id)
 
-        assert len(spoofed_populated_user.workout_list) == 3
+        response = web_client.get('/api/workouts', headers=headers) 
+        assert len(response.json['workouts']) == 3
 
         response = web_client.get(f'/api/workouts/{workout_id}', headers=headers)
 
         assert response.json['message'] == f'Here are the details for workout ID: {workout_id}'
-        assert response.json['workout'] == spoofed_populated_user.workout_list[0].to_dict()
+        assert response.json['workout'] == burrito_workout.to_dict()
         assert response.status_code == 200   
 
-def test_add_notes_to_workout(web_client, clear_db, auth_token, spoofed_populated_user):
+def test_add_notes_to_workout(web_client, clear_db, auth_token, burrito_workout):
         headers = {"Authorization": f"Bearer {auth_token}"}
-        workout_id = str(spoofed_populated_user.workout_list[0].id)
+        workout_id = str(burrito_workout.id)
         payload = {'notes' : 'Adding more notes'}
 
-        assert len(spoofed_populated_user.workout_list[0].notes) == 0
+        assert len(burrito_workout.notes) == 1
 
         response = web_client.patch(f'/api/workouts/{workout_id}/add_notes', headers=headers, json=payload)
 
         assert response.json['message'] == f'{payload["notes"]}: added to workout notes'
         assert response.status_code == 200
+        burrito_workout.reload()
+        assert len(burrito_workout.notes) == 2
 
-        spoofed_populated_user.reload()
-
-
-        assert len(spoofed_populated_user.workout_list[0].notes) == 1
-
-def test_delete_notes_from_workout(web_client, clear_db, auth_token, spoofed_populated_user):
+def test_delete_notes_from_workout(web_client, clear_db, auth_token, burrito_workout):
         headers = {"Authorization": f"Bearer {auth_token}"}
-        workout_id = str(spoofed_populated_user.workout_list[0].id)
+        workout_id = str(burrito_workout.id)
         payload = {'notes' : 'Adding more notes'}
 
-        assert len(spoofed_populated_user.workout_list[0].notes) == 0
+        assert len(burrito_workout.notes) == 1
         web_client.patch(f'/api/workouts/{workout_id}/add_notes', headers=headers, json={'notes' : 'Persist these notes'})
         response = web_client.patch(f'/api/workouts/{workout_id}/add_notes', headers=headers, json=payload)
         web_client.patch(f'/api/workouts/{workout_id}/add_notes', headers=headers, json={'notes' : 'Persist these notes'})
 
-        spoofed_populated_user.reload()
+        burrito_workout.reload()
 
         assert response.json['message'] == f'{payload["notes"]}: added to workout notes'
         assert response.status_code == 200
-        assert len(spoofed_populated_user.workout_list[0].notes) == 3
+        assert len(burrito_workout.notes) == 4
 
-        spoofed_populated_user.reload()
-        note_index = 1
+        note_index = 2
         response = web_client.delete(f'/api/workouts/{workout_id}/delete_note/{note_index}', headers=headers)
         assert response.status_code == 200
         assert response.json['message'] == 'Note successfully deleted'
 
+        burrito_workout.reload()
 
-        spoofed_populated_user.reload()
-        assert len(spoofed_populated_user.workout_list[0].notes) == 2
-        assert spoofed_populated_user.workout_list[0].notes[0] == 'Persist these notes'
-        assert spoofed_populated_user.workout_list[0].notes[1] == 'Persist these notes'
+        assert len(burrito_workout.notes) == 3
+        assert burrito_workout.notes[1] == 'Persist these notes'
+        assert burrito_workout.notes[2] == 'Persist these notes'
 
 
-def test_toggling_workout_complete(web_client, clear_db, auth_token, spoofed_populated_user):
+def test_toggling_workout_complete(web_client, clear_db, auth_token, burrito_workout):
         headers = {"Authorization": f"Bearer {auth_token}"}
-        workout_id = str(spoofed_populated_user.workout_list[0].id)
-        assert spoofed_populated_user.workout_list[0].complete == False
+        workout_id = str(burrito_workout.id)
+        assert burrito_workout.complete == False
         response = web_client.patch(f'/api/workouts/{workout_id}/mark_complete', headers=headers)
-        spoofed_populated_user.reload()
+        burrito_workout.reload()
         assert response.json['message'] == "Workout marked as complete"
         assert response.status_code == 200
-        assert spoofed_populated_user.workout_list[0].complete == True
+        assert burrito_workout.complete == True
         response = web_client.patch(f'/api/workouts/{workout_id}/mark_complete', headers=headers)
         assert response.json['message'] == "Workout marked as incomplete"
         assert response.status_code == 200
-        spoofed_populated_user.reload()
-        assert spoofed_populated_user.workout_list[0].complete == False
+        burrito_workout.reload()
+        assert burrito_workout.complete == False
                     
-def test_adding_userstats_to_workout(web_client, clear_db, auth_token, spoofed_populated_user, alt_user_burrito_stats, user_burrito_stats):
+
+
+### FUNCTIONALITY: Workout x SetDict Tests
+
+def test_adding_set_dict_success(web_client, clear_db, auth_token, burrito_workout, warm_up_shoulder_press):
     headers = {"Authorization": f"Bearer {auth_token}"}
-    workout_id = str(spoofed_populated_user.workout_list[0].id)
-
-    assert spoofed_populated_user.workout_list[0].user_stats == user_burrito_stats
-    payload = alt_user_burrito_stats.to_dict()
-
-    response = web_client.put(f'/api/workouts/{workout_id}/add_stats', headers=headers, json=payload)
-    assert response.json['message'] == 'Stats added to workout'
-    assert response.status_code == 201
-    spoofed_populated_user.reload()
-    assert spoofed_populated_user.workout_list[0].user_stats == alt_user_burrito_stats
-
-
-
-
-                    ### Workout x SetDict Tests
-
-def test_adding_set_dict_success(web_client, clear_db, auth_token, user_burrito, spoof_arnold_press_dict):
-    headers = {"Authorization": f"Bearer {auth_token}"}
-    web_client.post('/api/workouts', headers=headers, json={'workout_name' : 'First Try'}) # Create Workout
-    user_burrito.reload()
-    workout = next((workout for workout in user_burrito.workout_list if workout.workout_name == 'First Try'), None)
-    workout_id = str(workout.id)
+    workout_id = str(burrito_workout.id)
     payload = {
-                'exercise_name': spoof_arnold_press_dict.exercise_name,
-                'set_type' : spoof_arnold_press_dict.set_type,
-                'reps': spoof_arnold_press_dict.reps,
-                'loading': spoof_arnold_press_dict.loading,
-                'focus' : spoof_arnold_press_dict.focus,
-                'rest' : spoof_arnold_press_dict.rest,
-                'notes' :spoof_arnold_press_dict.notes
+                'exercise_name': warm_up_shoulder_press.exercise_name,
+                'set_type' : warm_up_shoulder_press.set_type,
+                'reps': warm_up_shoulder_press.reps,
+                'loading': warm_up_shoulder_press.loading,
+                'focus' : warm_up_shoulder_press.focus,
+                'rest' : warm_up_shoulder_press.rest,
+                'notes' :warm_up_shoulder_press.notes
             }
     response = web_client.post(f'/api/workouts/{workout_id}/add_set', headers=headers, json=payload) # Create SetDict in workout
 
-    user_burrito.reload()
+    burrito_workout.reload()
 
-    assert response.json['message'] == f"Set info for {payload['exercise_name']} created and added to {str(workout.workout_name)}"
+    assert response.json['message'] == f"Set info for {payload['exercise_name']} created and added to {str(burrito_workout.workout_name)}"
     assert response.status_code == 201
-    user_burrito.reload()
+    burrito_workout.reload()
 
-    workout_to_check = next((workout for workout in user_burrito.workout_list if str(workout.id) == workout_id), None) # Fetch the workout_list from spoofed user embedded listfield
 
-    assert len(workout_to_check.set_dicts_list) == 1
+    assert len(burrito_workout.set_dicts_list) == 1
     
 
-def test_no_exercise_name_set_dict_fails(web_client, clear_db, user_burrito, spoof_arnold_press_dict, auth_token):
+def test_no_exercise_name_set_dict_fails(web_client, clear_db, user_burrito, warm_up_shoulder_press, burrito_workout, auth_token):
     headers = {"Authorization": f"Bearer {auth_token}"}
-    web_client.post('/api/workouts', headers=headers, json={'workout_name' : 'First Try'}) # Create Workout
-    user_burrito.reload()
-    workout = next((workout for workout in user_burrito.workout_list if workout.workout_name == 'First Try'), None)
-    workout_id = str(workout.id)
+    workout_id = str(burrito_workout.id)
     payload = {
-                'set_type' : spoof_arnold_press_dict.set_type,
-                'reps': spoof_arnold_press_dict.reps,
-                'loading': spoof_arnold_press_dict.loading,
-                'focus' : spoof_arnold_press_dict.focus,
-                'rest' : spoof_arnold_press_dict.rest,
-                'notes' :spoof_arnold_press_dict.notes
+                'set_type' : warm_up_shoulder_press.set_type,
+                'reps': warm_up_shoulder_press.reps,
+                'loading': warm_up_shoulder_press.loading,
+                'focus' : warm_up_shoulder_press.focus,
+                'rest' : warm_up_shoulder_press.rest,
+                'notes' :warm_up_shoulder_press.notes
             }
 
     response = web_client.post(f'/api/workouts/{workout_id}/add_set', headers=headers, json=payload) # Create SetDict
@@ -347,47 +318,37 @@ def test_no_exercise_name_set_dict_fails(web_client, clear_db, user_burrito, spo
 
 
 
-def test_partial_set_dict_creation_succeess(web_client, clear_db, auth_token, user_burrito, spoofed_empty_workout, spoof_arnold_press_dict):
+def test_partial_set_dict_creation_succeess(web_client, clear_db, auth_token, user_burrito, burrito_workout, warm_up_shoulder_press):
     headers = {"Authorization": f"Bearer {auth_token}"}
-    web_client.post('/api/workouts', headers=headers, json={'workout_name' : 'First Try'}) # Create Workout
-    user_burrito.reload()
-    workout = next((workout for workout in user_burrito.workout_list if workout.workout_name == 'First Try'), None)
-    workout_name = str(workout.workout_name)
-    workout_id = str(workout.id)
+    workout_id = str(burrito_workout.id)
     payload = {
-                'exercise_name': spoof_arnold_press_dict.exercise_name,
-                'reps': spoof_arnold_press_dict.reps,
-                'loading': spoof_arnold_press_dict.loading,
-                'rest' : spoof_arnold_press_dict.rest,
-                'notes' :spoof_arnold_press_dict.notes
+                'exercise_name': warm_up_shoulder_press.exercise_name,
+                'reps': warm_up_shoulder_press.reps,
+                'loading': warm_up_shoulder_press.loading,
+                'rest' : warm_up_shoulder_press.rest,
+                'notes' :warm_up_shoulder_press.notes
             }
 
     response = web_client.post(f'/api/workouts/{workout_id}/add_set', headers=headers, json=payload) # Create SetDict
 
-    user_burrito.reload()
+    burrito_workout.reload()
 
-    assert response.json['message'] == f"Set info for {payload['exercise_name']} created and added to {workout_name}"
+    assert response.json['message'] == f"Set info for {payload['exercise_name']} created and added to {burrito_workout.workout_name}"
     assert response.status_code == 201
 
-    workout_to_check = next((workout for workout in user_burrito.workout_list if workout.workout_name == 'First Try'), None) # Fetch the workout_list from spoofed user embedded listfield
+    assert len(burrito_workout.set_dicts_list) == 1
 
-    assert len(workout_to_check.set_dicts_list) == 1
-
-def test_creation_of_set_dict_fails_with_invalid_inputs(web_client, clear_db, user_burrito, auth_token, spoofed_empty_workout, spoof_arnold_press_dict):
+def test_creation_of_set_dict_fails_with_invalid_inputs(web_client, clear_db, user_burrito, auth_token, burrito_workout, warm_up_shoulder_press):
     headers = {"Authorization": f"Bearer {auth_token}"}
-    web_client.post('/api/workouts', headers=headers, json={'workout_name' : 'First Try'}) # Create Workout
-    user_burrito.reload()
-    workout = next((workout for workout in user_burrito.workout_list if workout.workout_name == 'First Try'), None)
-    workout_id = str(workout.id)
+    workout_id = str(burrito_workout.id)
     payload = {
-                'workout_name' : spoofed_empty_workout.workout_name,
-                'exercise_name': spoof_arnold_press_dict.exercise_name,
-                'set_type' : spoof_arnold_press_dict.set_type,
-                'reps': spoof_arnold_press_dict.reps,
-                'loading': spoof_arnold_press_dict.loading,
+                'exercise_name': warm_up_shoulder_press.exercise_name,
+                'set_type' : warm_up_shoulder_press.set_type,
+                'reps': warm_up_shoulder_press.reps,
+                'loading': warm_up_shoulder_press.loading,
                 'focus' : 12,
-                'rest' : spoof_arnold_press_dict.rest,
-                'notes' :spoof_arnold_press_dict.notes
+                'rest' : warm_up_shoulder_press.rest,
+                'notes' :warm_up_shoulder_press.notes
             }
 
 
@@ -397,23 +358,23 @@ def test_creation_of_set_dict_fails_with_invalid_inputs(web_client, clear_db, us
     assert response.status_code == 400
 
 
-def test_set_dict_toggle_complete_twice(web_client, clear_db, auth_token, spoofed_populated_user):
+def test_set_dict_toggle_complete_twice(web_client, clear_db, auth_token, workout_with_dicts):
     headers = {"Authorization": f"Bearer {auth_token}"}
-    assert spoofed_populated_user.workout_list[0].complete == False
-    workout_id = spoofed_populated_user.workout_list[0].id
+    assert workout_with_dicts.set_dicts_list[0].complete == False
+    workout_id = str(workout_with_dicts.id)
     set_order = 1
     response = web_client.patch(f'/api/workouts/{workout_id}/{set_order}/mark_complete', headers=headers)
     assert response.json['message'] == 'Set marked complete'
     assert response.status_code == 200
-    spoofed_populated_user.reload()
-    assert spoofed_populated_user.workout_list[0].set_dicts_list[0].complete == True
+    workout_with_dicts.reload()
+    assert workout_with_dicts.set_dicts_list[0].complete == True
     response = web_client.patch(f'/api/workouts/{workout_id}/{set_order}/mark_complete', headers=headers)
     assert response.json['message'] == 'Set marked incomplete'
     assert response.status_code == 200
-    spoofed_populated_user.reload()
-    assert spoofed_populated_user.workout_list[0].set_dicts_list[0].complete == False
+    workout_with_dicts.reload()
+    assert workout_with_dicts.set_dicts_list[0].complete == False
 
-
+#TODO Start HERE!
 
 def test_set_dict_add_notes(web_client, auth_token, clear_db, spoofed_populated_user):
     headers = {"Authorization": f"Bearer {auth_token}"}
