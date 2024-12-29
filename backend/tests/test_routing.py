@@ -135,7 +135,7 @@ Workout routes
 
 # Workout creation
 
-# TODO: Refactor tests now workout_list is not a property of User model
+
 
 def test_workout_creates_correctly(web_client, clear_db, user_burrito, auth_token):
     headers = {"Authorization": f"Bearer {auth_token}"}
@@ -374,39 +374,41 @@ def test_set_dict_toggle_complete_twice(web_client, clear_db, auth_token, workou
     workout_with_dicts.reload()
     assert workout_with_dicts.set_dicts_list[0].complete == False
 
-#TODO Start HERE!
 
-def test_set_dict_add_notes(web_client, auth_token, clear_db, spoofed_populated_user):
+def test_set_dict_add_notes(web_client, auth_token, clear_db, workout_with_dicts):
     headers = {"Authorization": f"Bearer {auth_token}"}
     payload = {'notes' : 'Until failure'}
-    workout_id = str(spoofed_populated_user.workout_list[0].id)
-    set_order = spoofed_populated_user.workout_list[0].set_dicts_list[0].set_order
-    og_notes = spoofed_populated_user.workout_list[0].set_dicts_list[0].notes
+    workout_id = str(workout_with_dicts.id)
+    set_order = workout_with_dicts.set_dicts_list[0].set_order
 
-    assert og_notes == 'Good form and tempo'
     response = web_client.patch(f'/api/workouts/{workout_id}/{set_order}/add_notes', headers=headers, json=payload)
     assert response.json['message'] == "Notes added to set"
     assert response.status_code == 201
+    workout_with_dicts.reload()
 
-    spoofed_populated_user.reload()
-    updated_notes = spoofed_populated_user.workout_list[0].set_dicts_list[0].notes
+    updated_notes = workout_with_dicts.set_dicts_list[0].notes
     assert updated_notes == "Until failure"
 
-def test_set_dict_delete_notes(web_client, auth_token, clear_db, spoofed_populated_user):
+def test_set_dict_delete_notes(web_client, auth_token, clear_db, workout_with_dicts):
     headers = {"Authorization": f"Bearer {auth_token}"}
-    workout_id = str(spoofed_populated_user.workout_list[0].id)
-    set_order = spoofed_populated_user.workout_list[0].set_dicts_list[0].set_order
-    og_notes = spoofed_populated_user.workout_list[0].set_dicts_list[0].notes
+    payload = {'notes' : 'Until failure'}
+    workout_id = str(workout_with_dicts.id)
+    set_order = workout_with_dicts.set_dicts_list[0].set_order
 
-    assert og_notes == 'Good form and tempo'
+    response = web_client.patch(f'/api/workouts/{workout_id}/{set_order}/add_notes', headers=headers, json=payload)
+    assert response.json['message'] == "Notes added to set"
+    assert response.status_code == 201
+    workout_with_dicts.reload()
+    assert len(workout_with_dicts.set_dicts_list[0].notes) > 0
+
     response = web_client.delete(f'/api/workouts/{workout_id}/{set_order}/delete_notes', headers=headers)
     assert response.json['message'] == "Notes deleted"
     assert response.status_code == 200
 
-    spoofed_populated_user.reload()
-    assert spoofed_populated_user.workout_list[0].set_dicts_list[0].notes == None
+    workout_with_dicts.reload()
+    assert workout_with_dicts.set_dicts_list[0].notes == None
 
-#TODO Missing routes: PersonalData and integration with UserStats weight
+#TODO Writes tests for functionality previously provided by old models
 
 def test_adding_personal_data_to_user(web_client, auth_token, clear_db, user_burrito, spoofed_personal_data):
     headers = {"Authorization": f"Bearer {auth_token}"}
