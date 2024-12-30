@@ -9,7 +9,8 @@
 
 ## Next Goals
 
-    - Finish building and documenting API routes using TDD
+    - ~~Finish building and documenting API routes using TDD~~
+    - Implement Flask-RESTX and Swagger for namespaces and API documentation
     - Create functional JavaScript/React web frontend
 
 
