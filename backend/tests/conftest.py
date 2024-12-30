@@ -102,6 +102,11 @@ def auth_token(user_burrito):
     yield token
 
 @pytest.fixture
+def bad_token():
+    token = create_access_token("Not a user")
+    yield token
+
+@pytest.fixture
 def burrito_workout(user_burrito):
     _weight = user_burrito.weight[0]
     weight_values = list(_weight.values())
@@ -115,3 +120,12 @@ def burrito_workout(user_burrito):
 def warm_up_shoulder_press():
     set_dict = SetDicts(set_order=1, exercise_name="Shoulder Press", set_number=1, set_type="Warm up", reps=12, loading=27.5, rest=45)
     yield set_dict
+
+@pytest.fixture
+def workout_with_dicts(burrito_workout, warm_up_shoulder_press):
+    burrito_workout.add_set_dict(warm_up_shoulder_press)
+    burrito_workout.add_set_dict(warm_up_shoulder_press)
+    burrito_workout.add_set_dict(warm_up_shoulder_press)
+    burrito_workout.add_set_dict(warm_up_shoulder_press)
+    burrito_workout.save()
+    yield burrito_workout

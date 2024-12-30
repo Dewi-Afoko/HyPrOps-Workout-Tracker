@@ -59,8 +59,6 @@ def create_workout():
     workout = Workout(user_id=str(user.id), workout_name=data['workout_name'])
     workout.save()
 
-    user.add_workout(workout)
-    user.save()
 
     return jsonify({'message' : f'{workout.workout_name} created by {user.username}'}), 201
 
@@ -78,12 +76,7 @@ def add_workout_notes(workout_id):
     if tuple_checker(workout):
         return workout
     workout.add_notes(data.get('notes'))
-        # Update the workout in the user's workout_list and save the user
-    for i, w in enumerate(user.workout_list):
-        if str(w.id) == workout_id:
-            user.workout_list[i] = workout  # Update the workout in the list
-            break
-    user.save()
+
     return jsonify({'message' : f'{data.get("notes")}: added to workout notes'}), 200
 
 # FUNCTIONALITY Delete notes from workout by index positon
@@ -100,12 +93,7 @@ def delete_workout_note(workout_id, note_index):
         return workout
     
     workout.delete_note(note_index)
-        # Update the workout in the user's workout_list
-    for i, w in enumerate(user.workout_list):
-        if str(w.id) == workout_id:
-            user.workout_list[i] = workout  # Reassign the updated workout
-            break
-    user.save()
+
 
     return jsonify({'message' : 'Note successfully deleted'}), 200
 
@@ -124,11 +112,7 @@ def toggle_workout_complete(workout_id):
         return workout
     
     workout.toggle_complete()
-    for i, w in enumerate(user.workout_list):
-        if str(w.id) == workout_id:
-            user.workout_list[i] = workout  # Reassign the updated workout
-            break
-    user.save()
+    
     if workout.complete == True:
         status = "complete"
     elif workout.complete == False:

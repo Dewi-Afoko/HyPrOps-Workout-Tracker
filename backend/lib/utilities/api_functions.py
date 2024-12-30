@@ -27,7 +27,7 @@ def find_user_workouts_list():
     user = find_user_from_jwt()
     if tuple_checker(user):
         return user
-    workouts = Workout.objects(user_id=user.id)
+    workouts = Workout.objects(user_id=user)
     workouts = list(workouts)
     if not workouts:
         return jsonify({'error' : 'No workouts found'}), 404
