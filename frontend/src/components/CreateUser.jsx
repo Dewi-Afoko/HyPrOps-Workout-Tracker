@@ -16,9 +16,8 @@ const CreateUser = () => {
             return;
         }
         try {
-            const response = await axios.post(`http://127.0.0.1:5000/api/user`, { username, password });
+            const response = await axios.post(`http://127.0.0.1:5000/api/users`, { username, password });
             alert(`API Response: ${JSON.stringify(response.data)}`);
-            localStorage.setItem("user_id", response.data.id); // Set user's ID in localStorage
             navigate('/login');
         } catch (error) {
             console.error("Error making API call:", error);

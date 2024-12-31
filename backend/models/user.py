@@ -8,7 +8,7 @@ class User(Document):
     password = StringField(required=True)
     name = StringField(required=False)
     height = FloatField(required=False)
-    weight = ListField(DictField(), default=list)
+    weight = DictField()
     dob = DateField(required=False)
 
     def hash_password(self):
@@ -30,17 +30,19 @@ class User(Document):
         if height is not None:
             self.height = self._validate_is_number(height, "height") 
         if weight is not None:
-            weight_log = {datetime.now().strftime("%Y/%m/%d") : self._validate_is_number(weight, "weight")}
-            self.weight.append(weight_log)
+            weight = self._validate_is_number(weight, "weight")
+            self.weight[datetime.now().strftime("%Y/%m/%d")] = weight
         self.save()
 
     def to_dict(self):
+        latest_weigh_in = max(self.weight, key=lambda date: datetime.strptime(date, "%Y/%m/%d"))
         payload = {
             'id' : str(self.id),
             'username' : self.username,
             'name': self.name,
             'height': self.height,
-            'weight': self.weight[-1],
+            'weight': self.weight[latest_weigh_in],
+            'last_weighed_on': latest_weigh_in
             }
         if self.dob != None:
             payload['dob'] = self.dob.strftime('%Y/%m/%d')

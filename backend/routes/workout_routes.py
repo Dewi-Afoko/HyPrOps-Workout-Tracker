@@ -120,42 +120,6 @@ def toggle_workout_complete(workout_id):
 
     return jsonify({'message' : f'Workout marked as {status}'}), 200
 
-#TODO: REFACTOR No more UserStats or PersonalData
-
-# @workouts_bp.route('/workouts/<workout_id>/add_stats', methods=['PUT'])
-# @jwt_required()
-# def add_stats_to_workout(workout_id):
-#     data = request.get_json()
-
-#     user = find_user_from_jwt()
-#     if tuple_checker(user):
-#         return user
-    
-#     workout = find_single_workout(workout_id)
-#     if tuple_checker(workout):
-#         return workout
-    
-#     if user.personal_data != None:
-#         personal_data = user.personal_data
-
-#     if not personal_data:
-#         return jsonify({'error' : 'No personal data found'}), 400
-#     print(f'From Route: {personal_data.to_dict() =}')
-#     user_stats = UserStats(weight=personal_data.weight, sleep_score=data.get('sleep_score'), sleep_quality=data.get('sleep_quality'), notes=data.get('notes'))
-
-#     if not user_stats:
-#         return jsonify({'error' : 'User stats not created'}), 400
-
-#     workout.add_stats(user_stats)
-#     for i, w in enumerate(user.workout_list):
-#         if str(w.id) == workout_id:
-#             user.workout_list[i] = workout  # Reassign the updated workout
-#             break
-#     user.save()
-#     workout.save()
-
-#     return jsonify({'message' : 'Stats added to workout'}), 201
-
 
 # FUNCTIONALITY Create SetDict and add to workout
 

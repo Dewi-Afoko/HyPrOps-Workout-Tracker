@@ -91,7 +91,7 @@ def clear_db():
 
 @pytest.fixture
 def user_burrito(testing_password):
-    burrito = User(username="Chaos", password=testing_password, name="Burrito", height=30, weight=[{"2024/12/27" : 35}], dob=datetime.strptime("2021/10/10", "%Y/%m/%d"))
+    burrito = User(username="Chaos", password=testing_password, name="Burrito", height=30, weight={"2024/12/27" : 35}, dob=datetime.strptime("2021/10/10", "%Y/%m/%d"))
     burrito.hash_password()
     burrito.save()
     yield burrito
@@ -108,10 +108,7 @@ def bad_token():
 
 @pytest.fixture
 def burrito_workout(user_burrito):
-    _weight = user_burrito.weight[0]
-    weight_values = list(_weight.values())
-    weight = weight_values[-1
-    ]
+    weight = user_burrito.weight["2024/12/27"]
     this_workout = Workout(user_id=user_burrito.id, workout_name="Workout Fixture", date=datetime.strptime("2024/12/28", "%Y/%m/%d"), user_weight=weight, sleep_score=80, sleep_quality="Good", notes=["Feeling good"])
     this_workout.save()
     yield this_workout
