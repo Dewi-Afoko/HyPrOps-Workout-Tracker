@@ -32,7 +32,8 @@ def test_new_user_has_id_and_fixture_to_dict(user_burrito):
         "username" : "Chaos",
         "name" : "Burrito",
         "height" : 30.0,
-        "weight" : {"2024/12/27" : 35},
+        "weight" :  35,
+        "last_weighed_on" : "2024/12/27",
         "dob" : "2021/10/10"
     }
 

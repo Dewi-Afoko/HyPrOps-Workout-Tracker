@@ -91,7 +91,7 @@ def clear_db():
 
 @pytest.fixture
 def user_burrito(testing_password):
-    burrito = User(username="Chaos", password=testing_password, name="Burrito", height=30, weight=[{"2024/12/27" : 35}], dob=datetime.strptime("2021/10/10", "%Y/%m/%d"))
+    burrito = User(username="Chaos", password=testing_password, name="Burrito", height=30, weight={"2024/12/27" : 35}, dob=datetime.strptime("2021/10/10", "%Y/%m/%d"))
     burrito.hash_password()
     burrito.save()
     yield burrito
