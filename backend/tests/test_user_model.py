@@ -14,12 +14,12 @@ test_password = os.getenv("TEST_PASSWORD")
 
 
 def test_create_user_unhashed_password():
-    new_user = User(username="Test", password="unhashed_password", name="Subject", height=185, weight=175)
+    new_user = User(username="Test", password="unhashed_password", name="Subject", height=185, weight={datetime.now().strftime("%Y/%m/%d"): 175})
     assert new_user.username == "Test"
     assert new_user.password == "unhashed_password"
     assert new_user.name == "Subject"
     assert new_user.height == 185
-    assert new_user.weight == 175
+    assert new_user.weight == {datetime.now().strftime("%Y/%m/%d"): 175}
 
 def test_create_user_hashed_password(user_burrito):
     assert user_burrito.username == "Chaos"
@@ -51,7 +51,7 @@ def test_update_some_personal_details(user_burrito):
 def test_update_all_personal_details(user_burrito):
     user_burrito.update_personal_details(height=25, weight=30, name="Zan Ji", dob="2020/09/09")
     assert user_burrito.height == 25
-    assert 30 in user_burrito.weight[-1].values()
+    assert 30 in user_burrito.weight.values()
     assert user_burrito.name == "Zan Ji"
     assert user_burrito.dob.strftime("%Y/%m/%d") == "2020/09/09"
 
@@ -73,6 +73,7 @@ def test_to_dict_function(user_burrito):
         'username' : 'Chaos',
         'name' : 'Burrito',
         'height' : 30,
-        'weight' : {"2024/12/27" : 35},
+        'weight' :  35,
+        'last_weighed_on' : "2024/12/27",
         'dob' : '2021/10/10'
     }

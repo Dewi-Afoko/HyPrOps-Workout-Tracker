@@ -421,6 +421,6 @@ def test_updating_user_personal_details(web_client, auth_token, user_burrito, cl
     assert response.status_code == 201
     user_burrito.reload()
     assert user_burrito.name == "Zan Ji"
-    assert user_burrito.weight[-1] == {datetime.now().strftime("%Y/%m/%d"): 30.0}
+    assert user_burrito.weight[datetime.now().strftime("%Y/%m/%d")] ==  30
     assert user_burrito.height == 25
     assert user_burrito.to_dict()['dob'] == "2023/01/01"
