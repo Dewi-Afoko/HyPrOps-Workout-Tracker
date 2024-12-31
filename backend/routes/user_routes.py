@@ -30,20 +30,14 @@ def get_users():
         return jsonify({'error' : 'No users found!'}), 404
     return jsonify({'message' : user_list}), 200
     
-@user_bp.route('/users/add_personal_data', methods=['POST'])
+@user_bp.route('/users/update_personal_data', methods=['PATCH'])
 @jwt_required()
-def add_personal_data():
+def update_personal_data():
     data = request.get_json()
+    payload = {**data}
     user = find_user_from_jwt()
-    try:
-        if 'dob' in data.keys():
-            dob = datetime.strptime(data.get('dob'), '%Y/%m/%d')
-            personal_data = PersonalData(name=data.get('name'), dob=dob, height=data.get('height'), weight=data.get('weight'))
-        else:
-            personal_data = PersonalData(name=data.get('name'), height=data.get('height'), weight=data.get('weight'))
-        user.add_personal_data(personal_data)
-        user.save()
-        print(f'{personal_data.to_dict()}')
+    try: 
+        user.update_personal_details(**payload)
     except ValidationError:
         return jsonify({"error" : "Failed to create Personal Data"}), 400
 

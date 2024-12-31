@@ -6,7 +6,7 @@ from flask_jwt_extended import create_access_token
 from bson import ObjectId
 from werkzeug.security import generate_password_hash
 from lib.utilities.api_functions import find_single_workout
-
+from datetime import datetime
 
 """ 
 User Database Routes 
@@ -408,3 +408,19 @@ def test_set_dict_delete_notes(web_client, auth_token, clear_db, workout_with_di
     workout_with_dicts.reload()
     assert workout_with_dicts.set_dicts_list[0].notes == None
 
+def test_updating_user_personal_details(web_client, auth_token, user_burrito, clear_db):
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    payload = {
+        "name" : "Zan Ji",
+        "dob" : "2023/01/01",
+        "weight" : 30,
+        "height" : 25
+    }
+    response = web_client.patch('/api/users/update_personal_data', headers=headers, json=payload)
+    assert response.json['message'] == "Personal data updated"
+    assert response.status_code == 201
+    user_burrito.reload()
+    assert user_burrito.name == "Zan Ji"
+    assert user_burrito.weight[-1] == {datetime.now().strftime("%Y/%m/%d"): 30.0}
+    assert user_burrito.height == 25
+    assert user_burrito.to_dict()['dob'] == "2023/01/01"
