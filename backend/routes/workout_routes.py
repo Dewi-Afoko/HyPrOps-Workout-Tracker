@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
 from models import User, Workout, SetDicts
-from lib.utilities.api_functions import find_set_dicts, find_single_set_dict, find_single_workout, find_user_from_jwt, find_user_workouts_list, workouts_as_dict, tuple_checker
+from lib.utilities.api_functions import find_set_dicts, find_single_set_dict, find_single_workout, find_user_from_jwt, find_user_workouts_list, workouts_as_dict, check_for_error
 from mongoengine import ValidationError
 
 workouts_bp = Blueprint('workouts', __name__)
@@ -12,13 +12,13 @@ workouts_bp = Blueprint('workouts', __name__)
 @jwt_required()
 def get_all_workouts():
     user = find_user_from_jwt()
-    if tuple_checker(user):
+    if check_for_error(user):
         return user
     
     workouts = find_user_workouts_list()
     workouts_dicts = workouts_as_dict(workouts)
 
-    if tuple_checker(workouts_dicts):
+    if check_for_error(workouts_dicts):
         return workouts_dicts
 
     return jsonify({
@@ -32,11 +32,11 @@ def get_all_workouts():
 @jwt_required()
 def get_single_workout(workout_id):
     user = find_user_from_jwt()
-    if tuple_checker(user):
+    if check_for_error(user):
         return user
     
     workout = find_single_workout(workout_id)
-    if tuple_checker(workout):
+    if check_for_error(workout):
         return workout
     
     return jsonify({
@@ -53,7 +53,7 @@ def create_workout():
     if 'workout_name' not in data.keys():
         return jsonify({'error' : 'You need to name your workout'}), 400
     user = find_user_from_jwt()
-    if tuple_checker(user):
+    if check_for_error(user):
         return user
 
     workout = Workout(user_id=str(user.id), workout_name=data['workout_name'])
@@ -69,11 +69,11 @@ def create_workout():
 def add_workout_notes(workout_id):
     data = request.get_json()
     user = find_user_from_jwt()
-    if tuple_checker(user):
+    if check_for_error(user):
         return user
     
     workout = find_single_workout(workout_id)
-    if tuple_checker(workout):
+    if check_for_error(workout):
         return workout
     workout.add_notes(data.get('notes'))
 
@@ -85,11 +85,11 @@ def add_workout_notes(workout_id):
 @jwt_required()
 def delete_workout_note(workout_id, note_index):
     user = find_user_from_jwt()
-    if tuple_checker(user):
+    if check_for_error(user):
         return user
     
     workout = find_single_workout(workout_id)
-    if tuple_checker(workout):
+    if check_for_error(workout):
         return workout
     
     workout.delete_note(note_index)
@@ -104,11 +104,11 @@ def delete_workout_note(workout_id, note_index):
 def toggle_workout_complete(workout_id):
     
     user = find_user_from_jwt()
-    if tuple_checker(user):
+    if check_for_error(user):
         return user
     
     workout = find_single_workout(workout_id)
-    if tuple_checker(workout):
+    if check_for_error(workout):
         return workout
     
     workout.toggle_complete()
@@ -134,11 +134,11 @@ def add_set_dict(workout_id):
         return jsonify({'error' : 'You need to specify an exercise'}), 400
     
     user = find_user_from_jwt()
-    if tuple_checker(user):
+    if check_for_error(user):
         return user
     
     workout = find_single_workout(workout_id)
-    if tuple_checker(workout):
+    if check_for_error(workout):
         return workout
     
     set_order = (len(workout.set_dicts_list) + 1)
@@ -165,11 +165,11 @@ def add_set_dict(workout_id):
 def toggle_set_complete(workout_id, set_order):
 
     user = find_user_from_jwt()
-    if tuple_checker(user):
+    if check_for_error(user):
         return user
     
     workout = find_single_workout(workout_id)
-    if tuple_checker(workout):
+    if check_for_error(workout):
         return workout
     
 
@@ -191,11 +191,11 @@ def toggle_set_complete(workout_id, set_order):
 def add_notes_to_set(workout_id, set_order):
     data = request.get_json()
     user = find_user_from_jwt()
-    if tuple_checker(user):
+    if check_for_error(user):
         return user
     
     workout = find_single_workout(workout_id)
-    if tuple_checker(workout):
+    if check_for_error(workout):
         return workout
 
     set_dict = next((set for set in workout.set_dicts_list if set.set_order == int(set_order)), None)
@@ -212,11 +212,11 @@ def add_notes_to_set(workout_id, set_order):
 @jwt_required()
 def delete_set_notes(workout_id, set_order):
     user = find_user_from_jwt()
-    if tuple_checker(user):
+    if check_for_error(user):
         return user
     
     workout = find_single_workout(workout_id)
-    if tuple_checker(workout):
+    if check_for_error(workout):
         return workout
 
     set_dict = next((set for set in workout.set_dicts_list if set.set_order == int(set_order)), None)

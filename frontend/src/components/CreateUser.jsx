@@ -6,8 +6,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
 
 const CreateUser = () => {
-    const [username, setUsername] = useState(""); // State for username
-    const [password, setPassword] = useState(""); // State for password
+    const [username, setUsername] = useState(""); 
+    const [password, setPassword] = useState(""); 
     const navigate = useNavigate();
 
     const handleButtonClick = async () => {
@@ -17,7 +17,7 @@ const CreateUser = () => {
         }
         try {
             const response = await axios.post(`http://127.0.0.1:5000/api/users`, { username, password });
-            alert(`API Response: ${JSON.stringify(response.data)}`);
+            alert(`API Response: ${JSON.stringify(response.data.message)}`);
             navigate('/login');
         } catch (error) {
             console.error("Error making API call:", error);

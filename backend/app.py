@@ -4,13 +4,16 @@ from dotenv import load_dotenv
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 import os
-from routes import user_bp, auth_bp, workouts_bp
+from routes import user_bp, auth_ns, workouts_bp
+from flask_restx import Api
 
 load_dotenv()
 
 
 def create_app():
     app = Flask(__name__)
+    api = Api(app, version='3.1', title='HyPrOps Workout Tracker API', description='API for managing workout tracking')
+
     CORS(app)
 
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "default_secret_key")
@@ -19,7 +22,9 @@ def create_app():
     # Initialize the database
     initialize_db(db_name="HyPrOps")
 
-    app.register_blueprint(auth_bp, url_prefix='/api')
+    api.add_namespace(auth_ns, path="/auth")
+
+
     app.register_blueprint(user_bp, url_prefix='/api')
     app.register_blueprint(workouts_bp, url_prefix='/api')
 

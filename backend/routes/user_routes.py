@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
-from lib.utilities.api_functions import tuple_checker, get_credentials, find_user_from_jwt
+from lib.utilities.api_functions import check_for_error, get_credentials, find_user_from_jwt
 from mongoengine import NotUniqueError, ValidationError
 from models import User
 from datetime import datetime
@@ -11,13 +11,14 @@ user_bp = Blueprint('user', __name__)
 def register():
         data = request.get_json()
 
-        credentials = get_credentials(data)
-        if tuple_checker(credentials):
-            return credentials
+        credentials, status_code = get_credentials(data)
+        if status_code == 400:
+            return credentials, status_code
+
         try:
             user = User(username=credentials['username'], password=credentials['password'])
             user.hash_password()
-            return jsonify({'message' : f'{user.username} successfully registered!'}), 201
+            return {'message' : f'{user.username} successfully registered!'}, 201
             
         except NotUniqueError:
             return jsonify({'error' : 'Username unavailable'}), 409

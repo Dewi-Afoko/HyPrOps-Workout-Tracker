@@ -20,6 +20,7 @@ def test_register_user(web_client, clear_db):
         "password" : "hashDAT"
         }
     response = web_client.post('/api/users', json=payload)
+    print(f'{str(response) =}')
 
     assert response.status_code == 201
     assert response.json == {"message" : "Route_Testah successfully registered!"}
@@ -67,7 +68,7 @@ def test_successful_login_with_token(web_client, clear_db, user_burrito, testing
         'username' : str(user_burrito.username),
         'password' : testing_password
     }
-    response = web_client.post('/api/login', json=payload)
+    response = web_client.post('/auth/login', json=payload)
 
 
     assert response.status_code == 200
@@ -79,7 +80,7 @@ def test_login_fails_with_bad_username(web_client, clear_db, testing_password):
         'username' : "Johnny",
         'password' : testing_password
     }
-    response = web_client.post('/api/login', json=payload)
+    response = web_client.post('/auth/login', json=payload)
 
     assert response.status_code == 401
     assert response.json['error'] == "User not found"
@@ -90,7 +91,7 @@ def test_login_fails_with_bad_password(web_client, clear_db, user_burrito):
         'username' : str(user_burrito.username),
         'password' : "Not the password"
     }
-    response = web_client.post('/api/login', json=payload)
+    response = web_client.post('/auth/login', json=payload)
 
     assert response.status_code == 401
     assert response.json['error'] == "Invalid login credentials"
@@ -98,7 +99,7 @@ def test_login_fails_with_bad_password(web_client, clear_db, user_burrito):
 
 def test_login_fails_no_username(web_client, clear_db, user_burrito, testing_password):
     payload = {'password' : testing_password}
-    response = web_client.post('/api/login', json=payload)
+    response = web_client.post('/auth/login', json=payload)
 
     assert response.status_code == 400
     assert response.json['error'] == "Username not provided"
@@ -107,7 +108,7 @@ def test_login_fails_no_username(web_client, clear_db, user_burrito, testing_pas
 def test_login_fails_no_password(web_client, clear_db, user_burrito):
     payload = {'username' : user_burrito.username }
 
-    response = web_client.post('/api/login', json=payload)
+    response = web_client.post('/auth/login', json=payload)
 
     assert response.status_code == 400
     assert response.json['error'] == "Password not provided"
