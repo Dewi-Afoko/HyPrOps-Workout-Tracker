@@ -3,6 +3,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models.workout import Workout
 from datetime import datetime
 
+date_format = "%Y/%m/%d"
+
 class User(Document):
     username = StringField(required=True, unique=True)
     password = StringField(required=True)
@@ -31,11 +33,11 @@ class User(Document):
             self.height = self._validate_is_number(height, "height") 
         if weight is not None:
             weight = self._validate_is_number(weight, "weight")
-            self.weight[datetime.now().strftime("%Y/%m/%d")] = weight
+            self.weight[datetime.now().strftime(date_format)] = weight
         self.save()
 
     def to_dict(self):
-        latest_weigh_in = max(self.weight, key=lambda date: datetime.strptime(date, "%Y/%m/%d"))
+        latest_weigh_in = max(self.weight, key=lambda date: datetime.strptime(date, date_format))
         payload = {
             'id' : str(self.id),
             'username' : self.username,
@@ -45,7 +47,7 @@ class User(Document):
             'last_weighed_on': latest_weigh_in
             }
         if self.dob != None:
-            payload['dob'] = self.dob.strftime('%Y/%m/%d')
+            payload['dob'] = self.dob.strftime(date_format)
         return payload
 
     def _validate_name(self, name):
@@ -56,7 +58,7 @@ class User(Document):
     def _validate_dob(self, dob):
         if isinstance(dob, str):
             try:
-                return datetime.strptime(dob, "%Y/%m/%d")
+                return datetime.strptime(dob, date_format)
             except ValueError:
                 raise ValueError(f"Date of birth must be in YYYY/MM/DD format, got {dob}")
         raise ValueError(f"Date of birth must be a string, got {type(dob).__name__}")

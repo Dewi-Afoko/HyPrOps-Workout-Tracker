@@ -1,44 +1,68 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
-from lib.utilities.api_functions import tuple_checker, get_credentials, find_user_from_jwt
+from lib.utilities.helper_functions import get_credentials, find_user_from_jwt
+from flask_restx import Resource
+from flask_jwt_extended import jwt_required
+from lib.utilities.helper_functions import get_credentials, find_user_from_jwt
 from mongoengine import NotUniqueError, ValidationError
 from models import User
-from datetime import datetime
+from routes.restx_models.user_models import user_get_failure, user_get_success, user_ns, user_registration_error, user_registration_request, user_registration_success, user_update_failure, user_update_request, user_update_success
 
-user_bp = Blueprint('user', __name__)
 
-@user_bp.route('/users', methods=['POST'])
-def register():
+@user_ns.route('/register')
+class UserRegister(Resource):
+    @user_ns.expect(user_registration_request)
+    @user_ns.doc(responses={
+        201: ('Created', user_registration_success),
+        400: ('Bad Request', user_registration_error),
+        409: ('Conflict', user_registration_error),
+    })
+    def post(self):
         data = request.get_json()
 
-        credentials = get_credentials(data)
-        if tuple_checker(credentials):
-            return credentials
+        credentials, status_code = get_credentials(data)
+        if status_code == 400:
+            return credentials, status_code
+
         try:
             user = User(username=credentials['username'], password=credentials['password'])
             user.hash_password()
-            return jsonify({'message' : f'{user.username} successfully registered!'}), 201
-            
+            user.save()
+            return {'message': f'{user.username} successfully registered!'}, 201
         except NotUniqueError:
-            return jsonify({'error' : 'Username unavailable'}), 409
+            return {'error': 'Username unavailable'}, 409
         
-@user_bp.route('/users', methods=['GET'])
-@jwt_required()
-def get_users():
-    user_list = [User.to_dict() for User in User.objects()]
-    if len(user_list) > 1:
-        return jsonify({'error' : 'No users found!'}), 404
-    return jsonify({'message' : user_list}), 200
-    
-@user_bp.route('/users/update_personal_data', methods=['PATCH'])
-@jwt_required()
-def update_personal_data():
-    data = request.get_json()
-    payload = {**data}
-    user = find_user_from_jwt()
-    try: 
-        user.update_personal_details(**payload)
-    except ValidationError:
-        return jsonify({"error" : "Failed to create Personal Data"}), 400
 
-    return jsonify({"message" : "Personal data updated"}), 201
+@user_ns.route('/list')
+class UserGet(Resource):
+    @user_ns.doc(responses={
+        200: ('Success', user_get_success),
+        404: ('Not Found', user_get_failure),
+    })
+    @jwt_required()
+    def get(self):
+        user_list = [user.to_dict() for user in User.objects()]
+        if not user_list:
+            return {'error': 'No users found!'}, 404
+        return {'message': user_list}, 200
+
+
+
+@user_ns.route('/update_personal_data')
+class UpdatePersonalData(Resource):
+    @user_ns.expect(user_update_request)
+    @user_ns.doc(responses={
+        201: ('Created', user_update_success),
+        400: ('Bad Request', user_update_failure),
+    })
+    @jwt_required()
+    def patch(self):
+        data = request.get_json()
+        user = find_user_from_jwt()
+
+        try:
+            user.update_personal_details(**data)
+            user.save()
+            return {'message': 'Personal data updated'}, 201
+        except ValidationError:
+            return {'error': 'Failed to create Personal Data'}, 400

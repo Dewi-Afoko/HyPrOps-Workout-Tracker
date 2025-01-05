@@ -6,8 +6,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
 
 const LogIn = () => {
-    const [username, setUsername] = useState(""); // State for username
-    const [password, setPassword] = useState(""); // State for password
+    const [username, setUsername] = useState(""); 
+    const [password, setPassword] = useState(""); 
     const navigate = useNavigate();
 
     const handleButtonClick = async () => {
@@ -19,8 +19,8 @@ const LogIn = () => {
             const response = await axios.post(`http://127.0.0.1:5000/api/login`, { username, password });
             const token = response.data.token;
             localStorage.setItem('token', token);
-            alert(`API Response: ${JSON.stringify(response.data)}`);
-            localStorage.setItem("user_id", response.data.user_id); // Set user's ID in localStorage
+            alert(`API Response: ${JSON.stringify(response.data.message)}`);
+            // localStorage.setItem("user_id", response.data.user_id);  #TODO Add logic for getting user from token, so user details readily available
             navigate('/profile');
         } catch (error) {
             console.error("Error making API call:", error);
