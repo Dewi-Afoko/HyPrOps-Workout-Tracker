@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
-from lib.utilities.api_functions import check_for_error, get_credentials, find_user_from_jwt
+from lib.utilities.helper_functions import get_credentials, find_user_from_jwt
 from mongoengine import NotUniqueError, ValidationError
 from models import User
 from datetime import datetime

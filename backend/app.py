@@ -4,7 +4,9 @@ from dotenv import load_dotenv
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 import os
-from routes import user_bp, auth_ns, workouts_bp
+from routes import user_bp 
+from routes.workout_routes import workouts_bp
+from routes.restx_models import auth_ns
 from flask_restx import Api
 
 load_dotenv()

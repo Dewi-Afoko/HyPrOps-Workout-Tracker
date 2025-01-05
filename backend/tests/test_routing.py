@@ -5,7 +5,7 @@ from models.workout import Workout
 from flask_jwt_extended import create_access_token
 from bson import ObjectId
 from werkzeug.security import generate_password_hash
-from lib.utilities.api_functions import find_single_workout
+from lib.utilities.helper_functions import find_single_workout
 from datetime import datetime
 
 """ 
@@ -20,7 +20,6 @@ def test_register_user(web_client, clear_db):
         "password" : "hashDAT"
         }
     response = web_client.post('/api/users', json=payload)
-    print(f'{str(response) =}')
 
     assert response.status_code == 201
     assert response.json == {"message" : "Route_Testah successfully registered!"}

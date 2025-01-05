@@ -14,6 +14,9 @@ from mongoengine import connect, disconnect
 from dotenv import load_dotenv
 from datetime import datetime
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
+
+
 load_dotenv()
 
 test_password = os.getenv("TEST_PASSWORD")
