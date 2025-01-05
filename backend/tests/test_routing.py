@@ -19,7 +19,7 @@ def test_register_user(web_client, clear_db):
         "username": "Route_Testah", 
         "password" : "hashDAT"
         }
-    response = web_client.post('/api/users', json=payload)
+    response = web_client.post('/user/register', json=payload)
 
     assert response.status_code == 201
     assert response.json == {"message" : "Route_Testah successfully registered!"}
@@ -32,12 +32,12 @@ def test_duplicate_user_registration(web_client, clear_db):
         "username": "Route_Testah", 
         "password" : "hashDAT"
         }
-    response = web_client.post('/api/users', json=payload)
+    response = web_client.post('/user/register', json=payload)
 
     assert response.status_code == 201
     assert response.json == {"message" : "Route_Testah successfully registered!"}
 
-    response = web_client.post('/api/users', json=payload)
+    response = web_client.post('/user/register', json=payload)
     assert response.status_code == 409
     assert response.json['error'] == 'Username unavailable'
 
@@ -45,7 +45,7 @@ def test_no_password_registration_fails(web_client, clear_db):
     payload = {
         "username" : "A_User"
     }
-    response = web_client.post('/api/users', json=payload)
+    response = web_client.post('/user/register', json=payload)
     assert response.status_code == 400
     assert response.json['error'] == 'Password not provided'
 
@@ -53,7 +53,7 @@ def test_no_username_registration_fails(web_client, clear_db):
     payload = {
         "password" : "failure"
     }
-    response = web_client.post('/api/users', json=payload)
+    response = web_client.post('/user/register', json=payload)
     assert response.status_code == 400
     assert response.json['error'] == 'Username not provided'
 
@@ -118,12 +118,12 @@ def test_login_fails_no_password(web_client, clear_db, user_burrito):
 
 def test_get_returns_user_list(web_client, clear_db, auth_token):
     headers = {"Authorization": f"Bearer {auth_token}"}
-    response = web_client.get('/api/users', headers=headers)
+    response = web_client.get('/user/list', headers=headers)
     assert response.status_code == 200
     assert 'message' in response.json.keys()
 
 def test_get_fails_no_token(web_client, clear_db):
-    response = web_client.get('/api/users')
+    response = web_client.get('/user/list')
     assert response.status_code == 401
     assert response.json['msg'] == 'Missing Authorization Header'
 
@@ -416,7 +416,7 @@ def test_updating_user_personal_details(web_client, auth_token, user_burrito, cl
         "weight" : 30,
         "height" : 25
     }
-    response = web_client.patch('/api/users/update_personal_data', headers=headers, json=payload)
+    response = web_client.patch('/user/update_personal_data', headers=headers, json=payload)
     assert response.json['message'] == "Personal data updated"
     assert response.status_code == 201
     user_burrito.reload()

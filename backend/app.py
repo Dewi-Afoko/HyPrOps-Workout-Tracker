@@ -4,9 +4,8 @@ from dotenv import load_dotenv
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 import os
-from routes import user_bp 
 from routes.workout_routes import workouts_bp
-from routes.restx_models import auth_ns
+from routes.restx_models import auth_ns, user_ns
 from flask_restx import Api
 
 load_dotenv()
@@ -25,9 +24,9 @@ def create_app():
     initialize_db(db_name="HyPrOps")
 
     api.add_namespace(auth_ns, path="/auth")
+    api.add_namespace(user_ns, path='/user')
 
 
-    app.register_blueprint(user_bp, url_prefix='/api')
     app.register_blueprint(workouts_bp, url_prefix='/api')
 
     @app.route('/')
