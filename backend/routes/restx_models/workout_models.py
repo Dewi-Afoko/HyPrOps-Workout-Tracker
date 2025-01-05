@@ -3,29 +3,91 @@ from flask_restx import Namespace, fields
 # Define Namespace
 workout_ns = Namespace('workout', description='All actions related to workouts')
 
-# Model for successful GET workouts
+# Shared Models
+set_dict_model = workout_ns.model('SetDict', {
+    'set_order': fields.Integer(description='Order of the set in the workout'),
+    'exercise_name': fields.String(description='Name of the exercise'),
+    'set_number': fields.Integer(description='Set number for this exercise'),
+    'set_type': fields.String(description='Type of the set'),
+    'reps': fields.Integer(description='Number of reps in the set'),
+    'loading': fields.Float(description='Loading weight or resistance'),
+    'focus': fields.String(description='Focus or goal of the set'),
+    'rest': fields.Float(description='Rest period after the set'),
+    'notes': fields.String(description='Additional notes for the set'),
+    'complete': fields.Boolean(description='Whether the set is complete')
+})
+
+# Models for GET workouts
 workout_get_success = workout_ns.model('WorkoutGetSuccess', {
-    'message' : fields.String(description="Confirmation request was successful"),
-    'workouts' : fields.List(fields.String, description="A list of all user's workouts"),
+    'message': fields.String(description="Confirmation request was successful"),
+    'workouts': fields.List(fields.Raw, description="A list of all user's workouts"),
 })
 
-# Model for GET workouts failure
 workout_get_failure = workout_ns.model('WorkoutGetFailure', {
-    'error' : fields.String(description="An error message as no workouts were found"),
+    'error': fields.String(description="An error message indicating no workouts were found"),
 })
 
-# Registration Request Model
-user_registration_request = workout_ns.model('UserRegistrationRequest', {
-    'username': fields.String(required=True, description='The username of the user'),
-    'password': fields.String(required=True, description='The password of the user'),
+# Models for GET single workout
+single_workout_success = workout_ns.model('SingleWorkoutSuccess', {
+    'message': fields.String(description="Confirmation request was successful"),
+    'workout': fields.Raw(description="The details of a single workout"),
 })
 
-# Model for successful registration
-user_registration_success = workout_ns.model('UserRegistrationSuccess', {
-    'message': fields.String(description='A message confirming registration of user by username'),
+single_workout_failure = workout_ns.model('SingleWorkoutFailure', {
+    'error': fields.String(description="An error message indicating the workout was not found"),
 })
 
-# Model for registration failure
-user_registration_error = workout_ns.model('UserRegistrationError', {
-    'error': fields.String(description='Error message telling user why registration failed'),
+# Model for creating a workout
+create_workout_request = workout_ns.model('CreateWorkoutRequest', {
+    'workout_name': fields.String(required=True, description="The name of the new workout"),
+})
+
+create_workout_success = workout_ns.model('CreateWorkoutSuccess', {
+    'message': fields.String(description="Confirmation that the workout was created"),
+})
+
+create_workout_failure = workout_ns.model('CreateWorkoutFailure', {
+    'error': fields.String(description="An error message indicating the workout could not be created"),
+})
+
+# Models for adding/deleting notes to/from workout
+notes_request = workout_ns.model('NotesRequest', {
+    'notes': fields.String(required=True, description="Notes to add or update"),
+})
+
+notes_success = workout_ns.model('NotesSuccess', {
+    'message': fields.String(description="Confirmation that notes were successfully added or deleted"),
+})
+
+notes_failure = workout_ns.model('NotesFailure', {
+    'error': fields.String(description="An error message indicating failure to update notes"),
+})
+
+# Model for marking workout completion
+mark_complete_success = workout_ns.model('MarkCompleteSuccess', {
+    'message': fields.String(description="Confirmation that the workout was marked as complete or incomplete"),
+})
+
+# Model for adding a set to a workout
+add_set_request = workout_ns.model('AddSetRequest', {
+    'exercise_name': fields.String(required=True, description="The name of the exercise"),
+    'set_type': fields.String(description="Type of the set"),
+    'reps': fields.Integer(description="Number of reps in the set"),
+    'loading': fields.Float(description="Weight or resistance for the set"),
+    'focus': fields.String(description="Focus or goal of the set"),
+    'rest': fields.Float(description="Rest time after the set"),
+    'notes': fields.String(description="Additional notes for the set"),
+})
+
+add_set_success = workout_ns.model('AddSetSuccess', {
+    'message': fields.String(description="Confirmation that the set was added to the workout"),
+})
+
+add_set_failure = workout_ns.model('AddSetFailure', {
+    'error': fields.String(description="An error message indicating the set could not be added"),
+})
+
+# Model for marking a set complete
+mark_set_complete_success = workout_ns.model('MarkSetCompleteSuccess', {
+    'message': fields.String(description="Confirmation that the set was marked as complete or incomplete"),
 })

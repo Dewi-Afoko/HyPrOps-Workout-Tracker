@@ -4,8 +4,7 @@ from dotenv import load_dotenv
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 import os
-from routes.workout_routes import workouts_bp
-from routes.restx_models import auth_ns, user_ns
+from routes.restx_models import auth_ns, user_ns, workout_ns
 from flask_restx import Api
 
 load_dotenv()
@@ -25,9 +24,9 @@ def create_app():
 
     api.add_namespace(auth_ns, path="/auth")
     api.add_namespace(user_ns, path='/user')
+    api.add_namespace(workout_ns, path='/workouts')
 
 
-    app.register_blueprint(workouts_bp, url_prefix='/api')
 
     @app.route('/')
     def index():

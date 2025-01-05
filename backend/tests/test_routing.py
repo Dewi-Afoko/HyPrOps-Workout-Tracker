@@ -142,7 +142,7 @@ def test_workout_creates_correctly(web_client, clear_db, user_burrito, auth_toke
     payload = {
             'workout_name' : "Push"
             }
-    response = web_client.post('/api/workouts', headers=headers, json=payload)
+    response = web_client.post('/workouts', headers=headers, json=payload)
 
     assert response.status_code == 201
     assert response.json['message'] == f"{payload['workout_name']} created by {user_burrito.username}"
@@ -155,7 +155,7 @@ def test_workout_fails_with_no_name(web_client, clear_db, user_burrito, auth_tok
     headers = {"Authorization": f"Bearer {auth_token}"}
     payload = {'incorrect key' : 'invalid value'}
 
-    response = web_client.post('/api/workouts', headers=headers, json=payload)
+    response = web_client.post('/workouts', headers=headers, json=payload)
     assert response.status_code == 400
     assert response.json['error'] == "You need to name your workout"
 
@@ -165,7 +165,7 @@ def test_workout_fails_with_bad_user_token(web_client, clear_db, bad_token):
             'workout_name' : "Push"
             }
 
-    response = web_client.post('/api/workouts', headers=headers, json=payload)
+    response = web_client.post('/workouts', headers=headers, json=payload)
     assert response.status_code == 404
     assert response.json['error'] == 'User not found'
 
@@ -175,7 +175,7 @@ def test_workout_fails_with_bad_user_token(web_client, clear_db, bad_token):
 
 def test_getting_user_workouts_success(web_client, clear_db, user_burrito, burrito_workout, auth_token):
         headers = {"Authorization": f"Bearer {auth_token}"}
-        response = web_client.get('/api/workouts', headers=headers)        
+        response = web_client.get('/workouts', headers=headers)        
         assert response.json['message'] == 'Here are your workouts:'
         assert 'workouts' in response.json
         assert response.status_code == 200
@@ -183,7 +183,7 @@ def test_getting_user_workouts_success(web_client, clear_db, user_burrito, burri
                     
 def test_getting_workouts_fails_with_no_workouts(web_client, clear_db, auth_token):
         headers = {"Authorization": f"Bearer {auth_token}"}
-        response = web_client.get('/api/workouts', headers=headers)    
+        response = web_client.get('/workouts', headers=headers)    
 
         assert response.json['error'] == 'No workouts found'
         assert response.status_code == 404     
@@ -193,7 +193,7 @@ def test_getting_workouts_fails_with_no_workouts(web_client, clear_db, auth_toke
 def test_getting_single_workout_success(web_client, clear_db, auth_token, user_burrito, burrito_workout):
         headers = {"Authorization": f"Bearer {auth_token}"}
         workout_id = str(burrito_workout.id)
-        response = web_client.get(f'/api/workouts/{workout_id}', headers=headers)
+        response = web_client.get(f'/workouts/{workout_id}', headers=headers)
 
         assert response.json['message'] == f'Here are the details for workout ID: {workout_id}'
         assert response.json['workout'] == burrito_workout.to_dict()
@@ -201,14 +201,14 @@ def test_getting_single_workout_success(web_client, clear_db, auth_token, user_b
 
 def test_getting_single_workout_success_with_multiple_workouts(web_client, clear_db, auth_token, user_burrito, burrito_workout):
         headers = {"Authorization": f"Bearer {auth_token}"}
-        web_client.post('/api/workouts', headers=headers, json={'workout_name' : 'Workout2'})
-        web_client.post('/api/workouts', headers=headers, json={'workout_name' : 'Workout3'})
+        web_client.post('/workouts', headers=headers, json={'workout_name' : 'Workout2'})
+        web_client.post('/workouts', headers=headers, json={'workout_name' : 'Workout3'})
         workout_id = str(burrito_workout.id)
 
-        response = web_client.get('/api/workouts', headers=headers) 
+        response = web_client.get('/workouts', headers=headers) 
         assert len(response.json['workouts']) == 3
 
-        response = web_client.get(f'/api/workouts/{workout_id}', headers=headers)
+        response = web_client.get(f'/workouts/{workout_id}', headers=headers)
 
         assert response.json['message'] == f'Here are the details for workout ID: {workout_id}'
         assert response.json['workout'] == burrito_workout.to_dict()
@@ -221,7 +221,7 @@ def test_add_notes_to_workout(web_client, clear_db, auth_token, burrito_workout)
 
         assert len(burrito_workout.notes) == 1
 
-        response = web_client.patch(f'/api/workouts/{workout_id}/add_notes', headers=headers, json=payload)
+        response = web_client.patch(f'/workouts/{workout_id}/add_notes', headers=headers, json=payload)
 
         assert response.json['message'] == f'{payload["notes"]}: added to workout notes'
         assert response.status_code == 200
@@ -234,9 +234,9 @@ def test_delete_notes_from_workout(web_client, clear_db, auth_token, burrito_wor
         payload = {'notes' : 'Adding more notes'}
 
         assert len(burrito_workout.notes) == 1
-        web_client.patch(f'/api/workouts/{workout_id}/add_notes', headers=headers, json={'notes' : 'Persist these notes'})
-        response = web_client.patch(f'/api/workouts/{workout_id}/add_notes', headers=headers, json=payload)
-        web_client.patch(f'/api/workouts/{workout_id}/add_notes', headers=headers, json={'notes' : 'Persist these notes'})
+        web_client.patch(f'/workouts/{workout_id}/add_notes', headers=headers, json={'notes' : 'Persist these notes'})
+        response = web_client.patch(f'/workouts/{workout_id}/add_notes', headers=headers, json=payload)
+        web_client.patch(f'/workouts/{workout_id}/add_notes', headers=headers, json={'notes' : 'Persist these notes'})
 
         burrito_workout.reload()
 
@@ -245,7 +245,7 @@ def test_delete_notes_from_workout(web_client, clear_db, auth_token, burrito_wor
         assert len(burrito_workout.notes) == 4
 
         note_index = 2
-        response = web_client.delete(f'/api/workouts/{workout_id}/delete_note/{note_index}', headers=headers)
+        response = web_client.delete(f'/workouts/{workout_id}/delete_note/{note_index}', headers=headers)
         assert response.status_code == 200
         assert response.json['message'] == 'Note successfully deleted'
 
@@ -260,12 +260,12 @@ def test_toggling_workout_complete(web_client, clear_db, auth_token, burrito_wor
         headers = {"Authorization": f"Bearer {auth_token}"}
         workout_id = str(burrito_workout.id)
         assert burrito_workout.complete == False
-        response = web_client.patch(f'/api/workouts/{workout_id}/mark_complete', headers=headers)
+        response = web_client.patch(f'/workouts/{workout_id}/mark_complete', headers=headers)
         burrito_workout.reload()
         assert response.json['message'] == "Workout marked as complete"
         assert response.status_code == 200
         assert burrito_workout.complete == True
-        response = web_client.patch(f'/api/workouts/{workout_id}/mark_complete', headers=headers)
+        response = web_client.patch(f'/workouts/{workout_id}/mark_complete', headers=headers)
         assert response.json['message'] == "Workout marked as incomplete"
         assert response.status_code == 200
         burrito_workout.reload()
@@ -287,7 +287,7 @@ def test_adding_set_dict_success(web_client, clear_db, auth_token, burrito_worko
                 'rest' : warm_up_shoulder_press.rest,
                 'notes' :warm_up_shoulder_press.notes
             }
-    response = web_client.post(f'/api/workouts/{workout_id}/add_set', headers=headers, json=payload) # Create SetDict in workout
+    response = web_client.post(f'/workouts/{workout_id}/add_set', headers=headers, json=payload) # Create SetDict in workout
 
     burrito_workout.reload()
 
@@ -311,7 +311,7 @@ def test_no_exercise_name_set_dict_fails(web_client, clear_db, user_burrito, war
                 'notes' :warm_up_shoulder_press.notes
             }
 
-    response = web_client.post(f'/api/workouts/{workout_id}/add_set', headers=headers, json=payload) # Create SetDict
+    response = web_client.post(f'/workouts/{workout_id}/add_set', headers=headers, json=payload) # Create SetDict
     
     assert response.json['error'] == "You need to specify an exercise"
     assert response.status_code == 400
@@ -329,7 +329,7 @@ def test_partial_set_dict_creation_succeess(web_client, clear_db, auth_token, us
                 'notes' :warm_up_shoulder_press.notes
             }
 
-    response = web_client.post(f'/api/workouts/{workout_id}/add_set', headers=headers, json=payload) # Create SetDict
+    response = web_client.post(f'/workouts/{workout_id}/add_set', headers=headers, json=payload) # Create SetDict
 
     burrito_workout.reload()
 
@@ -352,7 +352,7 @@ def test_creation_of_set_dict_fails_with_invalid_inputs(web_client, clear_db, us
             }
 
 
-    response = web_client.post(f'/api/workouts/{workout_id}/add_set', headers=headers, json=payload) # Create SetDict
+    response = web_client.post(f'/workouts/{workout_id}/add_set', headers=headers, json=payload) # Create SetDict
 
     assert response.json['error'] == 'Failure to create set dictionary'
     assert response.status_code == 400
@@ -363,12 +363,12 @@ def test_set_dict_toggle_complete_twice(web_client, clear_db, auth_token, workou
     assert workout_with_dicts.set_dicts_list[0].complete == False
     workout_id = str(workout_with_dicts.id)
     set_order = 1
-    response = web_client.patch(f'/api/workouts/{workout_id}/{set_order}/mark_complete', headers=headers)
+    response = web_client.patch(f'/workouts/{workout_id}/{set_order}/mark_complete', headers=headers)
     assert response.json['message'] == 'Set marked complete'
     assert response.status_code == 200
     workout_with_dicts.reload()
     assert workout_with_dicts.set_dicts_list[0].complete == True
-    response = web_client.patch(f'/api/workouts/{workout_id}/{set_order}/mark_complete', headers=headers)
+    response = web_client.patch(f'/workouts/{workout_id}/{set_order}/mark_complete', headers=headers)
     assert response.json['message'] == 'Set marked incomplete'
     assert response.status_code == 200
     workout_with_dicts.reload()
@@ -379,10 +379,11 @@ def test_set_dict_add_notes(web_client, auth_token, clear_db, workout_with_dicts
     headers = {"Authorization": f"Bearer {auth_token}"}
     payload = {'notes' : 'Until failure'}
     workout_id = str(workout_with_dicts.id)
-    set_order = workout_with_dicts.set_dicts_list[0].set_order
+    test_set = workout_with_dicts.set_dicts_list[0]
+    set_order = test_set.set_order
 
-    response = web_client.patch(f'/api/workouts/{workout_id}/{set_order}/add_notes', headers=headers, json=payload)
-    assert response.json['message'] == "Notes added to set"
+    response = web_client.patch(f'/workouts/{workout_id}/{set_order}/add_notes', headers=headers, json=payload)
+    assert response.json['message'] == f'Notes added to set {test_set.exercise_name}, {test_set.set_number}'
     assert response.status_code == 201
     workout_with_dicts.reload()
 
@@ -393,16 +394,17 @@ def test_set_dict_delete_notes(web_client, auth_token, clear_db, workout_with_di
     headers = {"Authorization": f"Bearer {auth_token}"}
     payload = {'notes' : 'Until failure'}
     workout_id = str(workout_with_dicts.id)
-    set_order = workout_with_dicts.set_dicts_list[0].set_order
+    test_set = workout_with_dicts.set_dicts_list[0]
+    set_order = test_set.set_order
 
-    response = web_client.patch(f'/api/workouts/{workout_id}/{set_order}/add_notes', headers=headers, json=payload)
-    assert response.json['message'] == "Notes added to set"
+    response = web_client.patch(f'/workouts/{workout_id}/{set_order}/add_notes', headers=headers, json=payload)
+    assert response.json['message'] == f'Notes added to set {test_set.exercise_name}, {test_set.set_number}'
     assert response.status_code == 201
     workout_with_dicts.reload()
     assert len(workout_with_dicts.set_dicts_list[0].notes) > 0
 
-    response = web_client.delete(f'/api/workouts/{workout_id}/{set_order}/delete_notes', headers=headers)
-    assert response.json['message'] == "Notes deleted"
+    response = web_client.delete(f'/workouts/{workout_id}/{set_order}/delete_notes', headers=headers)
+    assert response.json['message'] == f'Notes deleted from set {test_set.exercise_name}, {test_set.set_number}'
     assert response.status_code == 200
 
     workout_with_dicts.reload()

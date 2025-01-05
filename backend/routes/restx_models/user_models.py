@@ -5,7 +5,7 @@ user_ns = Namespace('user', description='Creation and editing of user documents'
 
 # Model for successful GET users
 user_get_success = user_ns.model('UserGetSuccess', {
-    'message' : fields.List(fields.String, description="A list of all registered users as objects"),
+    'message' : fields.List(fields.Raw, description="A list of all registered users as objects"),
 })
 
 # Model for GET users failure
