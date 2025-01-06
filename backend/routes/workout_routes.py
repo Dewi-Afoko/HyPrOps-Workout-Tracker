@@ -45,7 +45,7 @@ class Workouts(Resource):
         
         workout = Workout(user_id=str(user.id), workout_name=data['workout_name'])
         workout.save()
-        return {'message': f'{workout.workout_name} created by {user.username}'}, 201
+        return {'message': f'{workout.workout_name} created by {user.username}', 'workout': workout.to_dict()}, 201
 
 
 @workout_ns.route('/<string:workout_id>')

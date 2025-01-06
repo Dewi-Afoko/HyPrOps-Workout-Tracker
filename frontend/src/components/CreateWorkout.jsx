@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import axios from "axios";
-import Button from "react-bootstrap/Button";
-import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
 import { useNavigate } from "react-router-dom";
 
 const CreateWorkout = () => {
@@ -13,35 +11,33 @@ const CreateWorkout = () => {
     };
 
     const handleButtonClick = async () => {
-        const user_id = localStorage.getItem('user_id');
-        const token = localStorage.getItem('token'); // Retrieve token from localStorage
-        if (!user_id || !token) {
-            alert("User ID or token not found in localStorage.");
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert("Auth token found, try logging in again.");
             return;
         }
         try {
-            // Make the POST request with token in headers
             const response = await axios.post(
-                `http://127.0.0.1:5000/api/workouts`, 
+                `http://127.0.0.1:5000/workouts`, 
                 {'workout_name' : workoutName}, 
                 {
                     headers: {
-                        Authorization: `Bearer ${token}` // Add token to Authorization header
+                        Authorization: `Bearer ${token}`
                     }
                 }
             );
             alert(`API Response: ${JSON.stringify(response.data)}`);
-            localStorage.setItem('workout_id', response.data.workout_id); // Set workout's ID in localStorage
+            console.log(response.data);
+            localStorage.setItem('workout_id', response.data.workout.id);
             navigate('/thisworkout');
         } catch (error) {
-            console.error("Error making API call:", error);
-            alert("Failed to fetch data. Check console for details.");
+            console.error("Error making API call:", error.response.data.error);
+            alert(error.response.data.error);
         }
     };
 
     return (
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-
+        <div>
         <input
         type="text"
         value={workoutName}
@@ -54,19 +50,11 @@ const CreateWorkout = () => {
             fontSize: "16px",
         }}
     />
-        <Button 
+        <button 
             onClick={handleButtonClick} 
-            variant="dark" 
-            style={{
-                backgroundColor: "black",
-                color: "red",
-                borderRadius: "50px",
-                fontSize: "16px",
-                padding: "10px 20px",
-            }}
         >
             Create Workout
-        </Button>
+        </button>
         </div>
     );
 };

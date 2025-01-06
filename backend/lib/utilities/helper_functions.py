@@ -53,7 +53,6 @@ def find_single_workout(workout_id):
     for workout in workouts:
         if str(workout.id) == workout_id:
             return workout
-        break
     return {'error' : 'Workout not found'}, 404
     
 def find_set_dicts(workout_id):

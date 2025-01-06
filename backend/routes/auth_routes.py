@@ -35,6 +35,6 @@ class Login(Resource):
             
             access_token = create_access_token(identity=credentials['username'])
             response = {
-                'message' : f'Login successful, welcome {credentials["username"]}','token' : access_token}
+                'message' : f'Login successful, welcome {credentials["username"]}','token' : access_token, 'user' : user.to_dict()}
             return marshal(response, user_login_success), 200
         

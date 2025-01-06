@@ -15,6 +15,7 @@ const UserLogin = () => {
         try {
             const response = await axios.post(`http://127.0.0.1:5000/auth/login`, {username, password});
             localStorage.setItem('token', response.data.token);
+            localStorage.setItem('user_id', response.data.user.id);
             alert(`message: ${JSON.stringify(response.data.message)}`);
             navigate('/profile')
         } catch (error) {

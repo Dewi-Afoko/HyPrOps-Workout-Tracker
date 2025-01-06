@@ -44,6 +44,7 @@ create_workout_request = workout_ns.model('CreateWorkoutRequest', {
 
 create_workout_success = workout_ns.model('CreateWorkoutSuccess', {
     'message': fields.String(description="Confirmation that the workout was created"),
+    'workout': fields.Raw(description="The workout object that was created"),
 })
 
 create_workout_failure = workout_ns.model('CreateWorkoutFailure', {

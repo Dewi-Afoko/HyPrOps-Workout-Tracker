@@ -1,27 +1,22 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Button, Card } from 'react-bootstrap';
 
 
 
 export function HomePage() {
+    const navigate = useNavigate();
 return (
     <div>
-      {/* Full-width header */}
-    <header className="text-center py-5">
-        <Container>
-        <Row className="justify-content-center align-items-center">
-            <Col xs={12} md={8}>
-            <h1 className="display-4 text-center">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HyPrOps ALPHA</h1>
-            <div className="mt-4 d-flex justify-content-center">
-            <Button variant="dark"
-                    style={{backgroundColor: "black",color: "red",borderRadius: "50px",fontSize: "16px",padding: "10px 20px"}}><Link className="no-link" to="/login">Log In</Link></Button>
-                <Button variant="dark"
-                    style={{backgroundColor: "black",color: "red",borderRadius: "50px",fontSize: "16px",padding: "10px 20px"}}><Link to="/register">Sign Up</Link></Button>
-            </div>
-            </Col>
-        </Row>
-        </Container>
+    <header>
+        HyProPs Workout Tracker
     </header>
+    <button type="button" onClick={() => navigate('/register')}>
+                Register
+                </button>
+    <button type="button" onClick={() => navigate('/login')}>
+                Login
+                </button>
+
 
       {/* Feature cards */}
     <Container className="mt-5 pb-5">

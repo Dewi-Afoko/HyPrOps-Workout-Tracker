@@ -25,7 +25,7 @@ const SplitIndividualWorkoutDetails = () => {
         }
         try {
             const response = await axios.get(
-                `http://127.0.0.1:5000/api/workouts/${workout_id}`,
+                `http://127.0.0.1:5000/workouts/${workout_id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

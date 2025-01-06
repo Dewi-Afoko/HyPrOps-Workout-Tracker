@@ -12,6 +12,7 @@ user_login_request = auth_ns.model('UserLoginRequest', {
 # Model for successful login
 user_login_success = auth_ns.model('UserLoginSuccess', {
     'token': fields.String(description='The authentication token'),
+    'user': fields.Raw(description='User as dict'),
     'message': fields.String(description='A messaging welcoming the user by username'),
 })
 
