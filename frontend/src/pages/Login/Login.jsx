@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Container, Row, Col, Button, Card } from 'react-bootstrap';
-import LogIn from "../../components/LogIn";
+import UserLogin from "../../components/UserLogin";
 
 
 export function Login() {
@@ -10,7 +10,7 @@ return (
     <header className="text-center py-5">
         <Container>
         <Row className="justify-content-center align-items-center">
-        <LogIn/>
+        <UserLogin/>
         </Row>
         </Container> 
     </header>
