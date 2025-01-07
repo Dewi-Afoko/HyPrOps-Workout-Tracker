@@ -43,6 +43,7 @@ const WorkoutDetailsById = () => {
             <p>ID: {thisWorkout.id}</p>
             <p>Name: {thisWorkout.workout_name}</p>
             <p>Created At: {thisWorkout.date}</p>
+            <p>Notes: {thisWorkout.notes}</p>
 
             {/* Display sets if available */}
             <h2>Sets</h2>
@@ -55,7 +56,7 @@ const WorkoutDetailsById = () => {
                 <strong>Performance Order:</strong> {set.set_order} | 
                 <strong>Exercise:</strong> {set.exercise_name} | 
                 <strong>Set Number:</strong> {set.set_number} | 
-                <strong>Set Type:</strong> {set.set_type} | 
+                <strong>Set Type:</strong> {set.set_type || "N/A"} | 
                 <strong> Focus:</strong> {set.focus || "N/A"} | 
                 <strong> Reps:</strong> {set.reps || "N/A"} | 
                 <strong> Loading:</strong> {set.loading || "N/A"}
