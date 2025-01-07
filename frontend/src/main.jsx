@@ -9,7 +9,7 @@ import { Dashboard } from "./pages/Dashboard/UserProfile";
 import { WorkoutsProvider } from "./context/WorkoutsContext";
 import { SpecificWorkout } from "./pages/WorkoutDetails/SpecificWorkout";
 import NavBar from "./components/Navbar";
-import { WorkoutsFeed } from "./pages/WorkoutFeed/AllMyWorkouts";
+import { AllMyWorkouts } from "./pages/WorkoutFeed/AllMyWorkouts";
 
 
 const App = () => {
@@ -24,7 +24,7 @@ const App = () => {
         <Route path='/login' element={<Login/>}/>
         <Route path='/profile' element={<Dashboard/>}/>
         <Route path='/thisworkout' element={<SpecificWorkout/>}/>
-        <Route path='/myworkouts' element={<WorkoutsFeed/>}/>
+        <Route path='/myworkouts' element={<AllMyWorkouts/>}/>
         </Routes>
     </BrowserRouter>
 </div>

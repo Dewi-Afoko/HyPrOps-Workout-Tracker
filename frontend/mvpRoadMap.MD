@@ -1,60 +1,57 @@
 # MVP Road Map
 
-
 ## Home Page
-    Page
-        Register/Login Links
-        Feature Cards
+    Page ✅
+        Register/Login Links ✅
+        Feature Cards ✅
     Status: Complete ✅
 
 ## Register
-    Component
-    Page
-        Register Component
+    Component ✅
+    Page ✅
+        Register Component ✅
     Status: Complete ✅
 
 ## Log In
-    Component
-    Page
-        Login Component
+    Component ✅
+    Page ✅
+        Login Component ✅
     Status: Complete ✅
 
 ## Update User Details
-    Component
+    Component ✅
     Status: Complete ✅
 
 ## View All Workouts
-    Component
+    Component ✅
     Page - Profile
-        Update User Details Component
-        Click through to Detailed Workout View
-        Create Workout Component
+        Update User Details Component ✅
+        Click through to Detailed Workout View ✅
+        Create Workout Component ✅
         Mark Workout Complete Component
         Delete Workout Component
-    Status:
+    Status: In Progress ⏳
 
 ## Detailed Workout View
-    Component
-    Page
-        Add Set Component
+    Component ✅
+    Page ✅
+        Add Set Component ✅
         Mark Set Complete Component
         Edit/Delete Set Component
         Edit Workout Component
-    Status: 
-
+    Status: In Progress ⏳
 
 ## Create Workout
-    Component
+    Component ✅
     Status: Complete ✅
-
 
 ## Edit Workout
     Component
     Status: 
 
 ## Add Sets To Workout
-    Component
-    Status:
+    Component ✅
+    Status: Complete ✅
 
 ## Edit/Delete Sets
     Component

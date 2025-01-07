@@ -61,7 +61,7 @@ const WorkoutDetailsById = () => {
                 <strong> Reps:</strong> {set.reps || "N/A"} | 
                 <strong> Loading:</strong> {set.loading || "N/A"}
                 <strong> Rest:</strong> {set.rest || "N/A"}
-                <strong> Complete?:</strong> {set.complete || "N/A"}
+                <strong> Complete?:</strong> {set.complete ? "Yes" : "No"}
                 <strong> Notes:</strong> {set.notes || "N/A"}
                         </li>
                     ))}
