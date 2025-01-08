@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import WorkoutToggleComplete from "./WorkoutToggleComplete";
+import WorkoutDelete from "./WorkoutDelete";
 
 const WorkoutsFeed = () => {
     const [myWorkouts, setMyWorkouts] = useState(null);
@@ -20,12 +21,15 @@ const WorkoutsFeed = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            setMyWorkouts(response.data.workouts);
+            setMyWorkouts(response.data.workouts || []);
             console.log("Workouts:", response.data.workouts);
         } catch (error) {
-            console.error(error);
-            alert("An error occurred, check console for details.");
-        }
+            console.error("Error fetching workouts:", error);
+            if (error.response && error.response.status === 404) {
+                setMyWorkouts([]); // Handle no workouts found
+            } else {
+                alert("An error occurred while fetching workouts.");
+            }}
     };
 
     // Fetch workouts on component mount
@@ -39,41 +43,52 @@ const WorkoutsFeed = () => {
         navigate("/thisworkout"); // Navigate to the "thisworkout" page
     };
 
-    if (!myWorkouts) {
-        return <div>Loading workouts...</div>;
+    if (myWorkouts === null) {
+        return <div>Loading workouts...</div>; // While data is being fetched
+    }
+
+    if (myWorkouts.length === 0) {
+        return <div>No workouts found.</div>; // When the workouts list is empty
     }
 
     return (
         <div>
             <h1>Workouts</h1>
-            <ul>
-                {myWorkouts.map((workout) => (
-                    <li key={workout.date}>
-                        {/* Workout name as a clickable element */}
-                        <p>
-                            <strong>Name:</strong>{" "}
-                            <span
-                                style={{ color: "blue", cursor: "pointer" }}
-                                onClick={() => handleWorkoutClick(workout.id)}
-                            >
-                                {workout.workout_name}
-                            </span>
-                        </p>
-                        <p><strong>Date:</strong> {workout.date}</p>
-                        <p><strong>Complete:</strong> {workout.complete ? "Yes" : "No"}</p>
-                        <p>
-                            <strong>Notes:</strong>{" "}
-                            {workout.notes && workout.notes.length > 0 ? workout.notes.join(", ") : "No notes"}
-                        </p>
-                        <WorkoutToggleComplete
-                            workoutId={workout.id}
-                            onToggleComplete={getMyWorkouts} // Refresh list after toggling
-                        />
-                    </li>
-                ))}
-            </ul>
+            {myWorkouts.length === 0 ? (
+                <p>No workouts found. Add a workout to get started!</p>
+            ) : (
+                <ul>
+                    {myWorkouts.map((workout) => (
+                        <li key={workout.id}>
+                            <p>
+                                <strong>Name:</strong>{" "}
+                                <span
+                                    style={{ color: "blue", cursor: "pointer" }}
+                                    onClick={() => handleWorkoutClick(workout.id)}
+                                >
+                                    {workout.workout_name}
+                                </span>
+                            </p>
+                            <p><strong>Date:</strong> {workout.date}</p>
+                            <p><strong>Complete:</strong> {workout.complete ? "Yes" : "No"}</p>
+                            <p>
+                                <strong>Notes:</strong>{" "}
+                                {workout.notes?.length > 0 ? workout.notes.join(", ") : "No notes"}
+                            </p>
+                            <WorkoutToggleComplete
+                                workoutId={workout.id}
+                                onToggleComplete={getMyWorkouts} // Refresh list after toggling
+                            />
+                            <WorkoutDelete
+                                workoutId={workout.id}
+                                onDeleteSuccess={getMyWorkouts} // Refresh the feed
+                            />
+                        </li>
+                    ))}
+                </ul>
+            )}
         </div>
     );
-};
+    }
 
 export default WorkoutsFeed;

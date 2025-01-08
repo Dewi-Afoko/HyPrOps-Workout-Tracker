@@ -102,3 +102,44 @@ class Workout(Document):
         if sleep_quality is not None:
             self.sleep_quality = sleep_quality
         self.save()
+
+    def edit_set(self, set_order, **kwargs):
+
+        # Find the set by set_order
+        set_to_edit = next((set_dict for set_dict in self.set_dicts_list if set_dict.set_order == set_order), None)
+
+        if not set_to_edit:
+            raise ValueError(f"Set with set_order {set_order} not found")
+
+        editable_fields = {
+            "set_order",
+            "exercise_name",
+            "set_type",
+            "reps",
+            "loading",
+            "focus",
+            "rest",
+            "notes",
+        }
+
+        for field, value in kwargs.items():
+            if field in editable_fields:
+                setattr(set_to_edit, field, value)
+            elif field in {"set_number", "complete"}:
+                raise ValueError(f"Cannot edit field '{field}'")
+            else:
+                raise KeyError(f"Invalid field '{field}'")
+
+        # Save the parent document
+        self.save()
+
+        return {"message": f"Set {set_order} successfully updated"}
+    
+    @classmethod
+    def delete_workout(cls, workout_id, user_id):
+        workout = cls.objects(id=workout_id, user_id=user_id).first()
+        if not workout:
+            return {"error": "Workout not found or unauthorized"}, 404
+
+        workout.delete()
+        return {"message": f"Workout {workout_id} deleted successfully"}, 200

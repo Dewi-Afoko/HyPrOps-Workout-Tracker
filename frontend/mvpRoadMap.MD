@@ -29,8 +29,8 @@
         Click through to Detailed Workout View ✅
         Create Workout Component ✅
         Mark Workout Complete Component ✅
-        Delete Workout Component
-    Status: In Progress ⏳
+        Delete Workout Component ✅
+    Status: In Progress Complete ✅
 
 ## Detailed Workout View
     Component ✅
@@ -38,29 +38,29 @@
         Add Set Component ✅
         Mark Set Complete Component ✅
         Delete Set Component ✅
-        Edit Set Component
+        Edit Set Component ✅
         Edit Workout Component ✅
-    Status: In Progress ⏳
+    Status: Complete ✅
 
 ## Create Workout
     Component ✅
     Status: Complete ✅
 
 ## Edit Workout
-    Component
-    Status: 
+    Component ✅
+    Status: Complete ✅
 
 ## Add Sets To Workout
     Component ✅
     Status: Complete ✅
 
 ## Edit/Delete Sets
-    Component
-    Status:
+    Component ✅
+    Status: Complete ✅
 
 ## Mark Set Complete
-    Component
-    Status:
+    Component ✅
+    Status: Complete ✅
 
 ### Stretch Targets
     Workouts as Tabulator Tables

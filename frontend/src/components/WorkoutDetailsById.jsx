@@ -4,6 +4,8 @@ import WorkoutToggleComplete from "./WorkoutToggleComplete";
 import SetToggleComplete from "./WorkoutSetToggleComplete";
 import SetDeleteButton from "./WorkoutSetDelete";
 import WorkoutEditDetails from "./WorkoutEditDetails";
+import SetEdit from "./WorkoutSetEdit";
+import WorkoutDelete from "./WorkoutDelete";
 
 
 const WorkoutDetailsById = () => {
@@ -58,6 +60,13 @@ const WorkoutDetailsById = () => {
                 workoutId={thisWorkout.id}
                 onUpdateSuccess={getThisWorkout} // Refresh after updating details
             />
+            <WorkoutDelete
+        workoutId={thisWorkout.id}
+        onDeleteSuccess={() => {
+            alert("Workout deleted successfully.");
+            navigate("/workouts"); // Redirect to workouts feed
+        }}
+    />
 
             {/* Display sets if available */}
             <h2>Sets</h2>
@@ -82,6 +91,12 @@ const WorkoutDetailsById = () => {
                                     setOrder={set.set_order}
                                     complete={set.complete}
                                     onToggleSetComplete={getThisWorkout} // Refresh after toggle
+                                />
+                <SetEdit
+                                    workoutId={thisWorkout.id}
+                                    setOrder={set.set_order}
+                                    exerciseName={set.exercise_name}
+                                    onUpdateSuccess={getThisWorkout} // Refresh workout details after edit
                                 />
                 <SetDeleteButton
                                     workoutId={thisWorkout.id}
