@@ -9,8 +9,9 @@
 
 ## Next Goals
 
-    - Implement Flask-RESTX and Swagger for namespaces and API documentation
-    - Create functional JavaScript/React web frontend
+    - Implement Flask-RESTX and Swagger for namespaces and API documentation ✅
+    - Create functional JavaScript/React web frontend ✅
+    - Create interactive Tabulator tables for workouts and sets ⏳
 
 
 ## Stretch Target
