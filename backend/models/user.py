@@ -37,17 +37,19 @@ class User(Document):
         self.save()
 
     def to_dict(self):
-        latest_weigh_in = max(self.weight, key=lambda date: datetime.strptime(date, date_format))
         payload = {
             'id' : str(self.id),
             'username' : self.username,
             'name': self.name,
             'height': self.height,
-            'weight': self.weight[latest_weigh_in],
-            'last_weighed_on': latest_weigh_in
             }
         if self.dob != None:
             payload['dob'] = self.dob.strftime(date_format)
+        if len(self.weight )> 0 :
+            latest_weigh_in = max(self.weight, key=lambda date: datetime.strptime(date, date_format))
+            payload['weight'] = self.weight[latest_weigh_in],
+            payload['last_weighed_on'] = latest_weigh_in
+
         return payload
 
     def _validate_name(self, name):

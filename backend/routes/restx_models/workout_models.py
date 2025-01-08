@@ -44,6 +44,7 @@ create_workout_request = workout_ns.model('CreateWorkoutRequest', {
 
 create_workout_success = workout_ns.model('CreateWorkoutSuccess', {
     'message': fields.String(description="Confirmation that the workout was created"),
+    'workout': fields.Raw(description="The workout object that was created"),
 })
 
 create_workout_failure = workout_ns.model('CreateWorkoutFailure', {
@@ -90,4 +91,63 @@ add_set_failure = workout_ns.model('AddSetFailure', {
 # Model for marking a set complete
 mark_set_complete_success = workout_ns.model('MarkSetCompleteSuccess', {
     'message': fields.String(description="Confirmation that the set was marked as complete or incomplete"),
+})
+
+# Response model for successful deletion
+delete_set_success = workout_ns.model('DeleteSetSuccess', {
+    'message': fields.String(description='Confirmation message that the set was deleted')
+})
+
+# Response model for deletion failure
+delete_set_failure = workout_ns.model('DeleteSetFailure', {
+    'error': fields.String(description='Error message describing the failure')
+})
+
+# Model for the request payload
+edit_workout_request = workout_ns.model('EditWorkoutRequest', {
+    'name': fields.String(required=False, description='The new name for the workout'),
+    'date': fields.String(required=False, description='The new date for the workout (format: YYYY-MM-DD)'),
+    'user_weight': fields.Float(required=False, description='The user’s weight in kg'),
+    'sleep_score': fields.Float(required=False, description='The user’s sleep score'),
+    'sleep_quality': fields.String(required=False, description='The user’s sleep quality (e.g., "Good", "Poor")'),
+})
+
+# Model for a successful response
+edit_workout_success = workout_ns.model('EditWorkoutSuccess', {
+    'message': fields.String(description='A message confirming the workout was updated successfully'),
+})
+
+# Model for a failure response
+edit_workout_failure = workout_ns.model('EditWorkoutFailure', {
+    'error': fields.String(description='An error message describing why the update failed'),
+})
+
+# Request model for editing a set
+edit_set_request = workout_ns.model('EditSetRequest', {
+    'set_order': fields.Integer(required=True, description='The order of the set to edit'),
+    'exercise_name': fields.String(required=False, description='The new exercise name'),
+    'set_type': fields.String(required=False, description='The type of set (e.g., warmup, working, dropset)'),
+    'reps': fields.Integer(required=False, description='The number of repetitions'),
+    'loading': fields.Float(required=False, description='The loading in kg or weight used'),
+    'focus': fields.String(required=False, description='The focus of the set (e.g., form, max load)'),
+    'rest': fields.Float(required=False, description='The rest time in seconds'),
+    'notes': fields.String(required=False, description='Any additional notes for the set'),
+})
+
+# Response model for successful edit
+edit_set_success = workout_ns.model('EditSetSuccess', {
+    'message': fields.String(description='A message confirming the set was updated successfully'),
+})
+
+# Response model for failure
+edit_set_failure = workout_ns.model('EditSetFailure', {
+    'error': fields.String(description='An error message describing why the update failed'),
+})
+
+delete_workout_success = workout_ns.model('DeleteWorkoutSuccess', {
+    'message': fields.String(description='Confirmation that the workout was deleted'),
+})
+
+delete_workout_failure = workout_ns.model('DeleteWorkoutFailure', {
+    'error': fields.String(description='Error message describing why the deletion failed'),
 })

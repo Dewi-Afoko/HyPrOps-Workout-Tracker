@@ -3,10 +3,10 @@ from flask_jwt_extended import jwt_required
 from lib.utilities.helper_functions import get_credentials, find_user_from_jwt
 from flask_restx import Resource
 from flask_jwt_extended import jwt_required
-from lib.utilities.helper_functions import get_credentials, find_user_from_jwt
+from lib.utilities.helper_functions import get_credentials, find_user_from_jwt, check_for_error
 from mongoengine import NotUniqueError, ValidationError
 from models import User
-from routes.restx_models.user_models import user_get_failure, user_get_success, user_ns, user_registration_error, user_registration_request, user_registration_success, user_update_failure, user_update_request, user_update_success
+from routes.restx_models.user_models import user_get_failure, user_get_success, user_ns, user_registration_error, user_registration_request, user_registration_success, user_update_failure, user_update_request, user_update_success, user_details_success, user_details_error
 
 
 @user_ns.route('/register')
@@ -45,6 +45,21 @@ class UserGet(Resource):
         if not user_list:
             return {'error': 'No users found!'}, 404
         return {'message': user_list}, 200
+    
+@user_ns.route('/details')
+class UserDetails(Resource):
+    @user_ns.doc(responses={
+        200: ('Success', user_details_success),
+        404: ('Not Found', user_details_error),
+    })
+    @jwt_required()
+    def get(self):
+        user = find_user_from_jwt()
+        if check_for_error(user):
+            return user
+        
+        return user.to_dict(), 200
+
 
 
 

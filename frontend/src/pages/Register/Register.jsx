@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Container, Row, Col, Button, Card } from 'react-bootstrap';
-import CreateUser from "../../components/CreateUser";
+import UserRegister from "../../components/UserRegister";
 
 
 export function RegisterUser() {
@@ -10,7 +10,7 @@ return (
     <header className="text-center py-5">
         <Container>
         <Row className="justify-content-center align-items-center">
-        <CreateUser/>
+        <UserRegister/>
         </Row>
         </Container>
     </header>

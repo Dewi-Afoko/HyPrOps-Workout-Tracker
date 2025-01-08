@@ -1,8 +1,8 @@
-import GetWorkouts from "../../components/GetMyWorkouts";
+import WorkoutsFeed from "../../components/WorkoutsFeed"
 
-export function WorkoutsFeed() {
+export function AllMyWorkouts() {
 
     return(
-        <GetWorkouts/>
+        <WorkoutsFeed/>
     )
 }

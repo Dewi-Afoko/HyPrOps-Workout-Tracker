@@ -1,6 +1,6 @@
-
-import GetWorkouts from "../../components/GetMyWorkouts";
 import CreateWorkout from "../../components/CreateWorkout";
+import UserUpdateDetails from "../../components/UserUpdateDetails";
+import WorkoutsFeed from "../../components/WorkoutsFeed";
 
 
 
@@ -10,7 +10,8 @@ return (
     <div>
 
             <CreateWorkout/>
-            <GetWorkouts/>
+            <UserUpdateDetails/>
+            <WorkoutsFeed/>
 
     </div>
 )}

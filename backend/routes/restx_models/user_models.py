@@ -47,3 +47,16 @@ user_update_failure = user_ns.model('UserUpdateFailure', {
     'error' : fields.String(description='Error for failure to update details') 
 })
 
+# Successful response model for user details
+user_details_success = user_ns.model('UserDetailsSuccess', {
+    'id': fields.String(description="The user's unique ID"),
+    'name': fields.String(description="The user's name", example="John Doe"),
+    'dob': fields.String(description="The user's date of birth", example="1990-01-01"),
+    'height': fields.Float(description="The user's height in cm", example=180.0),
+    'weight': fields.Float(description="The user's weight in kg", example=75.0),
+})
+
+# Error response model
+user_details_error = user_ns.model('UserDetailsError', {
+    'error': fields.String(description="Error message", example="User not found"),
+})

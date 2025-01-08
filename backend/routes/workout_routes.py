@@ -4,7 +4,7 @@ from models import User, Workout, SetDicts
 from lib.utilities.helper_functions import find_set_dicts, find_single_set_dict, find_single_workout, find_user_from_jwt, find_user_workouts_list, workouts_as_dict, check_for_error
 from mongoengine import ValidationError
 from flask_restx import Resource
-from .restx_models import workout_ns, workout_get_success, workout_get_failure, single_workout_success, single_workout_failure, create_workout_request, create_workout_success, create_workout_failure, notes_request, notes_success, notes_failure, mark_complete_success, add_set_request, add_set_success, add_set_failure, mark_set_complete_success
+from .restx_models import workout_ns, workout_get_success, workout_get_failure, single_workout_success, single_workout_failure, create_workout_request, create_workout_success, create_workout_failure, notes_request, notes_success, notes_failure, mark_complete_success, add_set_request, add_set_success, add_set_failure, mark_set_complete_success, delete_set_failure, delete_set_success, edit_workout_failure, edit_workout_request, edit_workout_success, edit_set_failure, edit_set_request, edit_set_success, delete_workout_failure, delete_workout_success
 
 
 
@@ -45,7 +45,7 @@ class Workouts(Resource):
         
         workout = Workout(user_id=str(user.id), workout_name=data['workout_name'])
         workout.save()
-        return {'message': f'{workout.workout_name} created by {user.username}'}, 201
+        return {'message': f'{workout.workout_name} created by {user.username}', 'workout': workout.to_dict()}, 201
 
 
 @workout_ns.route('/<string:workout_id>')
@@ -247,3 +247,120 @@ class DeleteNotesFromSet(Resource):
         set_dict.delete_notes()
         workout.save()
         return {'message': f'Notes deleted from set {set_dict.exercise_name}, {set_dict.set_number}'}, 200 
+    
+@workout_ns.route('/<string:workout_id>/delete_set/<int:set_number>')
+class DeleteSetFromWorkout(Resource):
+    @jwt_required()
+    @workout_ns.doc(responses={
+        200: ('Success', delete_set_success),
+        404: ('Not Found', delete_set_failure),
+        400: ('Bad Request', delete_set_failure),
+    })
+    def delete(self, workout_id, set_number):
+        """Delete a set from a workout by its index"""
+        user = find_user_from_jwt()
+        if check_for_error(user):
+            return user
+        
+        workout = find_single_workout(workout_id)
+        if check_for_error(workout):
+            return workout
+
+        if set_number < 0 or set_number >= len(workout.set_dicts_list):
+            return {'error': 'Invalid set number'}, 400
+
+        try:
+            workout.delete_set_dict(set_number)
+            return {'message': f'Set {set_number +1} successfully deleted from workout {workout.workout_name}'}, 200
+        except Exception as e:
+            return {'error': f'Failed to delete set: {str(e)}'}, 500
+
+@workout_ns.route('/<string:workout_id>/edit_details')
+class EditWorkoutDetails(Resource):
+    @jwt_required()
+    @workout_ns.expect(edit_workout_request)
+    @workout_ns.doc(responses={
+        200: ('Success', edit_workout_success),
+        400: ('Bad Request', edit_workout_failure),
+        404: ('Not Found', edit_workout_failure),
+    })
+    def patch(self, workout_id):
+        """Edit workout details"""
+        data = request.get_json()
+        user = find_user_from_jwt()
+        if check_for_error(user):
+            return user
+        
+        workout = find_single_workout(workout_id)
+        if check_for_error(workout):
+            return workout
+
+        try:
+            workout.edit_details(
+                name=data.get('name'),
+                date=data.get('date'),
+                user_weight=data.get('user_weight'),
+                sleep_score=data.get('sleep_score'),
+                sleep_quality=data.get('sleep_quality'),
+            )
+            return {'message': f'Workout {workout.workout_name} details updated successfully'}, 200
+        except ValueError as e:
+            return {'error': str(e)}, 400
+        except Exception as e:
+            return {'error': f'Failed to update workout details: {str(e)}'}, 400
+
+@workout_ns.route('/<string:workout_id>/edit_set')
+class EditSet(Resource):
+    @jwt_required()
+    @workout_ns.expect(edit_set_request)
+    @workout_ns.doc(responses={
+        200: ('Success', edit_set_success),
+        400: ('Bad Request', edit_set_failure),
+        404: ('Not Found', edit_set_failure),
+    })
+    def patch(self, workout_id):
+        """Edit details of a set in a workout"""
+        data = request.get_json()
+        user = find_user_from_jwt()
+        if check_for_error(user):
+            return user
+        
+        workout = find_single_workout(workout_id)
+        if check_for_error(workout):
+            return workout
+
+        set_order = data.get('set_order')
+        if set_order is None:
+            return {'error': 'Set order is required'}, 400
+
+        try:
+            editable_data = {key: value for key, value in data.items() if key != 'set_order'}
+            response = workout.edit_set(set_order, **editable_data)
+            return response, 200
+        except ValueError as e:
+            return {'error': str(e)}, 400
+        except KeyError as e:
+            return {'error': f"Invalid field: {str(e)}"}, 400
+        except Exception as e:
+            return {'error': f"Failed to update set: {str(e)}"}, 400
+
+
+@workout_ns.route('/<string:workout_id>')
+class DeleteWorkout(Resource):
+    @jwt_required()
+    @workout_ns.doc(responses={
+        200: ('Success', delete_workout_success),
+        404: ('Not Found', delete_workout_failure),
+    })
+    def delete(self, workout_id):
+        """Delete a workout by ID"""
+        user = find_user_from_jwt()
+        if check_for_error(user):
+            return user
+
+        workout = Workout.objects(id=workout_id, user_id=user.id).first()
+        if not workout:
+            return {"error": "Workout not found"}, 404
+
+        workout.delete()
+        return {"message": f"Workout {workout_id} deleted successfully"}, 200
