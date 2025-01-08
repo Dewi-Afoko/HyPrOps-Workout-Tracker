@@ -28,7 +28,7 @@
         Update User Details Component ✅
         Click through to Detailed Workout View ✅
         Create Workout Component ✅
-        Mark Workout Complete Component
+        Mark Workout Complete Component ✅
         Delete Workout Component
     Status: In Progress ⏳
 
@@ -36,9 +36,10 @@
     Component ✅
     Page ✅
         Add Set Component ✅
-        Mark Set Complete Component
-        Edit/Delete Set Component
-        Edit Workout Component
+        Mark Set Complete Component ✅
+        Delete Set Component ✅
+        Edit Set Component
+        Edit Workout Component ✅
     Status: In Progress ⏳
 
 ## Create Workout

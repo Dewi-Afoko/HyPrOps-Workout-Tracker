@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import WorkoutToggleComplete from "./WorkoutToggleComplete";
 
 const WorkoutsFeed = () => {
     const [myWorkouts, setMyWorkouts] = useState(null);
@@ -64,6 +65,10 @@ const WorkoutsFeed = () => {
                             <strong>Notes:</strong>{" "}
                             {workout.notes && workout.notes.length > 0 ? workout.notes.join(", ") : "No notes"}
                         </p>
+                        <WorkoutToggleComplete
+                            workoutId={workout.id}
+                            onToggleComplete={getMyWorkouts} // Refresh list after toggling
+                        />
                     </li>
                 ))}
             </ul>

@@ -86,13 +86,19 @@ class Workout(Document):
 
     def edit_details(self, name=None, date=None, user_weight=None, sleep_score=None, sleep_quality=None):
         if name is not None:
-            self.name = name
+            self.workout_name = name  # Ensure you update the correct field
         if date is not None:
             self.date = date
         if user_weight is not None:
-            self.user_weight = user_weight
+            try:
+                self.user_weight = float(user_weight)  # Cast to float for weight
+            except ValueError:
+                raise ValueError("user_weight must be a number")
         if sleep_score is not None:
-            self.sleep_score = sleep_score
+            try:
+                self.sleep_score = float(sleep_score)  # Cast to float for sleep_score
+            except ValueError:
+                raise ValueError("sleep_score must be a number")
         if sleep_quality is not None:
             self.sleep_quality = sleep_quality
         self.save()

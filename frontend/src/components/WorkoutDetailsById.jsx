@@ -1,5 +1,9 @@
 import axios from "axios";
 import { useEffect, useState } from "react"
+import WorkoutToggleComplete from "./WorkoutToggleComplete";
+import SetToggleComplete from "./WorkoutSetToggleComplete";
+import SetDeleteButton from "./WorkoutSetDelete";
+import WorkoutEditDetails from "./WorkoutEditDetails";
 
 
 const WorkoutDetailsById = () => {
@@ -44,6 +48,16 @@ const WorkoutDetailsById = () => {
             <p>Name: {thisWorkout.workout_name}</p>
             <p>Created At: {thisWorkout.date}</p>
             <p>Notes: {thisWorkout.notes}</p>
+            <p>Complete: {thisWorkout.complete ? "Yes" : "No"}</p>
+            <WorkoutToggleComplete
+                workoutId={thisWorkout.id}
+                complete={thisWorkout.complete}
+                onToggleComplete={getThisWorkout} // Refresh workout details after toggle
+            />
+            <WorkoutEditDetails
+                workoutId={thisWorkout.id}
+                onUpdateSuccess={getThisWorkout} // Refresh after updating details
+            />
 
             {/* Display sets if available */}
             <h2>Sets</h2>
@@ -63,6 +77,17 @@ const WorkoutDetailsById = () => {
                 <strong> Rest:</strong> {set.rest || "N/A"}
                 <strong> Complete?:</strong> {set.complete ? "Yes" : "No"}
                 <strong> Notes:</strong> {set.notes || "N/A"}
+                <SetToggleComplete
+                                    workoutId={thisWorkout.id}
+                                    setOrder={set.set_order}
+                                    complete={set.complete}
+                                    onToggleSetComplete={getThisWorkout} // Refresh after toggle
+                                />
+                <SetDeleteButton
+                                    workoutId={thisWorkout.id}
+                                    setNumber={set.set_order - 1} // Adjust to match zero-based index
+                                    onDeleteSuccess={getThisWorkout} // Refresh after deletion
+                                />
                         </li>
                     ))}
                 </ul>
