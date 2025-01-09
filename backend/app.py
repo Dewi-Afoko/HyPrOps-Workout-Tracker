@@ -14,8 +14,7 @@ def create_app():
     app = Flask(__name__)
     api = Api(app, version='3.1', title='HyPrOps Workout Tracker API', description='API for managing workout tracking')
 
-    CORS(app)
-
+    CORS(app, resources={r"/*": {"origins": "*"}}, methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "default_secret_key")
     JWTManager(app)
     app.config["TESTING"] = True

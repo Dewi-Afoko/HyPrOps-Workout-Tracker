@@ -8,7 +8,7 @@ from copy import deepcopy
 class Workout(Document):
     user_id = ReferenceField('User', required=True)
     workout_name = StringField(require=True)
-    date = DateTimeField(default=datetime.now().replace(second=0, microsecond=0))
+    date = DateTimeField(default=datetime.now().replace(hour=0, minute=0, second=0, microsecond=0))
     complete = BooleanField(default=False)
     set_dicts_list = EmbeddedDocumentListField(SetDicts)
     user_weight = FloatField()
@@ -57,7 +57,7 @@ class Workout(Document):
             "id": workout_id,
             "user_id": user_id,
             "workout_name": self.workout_name,
-            "date": self.date.isoformat() if self.date else None,  # Properly serialize date
+            "date": self.date.strftime('%Y/%m/%d') if self.date else None,  # Properly serialize date
             "complete": self.complete,
             "sets_dict_list": [set_dict.to_dict() for set_dict in self.set_dicts_list],
             "user_weight": float(self.user_weight) if self.user_weight else None,

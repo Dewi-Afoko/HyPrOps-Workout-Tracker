@@ -136,6 +136,7 @@ const UserUpdateDetails = () => {
                 <p><strong>Date of Birth:</strong> {currentDetails.dob || "Not provided"}</p>
                 <p><strong>Height:</strong> {currentDetails.height ? `${currentDetails.height} cm` : "Not provided"}</p>
                 <p><strong>Weight:</strong> {currentDetails.weight ? `${currentDetails.weight} kg` : "Not provided"}</p>
+                <p><strong>Last Weigh In:</strong> {currentDetails.weight ? `${currentDetails.last_weighed_on}` : "Not provided"}</p>
             </div>
             <button onClick={() => setIsModalOpen(true)}>Update Personal Details</button>
             {isModalOpen && <Modal />}
