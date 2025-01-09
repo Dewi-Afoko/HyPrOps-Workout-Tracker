@@ -29,36 +29,39 @@ const WorkoutsFeed = () => {
                 setMyWorkouts([]); // Handle no workouts found
             } else {
                 alert("An error occurred while fetching workouts.");
-            }}
+            }
+        }
     };
 
-    // Fetch workouts on component mount
     useEffect(() => {
         getMyWorkouts();
     }, []);
 
-    // Handle clicking on a workout name
     const handleWorkoutClick = (workoutId) => {
         localStorage.setItem("workout_id", workoutId); // Set workout ID in localStorage
         navigate("/thisworkout"); // Navigate to the "thisworkout" page
     };
 
     if (myWorkouts === null) {
-        return <div>Loading workouts...</div>; // While data is being fetched
+        return <div>Loading workouts...</div>;
     }
 
     if (myWorkouts.length === 0) {
-        return <div>No workouts found.</div>; // When the workouts list is empty
+        return <div>No workouts found.</div>;
     }
 
     return (
         <div>
             <h1>Workouts</h1>
-            {myWorkouts.length === 0 ? (
-                <p>No workouts found. Add a workout to get started!</p>
-            ) : (
-                <ul>
-                    {myWorkouts.map((workout) => (
+            <ul>
+                {myWorkouts.map((workout) => {
+                    // Safely handle sets_dict_list
+                    const uniqueExercises =
+                        workout.sets_dict_list?.length > 0
+                            ? [...new Set(workout.sets_dict_list.map((set) => set.exercise_name))]
+                            : [];
+
+                    return (
                         <li key={workout.id}>
                             <p>
                                 <strong>Name:</strong>{" "}
@@ -70,11 +73,13 @@ const WorkoutsFeed = () => {
                                 </span>
                             </p>
                             <p><strong>Date:</strong> {workout.date}</p>
-                            <p><strong>Complete:</strong> {workout.complete ? "Yes" : "No"}</p>
                             <p>
-                                <strong>Notes:</strong>{" "}
-                                {workout.notes?.length > 0 ? workout.notes.join(", ") : "No notes"}
+                                <strong>Lifts:</strong>{" "}
+                                {uniqueExercises.length > 0
+                                    ? uniqueExercises.join(", ")
+                                    : "No exercises"}
                             </p>
+                            <p><strong>Complete:</strong> {workout.complete ? "Yes" : "No"}</p>
                             <WorkoutToggleComplete
                                 workoutId={workout.id}
                                 onToggleComplete={getMyWorkouts} // Refresh list after toggling
@@ -84,11 +89,11 @@ const WorkoutsFeed = () => {
                                 onDeleteSuccess={getMyWorkouts} // Refresh the feed
                             />
                         </li>
-                    ))}
-                </ul>
-            )}
+                    );
+                })}
+            </ul>
         </div>
     );
-    }
+};
 
 export default WorkoutsFeed;

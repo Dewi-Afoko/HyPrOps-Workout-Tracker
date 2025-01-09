@@ -62,8 +62,11 @@
     Component ✅
     Status: Complete ✅
 
-### Stretch Targets
+### New Targets
     Workouts as Tabulator Tables
+        Update WorkoutsFeed 
+        Update WorkoutDetailsById
+            Look into toggling 'interactive mode' for edit routes, if not, stick with modals
     Split View Based On Completion 
         Split Workout Component
         Split Sets Component

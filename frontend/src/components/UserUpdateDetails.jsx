@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import axios from "axios";
 
 const UserUpdateDetails = () => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentDetails, setCurrentDetails] = useState({
         name: "",
         dob: "",
@@ -13,7 +14,6 @@ const UserUpdateDetails = () => {
     const [dob, setDob] = useState("");
     const [height, setHeight] = useState("");
     const [weight, setWeight] = useState("");
-    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchCurrentDetails = async () => {
@@ -61,7 +61,8 @@ const UserUpdateDetails = () => {
                 }
             );
             alert(`message: ${response.data.message}`);
-            navigate(0); 
+            setIsModalOpen(false); // Close modal
+            setCurrentDetails({ ...currentDetails, ...data }); // Update current details
         } catch (error) {
             console.error(error);
             const errorMessage = error.response?.data?.error || "An error occurred";
@@ -69,65 +70,98 @@ const UserUpdateDetails = () => {
         }
     };
 
+    const Modal = () =>
+        createPortal(
+            <div style={modalStyles.overlay}>
+                <div style={modalStyles.content}>
+                    <h2>Update Personal Details</h2>
+                    <form>
+                        <div>
+                            <label htmlFor="name">Name</label>
+                            <input
+                                id="name"
+                                type="text"
+                                placeholder="Enter your name"
+                                value={name}
+                                onChange={(event) => setName(event.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="dob">Date of Birth</label>
+                            <input
+                                id="dob"
+                                type="text"
+                                placeholder="Enter your date of birth (YYYY/MM/DD)"
+                                value={dob}
+                                onChange={(event) => setDob(event.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="height">Height</label>
+                            <input
+                                id="height"
+                                type="number"
+                                placeholder="Enter your height (cm)"
+                                value={height}
+                                onChange={(event) => setHeight(event.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="weight">Weight</label>
+                            <input
+                                id="weight"
+                                type="number"
+                                placeholder="Enter your weight (kg)"
+                                value={weight}
+                                onChange={(event) => setWeight(event.target.value)}
+                            />
+                        </div>
+                        <button type="button" onClick={handleSubmit}>
+                            Update Details
+                        </button>
+                        <button type="button" onClick={() => setIsModalOpen(false)}>
+                            Cancel
+                        </button>
+                    </form>
+                </div>
+            </div>,
+            document.body
+        );
+
     return (
-        <div>
-            <h1>Update Personal Details</h1>
-
-            {/* Display current user details */}
-            <h2>Current Details</h2>
-            <p><strong>Name:</strong> {currentDetails.name || "Not provided"}</p>
-            <p><strong>Date of Birth:</strong> {currentDetails.dob || "Not provided"}</p>
-            <p><strong>Height:</strong> {currentDetails.height ? `${currentDetails.height} cm` : "Not provided"}</p>
-            <p><strong>Weight:</strong> {currentDetails.weight ? `${currentDetails.weight} kg` : "Not provided"}</p>
-
-            {/* Form for updating details */}
-            <form>
-                <div>
-                    <label htmlFor="name">Name</label>
-                    <input
-                        id="name"
-                        type="text"
-                        placeholder={currentDetails.name || "Enter your name"}
-                        value={name} // Keep this empty for no prefilled values
-                        onChange={(event) => setName(event.target.value)}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="dob">Date of Birth</label>
-                    <input
-                        id="dob"
-                        type="text"
-                        placeholder={currentDetails.dob || "Enter your date of birth (YYYY/MM/DD)"}
-                        value={dob} // Keep this empty for no prefilled values
-                        onChange={(event) => setDob(event.target.value)}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="height">Height</label>
-                    <input
-                        id="height"
-                        type="number"
-                        placeholder={currentDetails.height ? `${currentDetails.height} cm` : "Enter your height (cm)"}
-                        value={height} // Keep this empty for no prefilled values
-                        onChange={(event) => setHeight(event.target.value)}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="weight">Weight</label>
-                    <input
-                        id="weight"
-                        type="number"
-                        placeholder={currentDetails.weight ? `${currentDetails.weight} kg` : "Enter your weight (kg)"}
-                        value={weight} // Keep this empty for no prefilled values
-                        onChange={(event) => setWeight(event.target.value)}
-                    />
-                </div>
-                <button type="button" onClick={handleSubmit}>
-                    Update Personal Details
-                </button>
-            </form>
-        </div>
+        <>
+            <div>
+                <h3>User Details</h3>
+                <p><strong>Name:</strong> {currentDetails.name || "Not provided"}</p>
+                <p><strong>Date of Birth:</strong> {currentDetails.dob || "Not provided"}</p>
+                <p><strong>Height:</strong> {currentDetails.height ? `${currentDetails.height} cm` : "Not provided"}</p>
+                <p><strong>Weight:</strong> {currentDetails.weight ? `${currentDetails.weight} kg` : "Not provided"}</p>
+            </div>
+            <button onClick={() => setIsModalOpen(true)}>Update Personal Details</button>
+            {isModalOpen && <Modal />}
+        </>
     );
+};
+
+const modalStyles = {
+    overlay: {
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    content: {
+        backgroundColor: "white",
+        padding: "20px",
+        borderRadius: "8px",
+        boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+        minWidth: "300px",
+    },
 };
 
 export default UserUpdateDetails;
