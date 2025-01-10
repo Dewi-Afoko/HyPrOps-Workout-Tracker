@@ -62,5 +62,4 @@
     Component ✅
     Status: Complete ✅
 
-### New Targets
-    No Tabulator, implement workout.format()
+

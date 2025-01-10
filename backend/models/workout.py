@@ -29,9 +29,21 @@ class Workout(Document):
         self.set_dicts_list.append(set_dict_copy)
         self.save()
 
-    def delete_set_dict(self, set_number):
-        del self.set_dicts_list[set_number]
+    def delete_set_dict(self, set_order):
+        # Find the set by its order
+        set_to_delete = next((set for set in self.set_dicts_list if set.set_order == set_order), None)
+
+        if not set_to_delete:
+            raise ValueError(f"Set with set_order {set_order} not found")
+
+        # Remove the set
+        self.set_dicts_list.remove(set_to_delete)
+
+        # Reformat and save
+        self.format_workout()
         self.save()
+
+
 
     def toggle_complete(self):
         if self.complete == False:
@@ -130,7 +142,8 @@ class Workout(Document):
             else:
                 raise KeyError(f"Invalid field '{field}'")
 
-        # Save the parent document
+        # Save workout after reformatting for set_number and order
+        self.format_workout()
         self.save()
 
         return {"message": f"Set {set_order} successfully updated"}

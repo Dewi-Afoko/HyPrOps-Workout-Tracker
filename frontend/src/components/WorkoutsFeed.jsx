@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { ReactTabulator } from "react-tabulator";
-import "react-tabulator/lib/styles.css"; // Tabulator base styles
-import "react-tabulator/css/tabulator_simple.min.css"; // Simplified Tabulator theme
+import { Table, Button, Modal } from "react-bootstrap";
 import axios from "axios";
+import WorkoutEditDetails from "./WorkoutEditDetails";
+import WorkoutDelete from "./WorkoutDelete";
 
 const WorkoutsFeed = () => {
     const [myWorkouts, setMyWorkouts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editWorkoutId, setEditWorkoutId] = useState(null);
+    const [refreshWorkouts, setRefreshWorkouts] = useState(false);
 
     const getMyWorkouts = async () => {
         const token = localStorage.getItem("token");
@@ -32,7 +35,7 @@ const WorkoutsFeed = () => {
 
     useEffect(() => {
         getMyWorkouts();
-    }, []);
+    }, [refreshWorkouts]);
 
     const toggleCompleteStatus = async (workoutId) => {
         const token = localStorage.getItem("token");
@@ -51,52 +54,27 @@ const WorkoutsFeed = () => {
                 }
             );
             alert(response.data.message);
-            getMyWorkouts(); // Refresh the table
+            setRefreshWorkouts(!refreshWorkouts); // Refresh the table
         } catch (error) {
             console.error("Error toggling workout status:", error);
             alert("Failed to toggle workout status.");
         }
     };
 
-    const columns = [
-        {
-            title: "Name",
-            field: "workout_name",
-            formatter: "link",
-            formatterParams: {
-                labelField: "workout_name",
-                urlPrefix: "#",
-            },
-            cellClick: (e, cell) => {
-                const workoutId = cell.getRow().getData().id;
-                localStorage.setItem("workout_id", workoutId);
-                window.location.href = "/thisworkout";
-            },
-        },
-        {
-            title: "Date",
-            field: "date",
-            formatter: (cell) => cell.getValue().split("T")[0], // Format as YYYY-MM-DD
-        },
-        {
-            title: "Lifts",
-            field: "sets_dict_list",
-            formatter: (cell) => {
-                const sets = cell.getValue() || [];
-                const uniqueLifts = [...new Set(sets.map((set) => set.exercise_name))];
-                return uniqueLifts.length > 0 ? uniqueLifts.join(", ") : "No exercises";
-            },
-        },
-        {
-            title: "Complete",
-            field: "complete",
-            formatter: "tickCross",
-            cellClick: (e, cell) => {
-                const workoutId = cell.getRow().getData().id;
-                toggleCompleteStatus(workoutId);
-            },
-        },
-    ];
+    const handleWorkoutClick = (workoutId) => {
+        localStorage.setItem("workout_id", workoutId);
+        window.location.href = "/thisworkout"; // Navigate to the workout details page
+    };
+
+    const handleEditClick = (workoutId) => {
+        setEditWorkoutId(workoutId);
+        setShowEditModal(true);
+    };
+
+    const handleDeleteSuccess = () => {
+        alert("Workout deleted successfully.");
+        setRefreshWorkouts(!refreshWorkouts); // Refresh the workouts table after deletion
+    };
 
     if (loading) {
         return <div>Loading workouts...</div>;
@@ -109,11 +87,87 @@ const WorkoutsFeed = () => {
     return (
         <div>
             <h3>Workouts</h3>
-            <ReactTabulator
-                data={myWorkouts}
-                columns={columns}
-                layout="fitColumns"
-            />
+            <Table striped bordered hover>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Lifts</th>
+                        <th>Complete</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {myWorkouts.map((workout) => {
+                        const uniqueLifts = workout.sets_dict_list
+                            ? [...new Set(workout.sets_dict_list.map((set) => set.exercise_name))]
+                            : [];
+                        return (
+                            <tr key={workout.id}>
+                                <td
+                                    style={{ color: "blue", cursor: "pointer" }}
+                                    onClick={() => handleWorkoutClick(workout.id)}
+                                >
+                                    {workout.workout_name}
+                                </td>
+                                <td>{workout.date.split("T")[0]}</td>
+                                <td>{uniqueLifts.length > 0 ? uniqueLifts.join(", ") : "No exercises"}</td>
+                                <td>
+                                    <Button
+                                        variant={workout.complete ? "success" : "warning"}
+                                        onClick={() => toggleCompleteStatus(workout.id)}
+                                    >
+                                        {workout.complete ? "Complete" : "Incomplete"}
+                                    </Button>
+                                </td>
+                                <td>
+                                {editWorkoutId === workout.id && (
+                                    <WorkoutEditDetails
+                                        workoutId={workout.id}
+                                        onUpdateSuccess={() => {
+                                            setEditWorkoutId(null);
+                                            setRefreshWorkouts(!refreshWorkouts);
+                                        }}
+                                        onClose={() => setEditWorkoutId(null)}
+                                    />
+                                )}
+                                <Button
+                                    variant="info"
+                                    onClick={() => setEditWorkoutId(workout.id)}
+                                >
+                                    Edit
+                                </Button>
+                            </td>
+                            <td>
+                                <WorkoutDelete
+                                    workoutId={workout.id}
+                                    onDeleteSuccess={() => setRefreshWorkouts(!refreshWorkouts)} // Trigger a refresh
+                                />
+                            </td>
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </Table>
+
+            {/* Edit Workout Modal */}
+            <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Workout</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {editWorkoutId && (
+                        <WorkoutEditDetails
+                            workoutId={editWorkoutId}
+                            onUpdateSuccess={() => {
+                                setShowEditModal(false);
+                                setRefreshWorkouts(!refreshWorkouts);
+                            }}
+                        />
+                    )}
+                </Modal.Body>
+            </Modal>
         </div>
     );
 };

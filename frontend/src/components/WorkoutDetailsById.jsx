@@ -105,6 +105,7 @@ const WorkoutDetailsById = () => {
                         <tr>
                             <th>Order</th>
                             <th>Exercise</th>
+                            <th>Set Number</th>
                             <th>Set Type</th>
                             <th>Focus</th>
                             <th>Reps</th>
@@ -123,6 +124,7 @@ const WorkoutDetailsById = () => {
                                 <tr key={set.set_order}>
                                     <td>{set.set_order}</td>
                                     <td>{set.exercise_name}</td>
+                                    <td>{set.set_number}</td>
                                     <td>{set.set_type || "N/A"}</td>
                                     <td>{set.focus || "N/A"}</td>
                                     <td>{set.reps || "N/A"}</td>
