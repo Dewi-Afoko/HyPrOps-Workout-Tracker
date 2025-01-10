@@ -1,4 +1,4 @@
-import CreateWorkout from "../../components/CreateWorkout";
+import CreateWorkout from "../../components/WorkoutCreate";
 import UserUpdateDetails from "../../components/UserUpdateDetails";
 import WorkoutsFeed from "../../components/WorkoutsFeed";
 
