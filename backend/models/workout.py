@@ -8,7 +8,7 @@ from copy import deepcopy
 class Workout(Document):
     user_id = ReferenceField('User', required=True)
     workout_name = StringField(require=True)
-    date = DateTimeField(default=datetime.now().replace(second=0, microsecond=0))
+    date = DateTimeField(default=datetime.now().replace(hour=0, minute=0, second=0, microsecond=0))
     complete = BooleanField(default=False)
     set_dicts_list = EmbeddedDocumentListField(SetDicts)
     user_weight = FloatField()
@@ -29,9 +29,21 @@ class Workout(Document):
         self.set_dicts_list.append(set_dict_copy)
         self.save()
 
-    def delete_set_dict(self, set_number):
-        del self.set_dicts_list[set_number]
+    def delete_set_dict(self, set_order):
+        # Find the set by its order
+        set_to_delete = next((set for set in self.set_dicts_list if set.set_order == set_order), None)
+
+        if not set_to_delete:
+            raise ValueError(f"Set with set_order {set_order} not found")
+
+        # Remove the set
+        self.set_dicts_list.remove(set_to_delete)
+
+        # Reformat and save
+        self.format_workout()
         self.save()
+
+
 
     def toggle_complete(self):
         if self.complete == False:
@@ -57,7 +69,7 @@ class Workout(Document):
             "id": workout_id,
             "user_id": user_id,
             "workout_name": self.workout_name,
-            "date": self.date.isoformat() if self.date else None,  # Properly serialize date
+            "date": self.date.strftime('%Y/%m/%d') if self.date else None,  # Properly serialize date
             "complete": self.complete,
             "sets_dict_list": [set_dict.to_dict() for set_dict in self.set_dicts_list],
             "user_weight": float(self.user_weight) if self.user_weight else None,
@@ -130,7 +142,8 @@ class Workout(Document):
             else:
                 raise KeyError(f"Invalid field '{field}'")
 
-        # Save the parent document
+        # Save workout after reformatting for set_number and order
+        self.format_workout()
         self.save()
 
         return {"message": f"Set {set_order} successfully updated"}

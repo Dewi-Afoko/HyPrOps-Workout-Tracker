@@ -10,10 +10,9 @@ const WorkoutDelete = ({ workoutId, onDeleteSuccess }) => {
             return;
         }
 
-        const confirmDelete = window.confirm(
-            "Are you sure you want to delete this workout? This action cannot be undone."
-        );
-        if (!confirmDelete) return;
+        if (!window.confirm("Are you sure you want to delete this workout?")) {
+            return; // Exit if the user cancels
+        }
 
         try {
             const response = await axios.delete(
@@ -25,17 +24,25 @@ const WorkoutDelete = ({ workoutId, onDeleteSuccess }) => {
                 }
             );
             alert(response.data.message);
-            onDeleteSuccess(); // Call parent callback to refresh the list or navigate
+            onDeleteSuccess(); // Callback to refresh the parent component
         } catch (error) {
             console.error("Error deleting workout:", error);
             const errorMessage = error.response?.data?.error || "An error occurred";
-            alert(`Failed to delete workout: ${errorMessage}`);
+            alert(`Error deleting workout: ${errorMessage}`);
         }
     };
 
     return (
         <button
-
+            style={{
+                backgroundColor: "red",
+                color: "white",
+                border: "none",
+                padding: "8px 16px",
+                borderRadius: "5px",
+                cursor: "pointer",
+                fontWeight: "bold",
+            }}
             onClick={handleDelete}
         >
             Delete Workout

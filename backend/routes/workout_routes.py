@@ -248,7 +248,7 @@ class DeleteNotesFromSet(Resource):
         workout.save()
         return {'message': f'Notes deleted from set {set_dict.exercise_name}, {set_dict.set_number}'}, 200 
     
-@workout_ns.route('/<string:workout_id>/delete_set/<int:set_number>')
+@workout_ns.route('/<string:workout_id>/delete_set/<int:set_order>')
 class DeleteSetFromWorkout(Resource):
     @jwt_required()
     @workout_ns.doc(responses={
@@ -256,8 +256,8 @@ class DeleteSetFromWorkout(Resource):
         404: ('Not Found', delete_set_failure),
         400: ('Bad Request', delete_set_failure),
     })
-    def delete(self, workout_id, set_number):
-        """Delete a set from a workout by its index"""
+    def delete(self, workout_id, set_order):
+        """Delete a set from a workout by its set_order"""
         user = find_user_from_jwt()
         if check_for_error(user):
             return user
@@ -266,14 +266,14 @@ class DeleteSetFromWorkout(Resource):
         if check_for_error(workout):
             return workout
 
-        if set_number < 0 or set_number >= len(workout.set_dicts_list):
-            return {'error': 'Invalid set number'}, 400
-
         try:
-            workout.delete_set_dict(set_number)
-            return {'message': f'Set {set_number +1} successfully deleted from workout {workout.workout_name}'}, 200
+            workout.delete_set_dict(set_order)
+            return {'message': f'Set {set_order} successfully deleted from workout {workout.workout_name}'}, 200
+        except ValueError as e:
+            return {'error': str(e)}, 400
         except Exception as e:
             return {'error': f'Failed to delete set: {str(e)}'}, 500
+
 
 @workout_ns.route('/<string:workout_id>/edit_details')
 class EditWorkoutDetails(Resource):

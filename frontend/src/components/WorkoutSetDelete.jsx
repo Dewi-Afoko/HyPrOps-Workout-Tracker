@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 
-const SetDeleteButton = ({ workoutId, setNumber, onDeleteSuccess }) => {
+const SetDeleteButton = ({ workoutId, setOrder, onDeleteSuccess }) => {
     const handleDelete = async () => {
         const token = localStorage.getItem("token");
 
@@ -12,7 +12,7 @@ const SetDeleteButton = ({ workoutId, setNumber, onDeleteSuccess }) => {
 
         try {
             const response = await axios.delete(
-                `http://127.0.0.1:5000/workouts/${workoutId}/delete_set/${setNumber}`,
+                `http://127.0.0.1:5000/workouts/${workoutId}/delete_set/${setOrder}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
