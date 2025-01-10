@@ -3,6 +3,7 @@ import { Table, Button, Modal } from "react-bootstrap";
 import axios from "axios";
 import WorkoutEditDetails from "./WorkoutEditDetails";
 import WorkoutDelete from "./WorkoutDelete";
+import CreateWorkout from "./WorkoutCreate";
 
 const WorkoutsFeed = () => {
     const [myWorkouts, setMyWorkouts] = useState([]);
@@ -85,7 +86,10 @@ const WorkoutsFeed = () => {
     }
 
     return (
+
+
         <div>
+            <CreateWorkout/>
             <h3>Workouts</h3>
             <Table striped bordered hover>
                 <thead>

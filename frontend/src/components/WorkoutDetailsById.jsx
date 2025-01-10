@@ -95,7 +95,9 @@ const WorkoutDetailsById = () => {
             <p><strong>ID:</strong> {thisWorkout.id}</p>
             <p><strong>Name:</strong> {thisWorkout.workout_name}</p>
             <p><strong>Date:</strong> {thisWorkout.date.split("T")[0]}</p>
-            <p><strong>Notes:</strong> {thisWorkout.notes || "None"}</p>
+            <p><strong>Weight:</strong> {thisWorkout.user_weight || "None"}</p>
+            <p><strong>Sleep Score:</strong> {thisWorkout.sleep_score || "None"}</p>
+            <p><strong>Sleep Quality:</strong> {thisWorkout.sleep_quality || "None"}</p>
             <p><strong>Complete:</strong> {thisWorkout.complete ? "Yes" : "No"}</p>
 
             <h2>Sets</h2>
