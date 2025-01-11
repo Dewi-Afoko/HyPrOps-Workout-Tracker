@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Table, Button, Modal } from "react-bootstrap";
 import axios from "axios";
 import SetEdit from "./WorkoutSetEdit";
+import AddSetToWorkout from "./WorkoutAddSet";
 
 const WorkoutDetailsById = () => {
     const [thisWorkout, setThisWorkout] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [editSetData, setEditSetData] = useState(null);
+    const [showAddSetModal, setShowAddSetModal] = useState(false);
 
     const getThisWorkout = async () => {
         const token = localStorage.getItem("token");
@@ -85,6 +87,16 @@ const WorkoutDetailsById = () => {
         }
     };
 
+    const renderAddSetButton = () => (
+        <Button
+            variant="primary"
+            onClick={() => setShowAddSetModal(true)}
+            style={{ marginBottom: "20px" }}
+        >
+            Add Set
+        </Button>
+    );
+
     if (!thisWorkout) {
         return <div>Loading workout details...</div>;
     }
@@ -99,6 +111,8 @@ const WorkoutDetailsById = () => {
             <p><strong>Sleep Score:</strong> {thisWorkout.sleep_score || "None"}</p>
             <p><strong>Sleep Quality:</strong> {thisWorkout.sleep_quality || "None"}</p>
             <p><strong>Complete:</strong> {thisWorkout.complete ? "Yes" : "No"}</p>
+
+            {renderAddSetButton()}
 
             <h2>Sets</h2>
             {thisWorkout.sets_dict_list?.length > 0 ? (
@@ -167,24 +181,38 @@ const WorkoutDetailsById = () => {
 
             {/* Edit Modal */}
             <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
-    <Modal.Header closeButton>
-        <Modal.Title>Edit Set</Modal.Title>
-    </Modal.Header>
-    <Modal.Body>
-        {editSetData && (
-            <SetEdit
-                workoutId={thisWorkout.id}
-                setOrder={editSetData.set_order}
-                exerciseName={editSetData.exercise_name}
-                onUpdateSuccess={() => {
-                    setShowEditModal(false);
-                    getThisWorkout();
-                }}
-            />
-        )}
-    </Modal.Body>
-</Modal>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Set</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {editSetData && (
+                        <SetEdit
+                            workoutId={thisWorkout.id}
+                            setOrder={editSetData.set_order}
+                            exerciseName={editSetData.exercise_name}
+                            onUpdateSuccess={() => {
+                                setShowEditModal(false);
+                                getThisWorkout();
+                            }}
+                        />
+                    )}
+                </Modal.Body>
+            </Modal>
 
+            {/* Add Set Modal */}
+            <Modal show={showAddSetModal} onHide={() => setShowAddSetModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Add a Set</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <AddSetToWorkout
+                        onSetAdded={() => {
+                            setShowAddSetModal(false);
+                            getThisWorkout();
+                        }}
+                    />
+                </Modal.Body>
+            </Modal>
         </div>
     );
 };
