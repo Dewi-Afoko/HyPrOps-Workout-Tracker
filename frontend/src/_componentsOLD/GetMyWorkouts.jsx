@@ -104,7 +104,7 @@ const GetWorkouts = ({ onRefresh }) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {workout.sets_dict_list.map((set) => {
+                                {workout.set_dicts_list.map((set) => {
                                     const exerciseName = set.exercise_name;
                                     const loading = set.loading;
                                     const rest = set.rest;

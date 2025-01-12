@@ -3,6 +3,7 @@ import { Table, Button, Modal } from "react-bootstrap";
 import axios from "axios";
 import SetEdit from "./WorkoutSetEdit";
 import AddSetToWorkout from "./WorkoutAddSet";
+import SetDuplicate from "./WorkoutSetDuplicate";
 
 const WorkoutDetailsById = () => {
     const [thisWorkout, setThisWorkout] = useState(null);
@@ -40,7 +41,7 @@ const WorkoutDetailsById = () => {
     }, []);
 
     const handleEditClick = (setData) => {
-        setEditSetData(setData); // Open the modal with the set data
+        setEditSetData(setData);
         setShowEditModal(true);
     };
 
@@ -87,15 +88,9 @@ const WorkoutDetailsById = () => {
         }
     };
 
-    const renderAddSetButton = () => (
-        <Button
-            variant="primary"
-            onClick={() => setShowAddSetModal(true)}
-            style={{ marginBottom: "20px" }}
-        >
-            Add Set
-        </Button>
-    );
+    const handleAddSetClick = () => {
+        setShowAddSetModal(true);
+    };
 
     if (!thisWorkout) {
         return <div>Loading workout details...</div>;
@@ -112,10 +107,16 @@ const WorkoutDetailsById = () => {
             <p><strong>Sleep Quality:</strong> {thisWorkout.sleep_quality || "None"}</p>
             <p><strong>Complete:</strong> {thisWorkout.complete ? "Yes" : "No"}</p>
 
-            {renderAddSetButton()}
+            <Button
+                variant="primary"
+                onClick={handleAddSetClick}
+                style={{ marginBottom: "20px" }}
+            >
+                Add Set
+            </Button>
 
             <h2>Sets</h2>
-            {thisWorkout.sets_dict_list?.length > 0 ? (
+            {thisWorkout.set_dicts_list?.length > 0 ? (
                 <Table striped bordered hover>
                     <thead>
                         <tr>
@@ -129,12 +130,13 @@ const WorkoutDetailsById = () => {
                             <th>Rest</th>
                             <th>Notes</th>
                             <th>Complete</th>
+                            <th>Duplicate Set</th>
                             <th>Edit</th>
                             <th>Delete</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {thisWorkout.sets_dict_list
+                        {thisWorkout.set_dicts_list
                             .sort((a, b) => a.set_order - b.set_order)
                             .map((set) => (
                                 <tr key={set.set_order}>
@@ -154,6 +156,13 @@ const WorkoutDetailsById = () => {
                                         >
                                             {set.complete ? "Complete" : "Incomplete"}
                                         </Button>
+                                    </td>
+                                    <td>
+                                        <SetDuplicate
+                                            workoutId={thisWorkout.id}
+                                            setOrder={set.set_order}
+                                            onDuplicateSuccess={getThisWorkout}
+                                        />
                                     </td>
                                     <td>
                                         <Button

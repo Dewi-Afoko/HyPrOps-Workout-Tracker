@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "./../styles/modals.css";
 
-const AddSetToWorkout = ({ onSetAdded = () => {} }) => {
+const AddSetToWorkout = ({ onSetAdded }) => {
     const [exerciseName, setExerciseName] = useState("");
     const [setType, setSetType] = useState("");
     const [reps, setReps] = useState("");
@@ -53,83 +54,80 @@ const AddSetToWorkout = ({ onSetAdded = () => {} }) => {
     };
 
     return (
-        <div>
-            <h2>Add a Set</h2>
-            <form>
-                <div>
-                    <label htmlFor="exerciseName">Exercise Name</label>
-                    <input
-                        id="exerciseName"
-                        type="text"
-                        placeholder="Enter exercise name"
-                        value={exerciseName}
-                        onChange={(e) => setExerciseName(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="setType">Set Type</label>
-                    <input
-                        id="setType"
-                        type="text"
-                        placeholder="Enter set type (optional)"
-                        value={setType}
-                        onChange={(e) => setSetType(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="reps">Reps</label>
-                    <input
-                        id="reps"
-                        type="number"
-                        placeholder="Enter number of reps (optional)"
-                        value={reps}
-                        onChange={(e) => setReps(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="loading">Loading (Weight)</label>
-                    <input
-                        id="loading"
-                        type="number"
-                        placeholder="Enter loading in kg (optional)"
-                        value={loading}
-                        onChange={(e) => setLoading(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="focus">Focus</label>
-                    <input
-                        id="focus"
-                        type="text"
-                        placeholder="Enter focus (optional)"
-                        value={focus}
-                        onChange={(e) => setFocus(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="rest">Rest (Seconds)</label>
-                    <input
-                        id="rest"
-                        type="number"
-                        placeholder="Enter rest time in seconds (optional)"
-                        value={rest}
-                        onChange={(e) => setRest(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="notes">Notes</label>
-                    <textarea
-                        id="notes"
-                        placeholder="Add any notes (optional)"
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                    />
-                </div>
-                <button type="button" onClick={handleSubmit}>
-                    Add Set
-                </button>
-            </form>
-        </div>
+        <form>
+            <div>
+                <label htmlFor="exerciseName">Exercise Name</label>
+                <input
+                    id="exerciseName"
+                    type="text"
+                    placeholder="Enter exercise name"
+                    value={exerciseName}
+                    onChange={(e) => setExerciseName(e.target.value)}
+                />
+            </div>
+            <div>
+                <label htmlFor="setType">Set Type</label>
+                <input
+                    id="setType"
+                    type="text"
+                    placeholder="Enter set type (optional)"
+                    value={setType}
+                    onChange={(e) => setSetType(e.target.value)}
+                />
+            </div>
+            <div>
+                <label htmlFor="reps">Reps</label>
+                <input
+                    id="reps"
+                    type="number"
+                    placeholder="Enter number of reps (optional)"
+                    value={reps}
+                    onChange={(e) => setReps(e.target.value)}
+                />
+            </div>
+            <div>
+                <label htmlFor="loading">Loading (Weight)</label>
+                <input
+                    id="loading"
+                    type="number"
+                    placeholder="Enter loading in kg (optional)"
+                    value={loading}
+                    onChange={(e) => setLoading(e.target.value)}
+                />
+            </div>
+            <div>
+                <label htmlFor="focus">Focus</label>
+                <input
+                    id="focus"
+                    type="text"
+                    placeholder="Enter focus (optional)"
+                    value={focus}
+                    onChange={(e) => setFocus(e.target.value)}
+                />
+            </div>
+            <div>
+                <label htmlFor="rest">Rest (Seconds)</label>
+                <input
+                    id="rest"
+                    type="number"
+                    placeholder="Enter rest time in seconds (optional)"
+                    value={rest}
+                    onChange={(e) => setRest(e.target.value)}
+                />
+            </div>
+            <div>
+                <label htmlFor="notes">Notes</label>
+                <textarea
+                    id="notes"
+                    placeholder="Add any notes (optional)"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                />
+            </div>
+            <button type="button" onClick={handleSubmit}>
+                Add Set
+            </button>
+        </form>
     );
 };
 

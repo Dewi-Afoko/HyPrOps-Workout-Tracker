@@ -1,10 +1,11 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
 from models import User, Workout, SetDicts
+from datetime import datetime
 from lib.utilities.helper_functions import find_set_dicts, find_single_set_dict, find_single_workout, find_user_from_jwt, find_user_workouts_list, workouts_as_dict, check_for_error
 from mongoengine import ValidationError
 from flask_restx import Resource
-from .restx_models import workout_ns, workout_get_success, workout_get_failure, single_workout_success, single_workout_failure, create_workout_request, create_workout_success, create_workout_failure, notes_request, notes_success, notes_failure, mark_complete_success, add_set_request, add_set_success, add_set_failure, mark_set_complete_success, delete_set_failure, delete_set_success, edit_workout_failure, edit_workout_request, edit_workout_success, edit_set_failure, edit_set_request, edit_set_success, delete_workout_failure, delete_workout_success
+from .restx_models import workout_ns, workout_get_success, workout_get_failure, single_workout_success, single_workout_failure, create_workout_request, create_workout_success, create_workout_failure, notes_request, notes_success, notes_failure, mark_complete_success, add_set_request, add_set_success, add_set_failure, mark_set_complete_success, delete_set_failure, delete_set_success, edit_workout_failure, edit_workout_request, edit_workout_success, edit_set_failure, edit_set_request, edit_set_success, delete_workout_failure, delete_workout_success,duplicated_set_failure,duplicated_set_success,duplicated_workout_failure,duplicated_workout_success
 
 
 
@@ -364,3 +365,89 @@ class DeleteWorkout(Resource):
 
         workout.delete()
         return {"message": f"Workout {workout_id} deleted successfully"}, 200
+
+@workout_ns.route('/<string:workout_id>/duplicate')
+class DuplicateWorkout(Resource):
+    @jwt_required()
+    @workout_ns.response(201, 'Workout duplicated successfully', duplicated_workout_success)
+    @workout_ns.response(404, 'Workout not found', duplicated_workout_failure)
+    @workout_ns.response(500, 'Internal server error', duplicated_workout_failure)
+    def post(self, workout_id):
+        user = find_user_from_jwt()
+        if check_for_error(user):
+            return user
+
+        workout = find_single_workout(workout_id)
+        if check_for_error(workout):
+            return workout
+
+        try:
+            # Create a new Workout by copying the existing one
+            duplicate_workout = Workout(
+                user_id=workout.user_id,
+                workout_name=f"{workout.workout_name} (Copy)",
+                date=datetime.now(),
+                notes=workout.notes,
+                set_dicts_list=[
+                    SetDicts(
+                        exercise_name=set_dict.exercise_name,
+                        set_type=set_dict.set_type,
+                        reps=set_dict.reps,
+                        loading=set_dict.loading,
+                        focus=set_dict.focus,
+                        rest=set_dict.rest,
+                        notes=set_dict.notes,
+                    )
+                    for set_dict in workout.set_dicts_list
+                ],
+            )
+            duplicate_workout.save()
+            return {"message": "Workout duplicated successfully", "workout": duplicate_workout.to_dict()}, 201
+        except Exception as e:
+            return {"error": f"Failed to duplicate workout: {str(e)}"}, 500
+        
+
+@workout_ns.route('/<string:workout_id>/<int:set_order>/duplicate_set')
+class DuplicateSet(Resource):
+    @jwt_required()
+    @workout_ns.response(200, 'Success', duplicated_set_success)
+    @workout_ns.response(404, 'Not Found', duplicated_set_failure)
+    @workout_ns.response(500, 'Internal Server Error', duplicated_set_failure)
+    def post(self, workout_id, set_order):
+        """Duplicate a set within a workout"""
+        user = find_user_from_jwt()
+        if check_for_error(user):
+            return user
+
+        workout = find_single_workout(workout_id)
+        if check_for_error(workout):
+            return workout
+
+        # Find the set to duplicate
+        set_to_duplicate = next(
+            (s for s in workout.set_dicts_list if s.set_order == set_order), None
+        )
+
+        if not set_to_duplicate:
+            return {'error': 'Set not found'}, 404
+
+        try:
+            # Duplicate the set
+            duplicated_set = set_to_duplicate.duplicate()
+
+            # Add to the workout's set_dicts_list
+            workout.set_dicts_list.append(duplicated_set)
+
+            # Recalculate the set orders and numbers
+            workout.format_workout()
+
+            # Save the workout (and its associated sets)
+            workout.save()
+
+            return {
+                'message': 'Set duplicated successfully',
+                'set': duplicated_set.to_dict()  # Ensure `to_dict` is implemented
+            }, 200
+
+        except Exception as e:
+            return {'error': f'Failed to duplicate set: {str(e)}'}, 500

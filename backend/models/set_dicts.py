@@ -38,3 +38,16 @@ class SetDicts(EmbeddedDocument):
             'complete' : self.complete
         }
     
+    def duplicate(self):
+        # Create a new instance of SetDicts with the same attributes
+        return SetDicts(
+            set_order=self.set_order,  # Optional, recalculate later if needed
+            exercise_name=self.exercise_name,
+            set_type=self.set_type,
+            reps=self.reps,
+            loading=self.loading,
+            focus=self.focus,
+            rest=self.rest,
+            notes=self.notes,
+            complete=self.complete,
+        )
