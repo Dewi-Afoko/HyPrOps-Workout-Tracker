@@ -1,7 +1,8 @@
 import React, { useState } from "react";
+import { Form, Button } from "react-bootstrap";
 import axios from "axios";
 
-const SetEdit = ({ workoutId, setOrder, exerciseName, onUpdateSuccess }) => {
+const SetEdit = ({ workoutId, setOrder, exerciseName, onUpdateSuccess, handleClose }) => {
     const [newExerciseName, setNewExerciseName] = useState(exerciseName || "");
     const [setType, setSetType] = useState("");
     const [reps, setReps] = useState("");
@@ -44,6 +45,7 @@ const SetEdit = ({ workoutId, setOrder, exerciseName, onUpdateSuccess }) => {
             );
             alert(response.data.message);
             onUpdateSuccess(); // Refresh the parent component
+            handleClose(); // Close the modal
         } catch (error) {
             console.error("Error updating set:", error);
             const errorMessage = error.response?.data?.error || "An error occurred";
@@ -52,82 +54,82 @@ const SetEdit = ({ workoutId, setOrder, exerciseName, onUpdateSuccess }) => {
     };
 
     return (
-        <form>
-            <div>
-                <label htmlFor="exerciseName">Exercise Name</label>
-                <input
-                    id="exerciseName"
+        <Form>
+            <Form.Group className="mb-3">
+                <Form.Label>Exercise Name</Form.Label>
+                <Form.Control
                     type="text"
                     placeholder="Enter exercise name"
                     value={newExerciseName}
                     onChange={(e) => setNewExerciseName(e.target.value)}
                 />
-            </div>
-            <div>
-                <label htmlFor="setType">Set Type</label>
-                <input
-                    id="setType"
+            </Form.Group>
+            <Form.Group className="mb-3">
+                <Form.Label>Set Type</Form.Label>
+                <Form.Control
                     type="text"
                     placeholder="Enter set type"
                     value={setType}
                     onChange={(e) => setSetType(e.target.value)}
                 />
-            </div>
-            <div>
-                <label htmlFor="reps">Reps</label>
-                <input
-                    id="reps"
+            </Form.Group>
+            <Form.Group className="mb-3">
+                <Form.Label>Reps</Form.Label>
+                <Form.Control
                     type="number"
                     placeholder="Enter reps"
                     value={reps}
                     onChange={(e) => setReps(e.target.value)}
                 />
-            </div>
-            <div>
-                <label htmlFor="loading">Loading (kg)</label>
-                <input
-                    id="loading"
+            </Form.Group>
+            <Form.Group className="mb-3">
+                <Form.Label>Loading (kg)</Form.Label>
+                <Form.Control
                     type="number"
                     step="0.1"
                     placeholder="Enter loading"
                     value={loading}
                     onChange={(e) => setLoading(e.target.value)}
                 />
-            </div>
-            <div>
-                <label htmlFor="focus">Focus</label>
-                <input
-                    id="focus"
+            </Form.Group>
+            <Form.Group className="mb-3">
+                <Form.Label>Focus</Form.Label>
+                <Form.Control
                     type="text"
                     placeholder="Enter focus"
                     value={focus}
                     onChange={(e) => setFocus(e.target.value)}
                 />
-            </div>
-            <div>
-                <label htmlFor="rest">Rest (seconds)</label>
-                <input
-                    id="rest"
+            </Form.Group>
+            <Form.Group className="mb-3">
+                <Form.Label>Rest (seconds)</Form.Label>
+                <Form.Control
                     type="number"
                     step="0.1"
                     placeholder="Enter rest time"
                     value={rest}
                     onChange={(e) => setRest(e.target.value)}
                 />
-            </div>
-            <div>
-                <label htmlFor="notes">Notes</label>
-                <textarea
-                    id="notes"
+            </Form.Group>
+            <Form.Group className="mb-3">
+                <Form.Label>Notes</Form.Label>
+                <Form.Control
+                    as="textarea"
+                    rows={3}
                     placeholder="Enter notes"
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                 />
+            </Form.Group>
+            <div className="d-flex justify-content-end">
+                <Button variant="secondary" onClick={handleClose} className="me-2">
+                    Cancel
+                </Button>
+                <Button variant="primary" onClick={handleEdit}>
+                    Update Set
+                </Button>
             </div>
-            <button type="button" onClick={handleEdit}>
-                Update Set
-            </button>
-        </form>
+        </Form>
     );
 };
 

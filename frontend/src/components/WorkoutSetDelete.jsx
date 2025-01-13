@@ -1,8 +1,13 @@
 import React from "react";
 import axios from "axios";
+import { Button } from "react-bootstrap";
 
 const SetDeleteButton = ({ workoutId, setOrder, onDeleteSuccess }) => {
     const handleDelete = async () => {
+        if (!window.confirm("Are you sure you want to delete this set?")) {
+            return;
+        }
+
         const token = localStorage.getItem("token");
 
         if (!token) {
@@ -29,9 +34,9 @@ const SetDeleteButton = ({ workoutId, setOrder, onDeleteSuccess }) => {
     };
 
     return (
-        <button onClick={handleDelete}>
-            Delete Set
-        </button>
+        <Button variant="danger" onClick={handleDelete}>
+            Delete
+        </Button>
     );
 };
 

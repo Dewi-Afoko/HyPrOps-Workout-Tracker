@@ -4,6 +4,7 @@ import axios from "axios";
 import SetEdit from "./WorkoutSetEdit";
 import AddSetToWorkout from "./WorkoutAddSet";
 import SetDuplicate from "./WorkoutSetDuplicate";
+import SetDeleteButton from "./WorkoutSetDelete";
 
 const WorkoutDetailsById = () => {
     const [thisWorkout, setThisWorkout] = useState(null);
@@ -62,32 +63,6 @@ const WorkoutDetailsById = () => {
         }
     };
 
-    const handleDeleteClick = async (setOrder) => {
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-            alert("Token not found in localStorage.");
-            return;
-        }
-
-        try {
-            const response = await axios.delete(
-                `http://127.0.0.1:5000/workouts/${thisWorkout.id}/delete_set/${setOrder}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            alert(response.data.message);
-            getThisWorkout(); // Refresh the table after deletion
-        } catch (error) {
-            console.error("Error deleting set:", error);
-            const errorMessage = error.response?.data?.error || "An error occurred";
-            alert(`Error deleting set: ${errorMessage}`);
-        }
-    };
-
     const handleAddSetClick = () => {
         setShowAddSetModal(true);
     };
@@ -107,13 +82,16 @@ const WorkoutDetailsById = () => {
             <p><strong>Sleep Quality:</strong> {thisWorkout.sleep_quality || "None"}</p>
             <p><strong>Complete:</strong> {thisWorkout.complete ? "Yes" : "No"}</p>
 
-            <Button
-                variant="primary"
-                onClick={handleAddSetClick}
-                style={{ marginBottom: "20px" }}
-            >
-                Add Set
-            </Button>
+
+            {/* Add Set Modal */}
+            <Button variant="primary" onClick={() => setShowAddSetModal(true)}>
+    Add Set
+</Button>
+<AddSetToWorkout
+    show={showAddSetModal}
+    handleClose={() => setShowAddSetModal(false)}
+    onSetAdded={getThisWorkout}
+/>
 
             <h2>Sets</h2>
             {thisWorkout.set_dicts_list?.length > 0 ? (
@@ -173,12 +151,11 @@ const WorkoutDetailsById = () => {
                                         </Button>
                                     </td>
                                     <td>
-                                        <Button
-                                            variant="danger"
-                                            onClick={() => handleDeleteClick(set.set_order)}
-                                        >
-                                            Delete
-                                        </Button>
+                                        <SetDeleteButton
+                                            workoutId={thisWorkout.id}
+                                            setOrder={set.set_order}
+                                            onDeleteSuccess={getThisWorkout}
+                                        />
                                     </td>
                                 </tr>
                             ))}
@@ -199,29 +176,15 @@ const WorkoutDetailsById = () => {
                             workoutId={thisWorkout.id}
                             setOrder={editSetData.set_order}
                             exerciseName={editSetData.exercise_name}
-                            onUpdateSuccess={() => {
-                                setShowEditModal(false);
-                                getThisWorkout();
-                            }}
+                            show={showEditModal}
+                            handleClose={() => setShowEditModal(false)}
+                            onUpdateSuccess={getThisWorkout}
                         />
                     )}
                 </Modal.Body>
             </Modal>
 
-            {/* Add Set Modal */}
-            <Modal show={showAddSetModal} onHide={() => setShowAddSetModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Add a Set</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <AddSetToWorkout
-                        onSetAdded={() => {
-                            setShowAddSetModal(false);
-                            getThisWorkout();
-                        }}
-                    />
-                </Modal.Body>
-            </Modal>
+
         </div>
     );
 };

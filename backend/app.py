@@ -6,6 +6,7 @@ from flask_jwt_extended import JWTManager
 import os
 from routes.restx_models import auth_ns, user_ns, workout_ns
 from flask_restx import Api
+from datetime import timedelta
 
 load_dotenv()
 
@@ -16,6 +17,7 @@ def create_app():
 
     CORS(app, resources={r"/*": {"origins": "*"}}, methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "default_secret_key")
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=4)
     JWTManager(app)
     app.config["TESTING"] = True
     # Initialize the database

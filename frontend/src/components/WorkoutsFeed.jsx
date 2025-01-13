@@ -5,12 +5,15 @@ import WorkoutEditDetails from "./WorkoutEditDetails";
 import WorkoutDelete from "./WorkoutDelete";
 import CreateWorkout from "./WorkoutCreate";
 import WorkoutDuplicate from "./WorkoutDuplicate";
+import { useNavigate } from "react-router-dom";
 
 const WorkoutsFeed = () => {
     const [myWorkouts, setMyWorkouts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editWorkoutId, setEditWorkoutId] = useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [refreshWorkouts, setRefreshWorkouts] = useState(false);
+    const navigate = useNavigate();
 
     const getMyWorkouts = async () => {
         const token = localStorage.getItem("token");
@@ -38,6 +41,21 @@ const WorkoutsFeed = () => {
         getMyWorkouts();
     }, [refreshWorkouts]);
 
+    const handleWorkoutClick = (workoutId) => {
+        localStorage.setItem("workout_id", workoutId);
+        navigate(`/thisworkout`); // Navigate to the workout details page
+    };
+
+    const handleEditClick = (workoutId) => {
+        setEditWorkoutId(workoutId);
+        setShowEditModal(true);
+    };
+
+    const handleCloseEditModal = () => {
+        setEditWorkoutId(null);
+        setShowEditModal(false);
+    };
+
     const toggleCompleteStatus = async (workoutId) => {
         const token = localStorage.getItem("token");
         if (!token) {
@@ -60,11 +78,6 @@ const WorkoutsFeed = () => {
             console.error("Error toggling workout status:", error);
             alert("Failed to toggle workout status.");
         }
-    };
-
-    const handleWorkoutClick = (workoutId) => {
-        localStorage.setItem("workout_id", workoutId);
-        window.location.href = "/thisworkout"; // Navigate to the workout details page
     };
 
     if (loading) {
@@ -100,7 +113,7 @@ const WorkoutsFeed = () => {
                             <tr key={workout.id}>
                                 <td
                                     style={{ color: "blue", cursor: "pointer" }}
-                                    onClick={() => handleWorkoutClick(workout.id)}
+                                    onClick={() => handleWorkoutClick(workout.id)} // Navigate to specific workout
                                 >
                                     {workout.workout_name}
                                 </td>
@@ -121,21 +134,9 @@ const WorkoutsFeed = () => {
                                     />
                                 </td>
                                 <td>
-                                    <Button
-                                        variant="info"
-                                        onClick={() => setEditWorkoutId(workout.id)}
-                                    >
+                                    <Button variant="info" onClick={() => handleEditClick(workout.id)}>
                                         Edit
                                     </Button>
-                                    {editWorkoutId === workout.id && (
-                                        <WorkoutEditDetails
-                                            workoutId={workout.id}
-                                            onUpdateSuccess={() => {
-                                                setEditWorkoutId(null);
-                                                setRefreshWorkouts(!refreshWorkouts);
-                                            }}
-                                        />
-                                    )}
                                 </td>
                                 <td>
                                     <WorkoutDelete
@@ -148,6 +149,25 @@ const WorkoutsFeed = () => {
                     })}
                 </tbody>
             </Table>
+
+            {/* Edit Workout Modal */}
+            <Modal show={showEditModal} onHide={handleCloseEditModal} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Workout Details</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {editWorkoutId && (
+                        <WorkoutEditDetails
+                            workoutId={editWorkoutId}
+                            onUpdateSuccess={() => {
+                                handleCloseEditModal();
+                                setRefreshWorkouts(!refreshWorkouts);
+                            }}
+                            handleClose={handleCloseEditModal}
+                        />
+                    )}
+                </Modal.Body>
+            </Modal>
         </div>
     );
 };

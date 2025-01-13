@@ -401,6 +401,7 @@ class DuplicateWorkout(Resource):
                     for set_dict in workout.set_dicts_list
                 ],
             )
+            duplicate_workout.format_workout()
             duplicate_workout.save()
             return {"message": "Workout duplicated successfully", "workout": duplicate_workout.to_dict()}, 201
         except Exception as e:
