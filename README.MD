@@ -1,5 +1,8 @@
 # This isn't an actual read me, this is just so I can remember the last thing I did... 😅
 
+## Update!
+Exciting news, the MVP/Alpha is built and ready to use! I'll use it for my workouts this week, use that as an opportunity to find any bugs, then clean up code, documentation and any bug fixes next week! 🍾
+
 ### v3 - Three Model Version
 
     - Reduced complexity by moving to three models
@@ -12,7 +15,7 @@
 
 ## Next Goals
 
-    - Create a user-friendly interface
-        - Split workouts into complete and incomplete feeds
-        - Copy/Use workout as template
+    - Create a user-friendly interface ✅
+        - Split workouts into complete and incomplete feeds ✅
+        - Copy/Use workout as template ✅
 
