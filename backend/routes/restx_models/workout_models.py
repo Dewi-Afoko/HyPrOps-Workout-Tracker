@@ -151,3 +151,25 @@ delete_workout_success = workout_ns.model('DeleteWorkoutSuccess', {
 delete_workout_failure = workout_ns.model('DeleteWorkoutFailure', {
     'error': fields.String(description='Error message describing why the deletion failed'),
 })
+
+# Model for a successful duplication response
+duplicated_set_success = workout_ns.model('DuplicateSetSuccess', {
+    'message': fields.String(description='Confirmation message that the set was duplicated successfully'),
+    'set': fields.Nested(set_dict_model, description='Details of the duplicated set')
+})
+
+# Model for a failure response
+duplicated_set_failure = workout_ns.model('DuplicateSetFailure', {
+    'error': fields.String(description='Error message describing the failure')
+})
+
+
+duplicated_workout_success = workout_ns.model('DuplicatedWorkoutSuccess', {
+    'message': fields.String(description='Confirmation that the workout was duplicated successfully'),
+    'workout': fields.Raw(description='Details of the duplicated workout'),
+})
+
+duplicated_workout_failure = workout_ns.model('DuplicatedWorkoutFailure', {
+    'error': fields.String(description='An error message indicating the workout could not be duplicated'),
+})
+

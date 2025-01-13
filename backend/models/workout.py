@@ -71,7 +71,7 @@ class Workout(Document):
             "workout_name": self.workout_name,
             "date": self.date.strftime('%Y/%m/%d') if self.date else None,  # Properly serialize date
             "complete": self.complete,
-            "sets_dict_list": [set_dict.to_dict() for set_dict in self.set_dicts_list],
+            "set_dicts_list": [set_dict.to_dict() for set_dict in self.set_dicts_list],
             "user_weight": float(self.user_weight) if self.user_weight else None,
             "sleep_score": self.sleep_score,
             "sleep_quality": self.sleep_quality,

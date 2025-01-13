@@ -3,13 +3,17 @@ import { Table, Button, Modal } from "react-bootstrap";
 import axios from "axios";
 import WorkoutEditDetails from "./WorkoutEditDetails";
 import WorkoutDelete from "./WorkoutDelete";
+import CreateWorkout from "./WorkoutCreate";
+import WorkoutDuplicate from "./WorkoutDuplicate";
+import { useNavigate } from "react-router-dom";
 
 const WorkoutsFeed = () => {
     const [myWorkouts, setMyWorkouts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [showEditModal, setShowEditModal] = useState(false);
     const [editWorkoutId, setEditWorkoutId] = useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [refreshWorkouts, setRefreshWorkouts] = useState(false);
+    const navigate = useNavigate();
 
     const getMyWorkouts = async () => {
         const token = localStorage.getItem("token");
@@ -37,6 +41,21 @@ const WorkoutsFeed = () => {
         getMyWorkouts();
     }, [refreshWorkouts]);
 
+    const handleWorkoutClick = (workoutId) => {
+        localStorage.setItem("workout_id", workoutId);
+        navigate(`/thisworkout`); // Navigate to the workout details page
+    };
+
+    const handleEditClick = (workoutId) => {
+        setEditWorkoutId(workoutId);
+        setShowEditModal(true);
+    };
+
+    const handleCloseEditModal = () => {
+        setEditWorkoutId(null);
+        setShowEditModal(false);
+    };
+
     const toggleCompleteStatus = async (workoutId) => {
         const token = localStorage.getItem("token");
         if (!token) {
@@ -61,21 +80,6 @@ const WorkoutsFeed = () => {
         }
     };
 
-    const handleWorkoutClick = (workoutId) => {
-        localStorage.setItem("workout_id", workoutId);
-        window.location.href = "/thisworkout"; // Navigate to the workout details page
-    };
-
-    const handleEditClick = (workoutId) => {
-        setEditWorkoutId(workoutId);
-        setShowEditModal(true);
-    };
-
-    const handleDeleteSuccess = () => {
-        alert("Workout deleted successfully.");
-        setRefreshWorkouts(!refreshWorkouts); // Refresh the workouts table after deletion
-    };
-
     if (loading) {
         return <div>Loading workouts...</div>;
     }
@@ -86,6 +90,7 @@ const WorkoutsFeed = () => {
 
     return (
         <div>
+            <CreateWorkout onCreateSuccess={() => setRefreshWorkouts(!refreshWorkouts)} />
             <h3>Workouts</h3>
             <Table striped bordered hover>
                 <thead>
@@ -94,20 +99,21 @@ const WorkoutsFeed = () => {
                         <th>Date</th>
                         <th>Lifts</th>
                         <th>Complete</th>
+                        <th>Duplicate Workout</th>
                         <th>Edit</th>
                         <th>Delete</th>
                     </tr>
                 </thead>
                 <tbody>
                     {myWorkouts.map((workout) => {
-                        const uniqueLifts = workout.sets_dict_list
-                            ? [...new Set(workout.sets_dict_list.map((set) => set.exercise_name))]
+                        const uniqueLifts = workout.set_dicts_list
+                            ? [...new Set(workout.set_dicts_list.map((set) => set.exercise_name))]
                             : [];
                         return (
                             <tr key={workout.id}>
                                 <td
                                     style={{ color: "blue", cursor: "pointer" }}
-                                    onClick={() => handleWorkoutClick(workout.id)}
+                                    onClick={() => handleWorkoutClick(workout.id)} // Navigate to specific workout
                                 >
                                     {workout.workout_name}
                                 </td>
@@ -122,29 +128,22 @@ const WorkoutsFeed = () => {
                                     </Button>
                                 </td>
                                 <td>
-                                {editWorkoutId === workout.id && (
-                                    <WorkoutEditDetails
+                                    <WorkoutDuplicate
                                         workoutId={workout.id}
-                                        onUpdateSuccess={() => {
-                                            setEditWorkoutId(null);
-                                            setRefreshWorkouts(!refreshWorkouts);
-                                        }}
-                                        onClose={() => setEditWorkoutId(null)}
+                                        onDuplicateSuccess={() => setRefreshWorkouts(!refreshWorkouts)}
                                     />
-                                )}
-                                <Button
-                                    variant="info"
-                                    onClick={() => setEditWorkoutId(workout.id)}
-                                >
-                                    Edit
-                                </Button>
-                            </td>
-                            <td>
-                                <WorkoutDelete
-                                    workoutId={workout.id}
-                                    onDeleteSuccess={() => setRefreshWorkouts(!refreshWorkouts)} // Trigger a refresh
-                                />
-                            </td>
+                                </td>
+                                <td>
+                                    <Button variant="info" onClick={() => handleEditClick(workout.id)}>
+                                        Edit
+                                    </Button>
+                                </td>
+                                <td>
+                                    <WorkoutDelete
+                                        workoutId={workout.id}
+                                        onDeleteSuccess={() => setRefreshWorkouts(!refreshWorkouts)}
+                                    />
+                                </td>
                             </tr>
                         );
                     })}
@@ -152,18 +151,19 @@ const WorkoutsFeed = () => {
             </Table>
 
             {/* Edit Workout Modal */}
-            <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+            <Modal show={showEditModal} onHide={handleCloseEditModal} centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>Edit Workout</Modal.Title>
+                    <Modal.Title>Edit Workout Details</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {editWorkoutId && (
                         <WorkoutEditDetails
                             workoutId={editWorkoutId}
                             onUpdateSuccess={() => {
-                                setShowEditModal(false);
+                                handleCloseEditModal();
                                 setRefreshWorkouts(!refreshWorkouts);
                             }}
+                            handleClose={handleCloseEditModal}
                         />
                     )}
                 </Modal.Body>

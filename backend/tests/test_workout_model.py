@@ -62,7 +62,7 @@ def test_to_dict_method(burrito_workout, warm_up_shoulder_press):
         "workout_name": burrito_workout.workout_name,
         "date": burrito_workout.date.isoformat() if burrito_workout.date else None,
         "complete": burrito_workout.complete,
-        "sets_dict_list": [warm_up_shoulder_press.to_dict()],
+        "set_dicts_list": [warm_up_shoulder_press.to_dict()],
         "notes": burrito_workout.notes,
         "sleep_score" : burrito_workout.sleep_score,
         "sleep_quality" : burrito_workout.sleep_quality,

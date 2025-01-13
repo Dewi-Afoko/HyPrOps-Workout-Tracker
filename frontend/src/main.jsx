@@ -15,7 +15,7 @@ import { AllMyWorkouts } from "./pages/WorkoutFeed/AllMyWorkouts";
 const App = () => {
     return (
         <div style={{ textAlign: "center", marginTop: "50px" }}>
-                        <h1>HyPrOps Fullstack Workout App</h1>
+                        <h1>HyPrOps Granular Workout App ALPHA</h1>
         <BrowserRouter>
         <NavBar/>
         <Routes>

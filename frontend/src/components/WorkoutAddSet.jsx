@@ -1,8 +1,8 @@
 import React, { useState } from "react";
+import { Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
 
-const AddSetToWorkout = ({ onSetAdded = () => {}}) => {
-    const [showModal, setShowModal] = useState(false);
+const AddSetToWorkout = ({ show, handleClose, onSetAdded }) => {
     const [exerciseName, setExerciseName] = useState("");
     const [setType, setSetType] = useState("");
     const [reps, setReps] = useState("");
@@ -45,8 +45,8 @@ const AddSetToWorkout = ({ onSetAdded = () => {}}) => {
                 }
             );
             alert(response.data.message);
-            setShowModal(false); // Close the modal
             onSetAdded(); // Notify parent component to refresh data
+            handleClose(); // Close the modal
         } catch (error) {
             console.error("Error adding set:", error);
             const errorMessage = error.response?.data?.error || "An error occurred";
@@ -55,119 +55,87 @@ const AddSetToWorkout = ({ onSetAdded = () => {}}) => {
     };
 
     return (
-        <div>
-            {/* Button to open modal */}
-            <button onClick={() => setShowModal(true)}>Add Set</button>
-
-            {/* Modal */}
-            {showModal && (
-                <div
-                    style={{
-                        position: "fixed",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "100%",
-                        backgroundColor: "rgba(0, 0, 0, 0.5)",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                    }}
-                >
-                    <div
-                        style={{
-                            backgroundColor: "white",
-                            padding: "20px",
-                            borderRadius: "8px",
-                            width: "400px",
-                        }}
-                    >
-                        <h2>Add a Set</h2>
-                        <form>
-                            <div>
-                                <label htmlFor="exerciseName">Exercise Name</label>
-                                <input
-                                    id="exerciseName"
-                                    type="text"
-                                    placeholder="Enter exercise name"
-                                    value={exerciseName}
-                                    onChange={(e) => setExerciseName(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="setType">Set Type</label>
-                                <input
-                                    id="setType"
-                                    type="text"
-                                    placeholder="Enter set type (optional)"
-                                    value={setType}
-                                    onChange={(e) => setSetType(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="reps">Reps</label>
-                                <input
-                                    id="reps"
-                                    type="number"
-                                    placeholder="Enter number of reps (optional)"
-                                    value={reps}
-                                    onChange={(e) => setReps(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="loading">Loading (Weight)</label>
-                                <input
-                                    id="loading"
-                                    type="number"
-                                    placeholder="Enter loading in kg (optional)"
-                                    value={loading}
-                                    onChange={(e) => setLoading(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="focus">Focus</label>
-                                <input
-                                    id="focus"
-                                    type="text"
-                                    placeholder="Enter focus (optional)"
-                                    value={focus}
-                                    onChange={(e) => setFocus(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="rest">Rest (Seconds)</label>
-                                <input
-                                    id="rest"
-                                    type="number"
-                                    placeholder="Enter rest time in seconds (optional)"
-                                    value={rest}
-                                    onChange={(e) => setRest(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="notes">Notes</label>
-                                <textarea
-                                    id="notes"
-                                    placeholder="Add any notes (optional)"
-                                    value={notes}
-                                    onChange={(e) => setNotes(e.target.value)}
-                                />
-                            </div>
-                            <button type="button" onClick={handleSubmit}>
-                                Add Set
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setShowModal(false)}
-                                style={{ marginLeft: "10px" }}
-                            >
-                                Cancel
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            )}
-        </div>
+        <Modal show={show} onHide={handleClose} centered>
+            <Modal.Header closeButton>
+                <Modal.Title>Add a New Set</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Form>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Exercise Name</Form.Label>
+                        <Form.Control
+                            type="text"
+                            placeholder="Enter exercise name"
+                            value={exerciseName}
+                            onChange={(e) => setExerciseName(e.target.value)}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Set Type</Form.Label>
+                        <Form.Control
+                            type="text"
+                            placeholder="Enter set type (optional)"
+                            value={setType}
+                            onChange={(e) => setSetType(e.target.value)}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Reps</Form.Label>
+                        <Form.Control
+                            type="number"
+                            placeholder="Enter number of reps (optional)"
+                            value={reps}
+                            onChange={(e) => setReps(e.target.value)}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Loading (kg)</Form.Label>
+                        <Form.Control
+                            type="number"
+                            placeholder="Enter loading (optional)"
+                            value={loading}
+                            onChange={(e) => setLoading(e.target.value)}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Focus</Form.Label>
+                        <Form.Control
+                            type="text"
+                            placeholder="Enter focus (optional)"
+                            value={focus}
+                            onChange={(e) => setFocus(e.target.value)}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Rest (seconds)</Form.Label>
+                        <Form.Control
+                            type="number"
+                            placeholder="Enter rest time (optional)"
+                            value={rest}
+                            onChange={(e) => setRest(e.target.value)}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Notes</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            rows={3}
+                            placeholder="Add any notes (optional)"
+                            value={notes}
+                            onChange={(e) => setNotes(e.target.value)}
+                        />
+                    </Form.Group>
+                </Form>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                    Cancel
+                </Button>
+                <Button variant="primary" onClick={handleSubmit}>
+                    Add Set
+                </Button>
+            </Modal.Footer>
+        </Modal>
     );
 };
 

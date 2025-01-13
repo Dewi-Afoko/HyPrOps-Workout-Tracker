@@ -7,7 +7,6 @@ export function SpecificWorkout() {
     return(
         <div>
 <WorkoutDetailsById/>
-<AddSetToWorkout/>
         </div>
     )
 }

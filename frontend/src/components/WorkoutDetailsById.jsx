@@ -2,11 +2,15 @@ import React, { useState, useEffect } from "react";
 import { Table, Button, Modal } from "react-bootstrap";
 import axios from "axios";
 import SetEdit from "./WorkoutSetEdit";
+import AddSetToWorkout from "./WorkoutAddSet";
+import SetDuplicate from "./WorkoutSetDuplicate";
+import SetDeleteButton from "./WorkoutSetDelete";
 
 const WorkoutDetailsById = () => {
     const [thisWorkout, setThisWorkout] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [editSetData, setEditSetData] = useState(null);
+    const [showAddSetModal, setShowAddSetModal] = useState(false);
 
     const getThisWorkout = async () => {
         const token = localStorage.getItem("token");
@@ -38,7 +42,7 @@ const WorkoutDetailsById = () => {
     }, []);
 
     const handleEditClick = (setData) => {
-        setEditSetData(setData); // Open the modal with the set data
+        setEditSetData(setData);
         setShowEditModal(true);
     };
 
@@ -59,30 +63,8 @@ const WorkoutDetailsById = () => {
         }
     };
 
-    const handleDeleteClick = async (setOrder) => {
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-            alert("Token not found in localStorage.");
-            return;
-        }
-
-        try {
-            const response = await axios.delete(
-                `http://127.0.0.1:5000/workouts/${thisWorkout.id}/delete_set/${setOrder}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            alert(response.data.message);
-            getThisWorkout(); // Refresh the table after deletion
-        } catch (error) {
-            console.error("Error deleting set:", error);
-            const errorMessage = error.response?.data?.error || "An error occurred";
-            alert(`Error deleting set: ${errorMessage}`);
-        }
+    const handleAddSetClick = () => {
+        setShowAddSetModal(true);
     };
 
     if (!thisWorkout) {
@@ -95,11 +77,24 @@ const WorkoutDetailsById = () => {
             <p><strong>ID:</strong> {thisWorkout.id}</p>
             <p><strong>Name:</strong> {thisWorkout.workout_name}</p>
             <p><strong>Date:</strong> {thisWorkout.date.split("T")[0]}</p>
-            <p><strong>Notes:</strong> {thisWorkout.notes || "None"}</p>
+            <p><strong>Weight:</strong> {thisWorkout.user_weight || "None"}</p>
+            <p><strong>Sleep Score:</strong> {thisWorkout.sleep_score || "None"}</p>
+            <p><strong>Sleep Quality:</strong> {thisWorkout.sleep_quality || "None"}</p>
             <p><strong>Complete:</strong> {thisWorkout.complete ? "Yes" : "No"}</p>
 
+
+            {/* Add Set Modal */}
+            <Button variant="primary" onClick={() => setShowAddSetModal(true)}>
+    Add Set
+</Button>
+<AddSetToWorkout
+    show={showAddSetModal}
+    handleClose={() => setShowAddSetModal(false)}
+    onSetAdded={getThisWorkout}
+/>
+
             <h2>Sets</h2>
-            {thisWorkout.sets_dict_list?.length > 0 ? (
+            {thisWorkout.set_dicts_list?.length > 0 ? (
                 <Table striped bordered hover>
                     <thead>
                         <tr>
@@ -113,12 +108,13 @@ const WorkoutDetailsById = () => {
                             <th>Rest</th>
                             <th>Notes</th>
                             <th>Complete</th>
+                            <th>Duplicate Set</th>
                             <th>Edit</th>
                             <th>Delete</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {thisWorkout.sets_dict_list
+                        {thisWorkout.set_dicts_list
                             .sort((a, b) => a.set_order - b.set_order)
                             .map((set) => (
                                 <tr key={set.set_order}>
@@ -140,6 +136,13 @@ const WorkoutDetailsById = () => {
                                         </Button>
                                     </td>
                                     <td>
+                                        <SetDuplicate
+                                            workoutId={thisWorkout.id}
+                                            setOrder={set.set_order}
+                                            onDuplicateSuccess={getThisWorkout}
+                                        />
+                                    </td>
+                                    <td>
                                         <Button
                                             variant="info"
                                             onClick={() => handleEditClick(set)}
@@ -148,12 +151,11 @@ const WorkoutDetailsById = () => {
                                         </Button>
                                     </td>
                                     <td>
-                                        <Button
-                                            variant="danger"
-                                            onClick={() => handleDeleteClick(set.set_order)}
-                                        >
-                                            Delete
-                                        </Button>
+                                        <SetDeleteButton
+                                            workoutId={thisWorkout.id}
+                                            setOrder={set.set_order}
+                                            onDeleteSuccess={getThisWorkout}
+                                        />
                                     </td>
                                 </tr>
                             ))}
@@ -165,23 +167,23 @@ const WorkoutDetailsById = () => {
 
             {/* Edit Modal */}
             <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
-    <Modal.Header closeButton>
-        <Modal.Title>Edit Set</Modal.Title>
-    </Modal.Header>
-    <Modal.Body>
-        {editSetData && (
-            <SetEdit
-                workoutId={thisWorkout.id}
-                setOrder={editSetData.set_order}
-                exerciseName={editSetData.exercise_name}
-                onUpdateSuccess={() => {
-                    setShowEditModal(false);
-                    getThisWorkout();
-                }}
-            />
-        )}
-    </Modal.Body>
-</Modal>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Set</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {editSetData && (
+                        <SetEdit
+                            workoutId={thisWorkout.id}
+                            setOrder={editSetData.set_order}
+                            exerciseName={editSetData.exercise_name}
+                            show={showEditModal}
+                            handleClose={() => setShowEditModal(false)}
+                            onUpdateSuccess={getThisWorkout}
+                        />
+                    )}
+                </Modal.Body>
+            </Modal>
+
 
         </div>
     );
