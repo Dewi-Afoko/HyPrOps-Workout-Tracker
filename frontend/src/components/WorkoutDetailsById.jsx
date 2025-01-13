@@ -124,8 +124,8 @@ const WorkoutDetailsById = () => {
                                     <td>{set.set_type || "N/A"}</td>
                                     <td>{set.focus || "N/A"}</td>
                                     <td>{set.reps || "N/A"}</td>
-                                    <td>{set.loading || "N/A"}</td>
-                                    <td>{set.rest || "N/A"}</td>
+                                    <td>{set.loading ? `${set.loading}kg` : "Bodyweight"}</td>
+                                    <td>{set.rest || "N/A"} secs</td>
                                     <td>{set.notes || "N/A"}</td>
                                     <td>
                                         <Button
