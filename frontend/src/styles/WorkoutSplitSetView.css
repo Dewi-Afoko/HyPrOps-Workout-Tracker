@@ -1,0 +1,20 @@
+.split-set-view {
+    padding: 20px;
+}
+
+.table-container {
+    overflow-x: auto; /* Horizontal scroll for tables */
+    max-height: 500px; /* Limit height to prevent clipping */
+    overflow-y: auto; /* Vertical scroll for long tables */
+    margin-bottom: 20px;
+    border: 1px solid #ddd; /* Optional border */
+    padding: 10px;
+    background-color: #f9f9f9; /* Light background for contrast */
+    border-radius: 8px;
+}
+
+.table-container h3 {
+    margin-bottom: 15px;
+    font-weight: bold;
+    text-align: center;
+}

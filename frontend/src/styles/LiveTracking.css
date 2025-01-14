@@ -1,0 +1,33 @@
+/* LiveTracking.css */
+.live-tracking-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+.next-five {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.split-view-and-details {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.split-view {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.split-view > div {
+    flex: 1;
+    overflow-x: auto;
+}
+
+.details-view {
+    width: 100%;
+}

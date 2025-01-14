@@ -97,6 +97,7 @@ const WorkoutsFeed = () => {
                     <tr>
                         <th>Name</th>
                         <th>Date</th>
+                        <th>Notes</th>
                         <th>Lifts</th>
                         <th>Complete</th>
                         <th>Duplicate Workout</th>
@@ -118,6 +119,7 @@ const WorkoutsFeed = () => {
                                     {workout.workout_name}
                                 </td>
                                 <td>{workout.date.split("T")[0]}</td>
+                                <td>{workout.notes}</td>
                                 <td>{uniqueLifts.length > 0 ? uniqueLifts.join(", ") : "No exercises"}</td>
                                 <td>
                                     <Button

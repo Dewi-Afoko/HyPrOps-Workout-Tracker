@@ -3,10 +3,11 @@ import WorkoutDetailsById from "../../components/WorkoutDetailsById"
 
 
 export function SpecificWorkout() {
+    const workoutId = localStorage.getItem('workout_id')
 
     return(
         <div>
-<WorkoutDetailsById/>
+<WorkoutDetailsById workoutId={workoutId}/>
         </div>
     )
 }

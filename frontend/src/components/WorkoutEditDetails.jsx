@@ -8,8 +8,9 @@ const WorkoutEditDetails = ({ workoutId, onUpdateSuccess, handleClose }) => {
     const [userWeight, setUserWeight] = useState("");
     const [sleepScore, setSleepScore] = useState("");
     const [sleepQuality, setSleepQuality] = useState("");
+    const [notes, setNotes] = useState("");
 
-    const handleSubmit = async () => {
+    const handleSubmitDetails = async () => {
         const token = localStorage.getItem("token");
         if (!token) {
             alert("Token not found in localStorage.");
@@ -46,6 +47,45 @@ const WorkoutEditDetails = ({ workoutId, onUpdateSuccess, handleClose }) => {
             const errorMessage = error.response?.data?.error || "An error occurred";
             alert(`Error updating workout details: ${errorMessage}`);
         }
+    };
+
+    const handleSubmitNotes = async () => {
+        if (!notes) {
+            alert("Please enter notes to add.");
+            return;
+        }
+
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("Token not found in localStorage.");
+            return;
+        }
+
+        try {
+            const response = await axios.patch(
+                `http://127.0.0.1:5000/workouts/${workoutId}/add_notes`,
+                { notes },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            alert(response.data.message);
+            onUpdateSuccess(); // Notify the parent to refresh data
+        } catch (error) {
+            console.error("Error adding notes:", error);
+            const errorMessage = error.response?.data?.error || "An error occurred";
+            alert(`Error adding notes: ${errorMessage}`);
+        }
+    };
+
+    const handleSubmit = () => {
+        handleSubmitDetails(); // Update workout details
+        if (notes) {
+            handleSubmitNotes(); // Add notes if provided
+        }
+        handleClose(); // Close modal
     };
 
     return (
@@ -92,6 +132,16 @@ const WorkoutEditDetails = ({ workoutId, onUpdateSuccess, handleClose }) => {
                     placeholder="Enter sleep quality"
                     value={sleepQuality}
                     onChange={(e) => setSleepQuality(e.target.value)}
+                />
+            </Form.Group>
+            <Form.Group className="mb-3">
+                <Form.Label>Workout Notes</Form.Label>
+                <Form.Control
+                    as="textarea"
+                    rows={3}
+                    placeholder="Add any notes"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
                 />
             </Form.Group>
             <div className="d-flex justify-content-end">
