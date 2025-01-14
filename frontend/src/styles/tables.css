@@ -24,3 +24,27 @@ button {
     padding: 5px 10px;
     font-size: 14px;
 }
+.split-set-view {
+    display: flex;
+    justify-content: space-between; /* Space between the tables */
+    gap: 20px; /* Add spacing between the tables */
+    width: 100%;
+}
+
+.table-container {
+    flex: 1; /* Allow tables to take equal space */
+    overflow-x: auto; /* Enable horizontal scrolling if the table overflows */
+    margin: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Add some shadow for better separation */
+    border-radius: 5px; /* Rounded corners for better aesthetics */
+    background-color: #f9f9f9; /* Optional: Background color for better distinction */
+}
+.table-container tbody tr td {
+    transition: color 0.2s ease-in-out;
+}
+
+.table-container tbody tr td:hover {
+    color: #0056b3; /* Hover color for exercise name */
+    text-decoration: underline;
+}

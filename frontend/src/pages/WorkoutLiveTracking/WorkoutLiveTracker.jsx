@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import WorkoutSplitSetView from "../../components/WorkoutSpliSetView";
 import NextFiveSets from "../../components/WorkoutNextFiveSets";
-import WorkoutDetailsById from "../../components/WorkoutDetailsById";
 import axios from "axios";
-import "../../styles/LiveTracking.css";
+import "../../styles/tables.css";
 
 export function LiveTracking() {
     const workoutId = localStorage.getItem("workout_id");
@@ -51,8 +50,8 @@ export function LiveTracking() {
                 <NextFiveSets workoutData={workoutData} onSetUpdate={handleSetUpdate} />
             </div>
 
-            {/* Split view section */}
-            <div className="split-view">
+
+            <div>
                 <WorkoutSplitSetView workoutData={workoutData} onSetUpdate={handleSetUpdate} />
             </div>
 
