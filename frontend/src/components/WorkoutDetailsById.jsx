@@ -13,7 +13,6 @@ const WorkoutDetailsById = ({ workoutId, workoutData, onSetUpdate }) => {
     const [editSetData, setEditSetData] = useState(null);
     const [showAddSetModal, setShowAddSetModal] = useState(false);
 
-    // Fetch workout data if not passed as a prop
     const fetchWorkoutData = async () => {
         const token = localStorage.getItem("token");
 
@@ -76,15 +75,6 @@ const WorkoutDetailsById = ({ workoutId, workoutData, onSetUpdate }) => {
 
     return (
         <div>
-            <h1>Workout Details</h1>
-            <p><strong>ID:</strong> {currentWorkoutData.id}</p>
-            <p><strong>Name:</strong> {currentWorkoutData.workout_name}</p>
-            <p><strong>Date:</strong> {currentWorkoutData.date.split("T")[0]}</p>
-            <p><strong>Weight:</strong> {currentWorkoutData.user_weight || "None"}</p>
-            <p><strong>Sleep Score:</strong> {currentWorkoutData.sleep_score || "None"}</p>
-            <p><strong>Sleep Quality:</strong> {currentWorkoutData.sleep_quality || "None"}</p>
-            <p><strong>Complete:</strong> {currentWorkoutData.complete ? "Yes" : "No"}</p>
-
             <Button
                 variant="primary"
                 onClick={handleAddSetClick}

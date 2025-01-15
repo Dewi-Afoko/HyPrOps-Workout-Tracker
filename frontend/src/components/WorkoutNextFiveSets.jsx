@@ -4,7 +4,7 @@ import axios from "axios";
 import "./../styles/tables.css"; // Ensure consistent table styling across the app
 
 const NextFiveSets = ({ workoutData, onSetUpdate }) => {
-    const handleCompleteClick = async (setOrder) => {
+    const handleCompleteClick = async (setOrder, restTime) => {
         const token = localStorage.getItem("token");
         if (!token) {
             alert("Token not found in localStorage.");
@@ -19,7 +19,7 @@ const NextFiveSets = ({ workoutData, onSetUpdate }) => {
                     headers: { Authorization: `Bearer ${token}` },
                 }
             );
-            onSetUpdate(); // Notify parent to refresh workout data
+            onSetUpdate(restTime); // Pass restTime to trigger countdown
         } catch (error) {
             console.error("Error marking set complete:", error);
             alert("Failed to update set status.");
@@ -62,12 +62,16 @@ const NextFiveSets = ({ workoutData, onSetUpdate }) => {
                                 <td>{set.rest || "N/A"} s</td>
                                 <td>{set.notes || "N/A"}</td>
                                 <td>
-                                    <Button
-                                        variant="success"
-                                        onClick={() => handleCompleteClick(set.set_order)}
-                                    >
-                                        Mark Complete
-                                    </Button>
+                                <Button
+    variant="success"
+    onClick={() => {
+        handleCompleteClick(set.set_order);
+        onSetUpdate(set.rest); // Pass the rest time to trigger the timer
+    }}
+>
+    Mark Complete
+</Button>
+
                                 </td>
                             </tr>
                         ))}
@@ -81,4 +85,3 @@ const NextFiveSets = ({ workoutData, onSetUpdate }) => {
 };
 
 export default NextFiveSets;
-

@@ -48,3 +48,36 @@ button {
     color: #0056b3; /* Hover color for exercise name */
     text-decoration: underline;
 }
+/* Timer Container */
+.countdown-timer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #f8f9fa; /* Light background */
+    border: 2px solid #dee2e6; /* Subtle border */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    width: fit-content;
+    font-family: 'Arial', sans-serif; /* Consistent font */
+}
+
+/* Timer Display Text */
+.timer-display {
+    font-size: 1.5rem; /* Large and readable */
+    font-weight: bold;
+    color: #343a40; /* Dark color for good contrast */
+}
+
+/* Blinking Effect for Last 10 Seconds */
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.timer-display.blink {
+    animation: blink 1s infinite;
+    color: #dc3545; /* Danger red for urgency */
+}
