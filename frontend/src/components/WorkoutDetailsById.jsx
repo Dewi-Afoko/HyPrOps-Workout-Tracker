@@ -36,10 +36,8 @@ const WorkoutDetailsById = ({ workoutId, workoutData, onSetUpdate }) => {
     };
 
     useEffect(() => {
-        if (!workoutData) {
-            fetchWorkoutData();
-        }
-    }, [workoutId, workoutData]);
+        fetchWorkoutData();
+    }, [workoutId]);
 
     const handleEditClick = (setData) => {
         setEditSetData(setData);
@@ -67,7 +65,7 @@ const WorkoutDetailsById = ({ workoutId, workoutData, onSetUpdate }) => {
         }
     };
 
-    const currentWorkoutData = workoutData || localWorkoutData;
+    const currentWorkoutData = localWorkoutData;
 
     if (!currentWorkoutData) {
         return <div>Loading workout details...</div>;
@@ -176,18 +174,20 @@ const WorkoutDetailsById = ({ workoutId, workoutData, onSetUpdate }) => {
 
             {/* Add Set Modal */}
             <Modal show={showAddSetModal} onHide={() => setShowAddSetModal(false)} centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>Add a Set</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <AddSetToWorkout
-                        onSetAdded={() => {
-                            setShowAddSetModal(false);
-                            fetchWorkoutData();
-                        }}
-                    />
-                </Modal.Body>
-            </Modal>
+    <Modal.Header closeButton>
+        <Modal.Title>Add a New Set</Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
+        <AddSetToWorkout
+            workoutId={workoutId}
+            onSetAdded={() => {
+                setShowAddSetModal(false);
+                fetchWorkoutData();
+            }}
+        />
+    </Modal.Body>
+</Modal>
+
         </div>
     );
 };
