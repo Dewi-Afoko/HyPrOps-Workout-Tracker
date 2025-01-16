@@ -4,11 +4,14 @@ import NextFiveSets from "./WorkoutNextFiveSets";
 import Countdown from "react-countdown";
 import axios from "axios";
 import "../styles/tables.css";
+import LastFiveSets from "./WorkoutLastFiveSets";
 
 const WorkoutLiveTrackingFeed = ({ workoutId }) => {
     const [workoutData, setWorkoutData] = useState(null);
     const [restTime, setRestTime] = useState(null); // Store rest time for countdown
     const [isCountdownActive, setIsCountdownActive] = useState(false); // Manage countdown visibility
+    const [countdownExpired, setCountdownExpired] = useState(false);
+
 
     const fetchWorkoutData = async () => {
         const token = localStorage.getItem("token");
@@ -47,8 +50,9 @@ const WorkoutLiveTrackingFeed = ({ workoutId }) => {
     };
 
     const handleCountdownComplete = () => {
-        setIsCountdownActive(false); // Hide the countdown timer when complete
+        setCountdownExpired(true); // ✅ Show the expired message instead of hiding the countdown
     };
+    
 
     if (!workoutData) {
         return <div>Loading workout details...</div>;
@@ -56,25 +60,6 @@ const WorkoutLiveTrackingFeed = ({ workoutId }) => {
 
     return (
         <div className="live-tracking-container">
-            {/* Countdown Timer */}
-            <div className="countdown-timer">
-                {isCountdownActive && restTime && (
-                    <Countdown
-    date={Date.now() + restTime * 1000}
-    onComplete={handleCountdownComplete}
-    renderer={({ minutes, seconds }) => {
-        const isBlinking = restTime <= 10; // Blink if time is less than or equal to 10 seconds
-        return (
-            <div className={`timer-display ${isBlinking ? 'blink' : ''}`}>
-                Rest Time Until Next Set: {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
-            </div>
-        );
-    }}
-/>
-
-                )}
-            </div>
-
             {/* NextFiveSets section */}
             <div className="next-five">
                 <NextFiveSets
@@ -82,9 +67,45 @@ const WorkoutLiveTrackingFeed = ({ workoutId }) => {
                     onSetUpdate={(updatedRestTime) => handleSetUpdate(updatedRestTime)}
                 />
             </div>
+    
+{/* Countdown Timer */}
+<div className="countdown-timer">
+    {isCountdownActive && restTime && !countdownExpired && (
+        <Countdown
+            date={Date.now() + restTime * 1000}
+            onComplete={handleCountdownComplete}
+            renderer={({ minutes, seconds }) => {
+                const isBlinking = minutes === 0 && seconds <= 10;
+                return (
+                    <div className={`timer-display ${isBlinking ? "blink" : ""}`}>
+                        Rest Time Until Next Set: {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
+                    </div>
+                );
+            }}
+        />
+    )}
 
+    {/* Expired Message: Show when countdown reaches zero */}
+    {countdownExpired && (
+        <div className="timer-complete">
+            <strong style={{ color: "red", fontSize: "1.5rem", fontWeight: "bold" }}>
+                Time to start your next set!
+            </strong>
+        </div>
+    )}
+</div>
+
+
+
+
+    
+            {/* LastFiveSets section */}
+            <div className="last-five">
+                <LastFiveSets workoutData={workoutData} />
+            </div>
+    
             {/* WorkoutSplitSetView */}
-            <div>
+            <div className="split-set-view">
                 <WorkoutSplitSetView
                     workoutData={workoutData}
                     onSetUpdate={(updatedRestTime) => handleSetUpdate(updatedRestTime)}

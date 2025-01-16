@@ -81,3 +81,12 @@ button {
     animation: blink 1s infinite;
     color: #dc3545; /* Danger red for urgency */
 }
+.blink {
+    animation: blinker 1s step-start infinite;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
+}
