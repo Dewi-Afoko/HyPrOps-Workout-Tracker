@@ -1,23 +1,25 @@
 import React, { useState } from "react";
-import { Table, Modal } from "react-bootstrap";
-import SetEdit from "./WorkoutSetEdit";
+import { Table } from "react-bootstrap";
+import LiveSetEdit from "./WorkoutLiveSetEdit";
 import "./../styles/tables.css"; // For consistent table styling
 
 const WorkoutSplitSetView = ({ workoutData, onSetUpdate }) => {
-    const [showEditModal, setShowEditModal] = useState(false);
+    const [editingField, setEditingField] = useState(null);
     const [selectedSet, setSelectedSet] = useState(null);
+    const [showLiveEditModal, setShowLiveEditModal] = useState(false);
 
     // Separate completed and uncompleted sets
     const completedSets = workoutData.set_dicts_list?.filter((set) => set.complete) || [];
     const uncompletedSets = workoutData.set_dicts_list?.filter((set) => !set.complete) || [];
 
-    const handleExerciseClick = (set) => {
+    const handleFieldClick = (set, field) => {
         setSelectedSet(set);
-        setShowEditModal(true);
+        setEditingField(field);
+        setShowLiveEditModal(true);
     };
 
     const handleClose = () => {
-        setShowEditModal(false);
+        setShowLiveEditModal(false);
         setSelectedSet(null);
     };
 
@@ -42,18 +44,27 @@ const WorkoutSplitSetView = ({ workoutData, onSetUpdate }) => {
                         {sets.map((set) => (
                             <tr key={set.set_order}>
                                 <td>{set.set_order}</td>
-                                <td
-                                    style={{ color: "blue", cursor: "pointer" }}
-                                    onClick={() => handleExerciseClick(set)}
-                                >
+                                <td onClick={() => handleFieldClick(set, "exercise_name")} style={{ cursor: "pointer", color: "blue" }}>
                                     {set.exercise_name}
                                 </td>
-                                <td>{set.set_type || "N/A"}</td>
-                                <td>{set.focus || "N/A"}</td>
-                                <td>{set.reps || "N/A"}</td>
-                                <td>{set.loading ? `${set.loading} kg` : "Bodyweight"}</td>
-                                <td>{set.rest || "N/A"} s</td>
-                                <td>{set.notes || "N/A"}</td>
+                                <td onClick={() => handleFieldClick(set, "set_type")} style={{ cursor: "pointer", color: "blue" }}>
+                                    {set.set_type || "N/A"}
+                                </td>
+                                <td onClick={() => handleFieldClick(set, "focus")} style={{ cursor: "pointer", color: "blue" }}>
+                                    {set.focus || "N/A"}
+                                </td>
+                                <td onClick={() => handleFieldClick(set, "reps")} style={{ cursor: "pointer", color: "blue" }}>
+                                    {set.reps || "N/A"}
+                                </td>
+                                <td onClick={() => handleFieldClick(set, "loading")} style={{ cursor: "pointer", color: "blue" }}>
+                                    {set.loading ? `${set.loading} kg` : "Bodyweight"}
+                                </td>
+                                <td onClick={() => handleFieldClick(set, "rest")} style={{ cursor: "pointer", color: "blue" }}>
+                                    {set.rest || "N/A"} s
+                                </td>
+                                <td onClick={() => handleFieldClick(set, "notes")} style={{ cursor: "pointer", color: "blue" }}>
+                                    {set.notes || "N/A"}
+                                </td>
                             </tr>
                         ))}
                     </tbody>
@@ -69,26 +80,18 @@ const WorkoutSplitSetView = ({ workoutData, onSetUpdate }) => {
             {renderTable(uncompletedSets, "Uncompleted Sets")}
             {renderTable(completedSets, "Completed Sets")}
 
-            {/* Edit Modal */}
-            <Modal show={showEditModal} onHide={handleClose} centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>Edit Set</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {selectedSet && (
-                        <SetEdit
-                            workoutId={workoutData.id}
-                            setOrder={selectedSet.set_order}
-                            exerciseName={selectedSet.exercise_name}
-                            onUpdateSuccess={() => {
-                                handleClose();
-                                onSetUpdate(); // Refresh parent data on update
-                            }}
-                            handleClose={handleClose}
-                        />
-                    )}
-                </Modal.Body>
-            </Modal>
+            {/* LiveSetEdit Modal - Moved OUTSIDE renderTable */}
+            <LiveSetEdit
+                workoutId={workoutData.id}
+                setData={selectedSet}
+                field={editingField}
+                show={showLiveEditModal}
+                handleClose={handleClose}
+                onUpdateSuccess={() => {
+                    setShowLiveEditModal(false);
+                    onSetUpdate();
+                }}
+            />
         </div>
     );
 };
