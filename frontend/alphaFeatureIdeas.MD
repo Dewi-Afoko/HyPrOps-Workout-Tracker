@@ -21,6 +21,9 @@
         - Delete note component
         - Display for workout notes
     
+
+    -  What do I want workouts to look like? Where do I want to display the information? What is useful for the user?
+   
    
     - Set type as tag
         - Highlight based on tags

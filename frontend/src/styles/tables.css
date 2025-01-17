@@ -123,3 +123,14 @@ td, th {
         max-width: 100%; /* Full width on small screens */
     }
 }
+/* Style for clickable table cells */
+.editable-cell {
+    cursor: pointer;
+    color: blue;
+    text-decoration: underline;
+    transition: color 0.2s ease-in-out;
+}
+
+.editable-cell:hover {
+    color: darkblue;
+}

@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Table, Modal } from "react-bootstrap";
-import SetEdit from "./WorkoutSetEdit";
+import LiveSetEdit from "./WorkoutLiveSetEdit"; // Component for field-specific editing
 import "./../styles/tables.css";
 
 const WorkoutSplitSetView = ({ workoutData, onSetUpdate }) => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedSet, setSelectedSet] = useState(null);
+    const [selectedField, setSelectedField] = useState(null);
 
     if (!workoutData || !workoutData.set_dicts_list) {
         return <div>Loading sets...</div>;
@@ -14,14 +15,16 @@ const WorkoutSplitSetView = ({ workoutData, onSetUpdate }) => {
     const completedSets = workoutData.set_dicts_list.filter((set) => set.complete);
     const uncompletedSets = workoutData.set_dicts_list.filter((set) => !set.complete);
 
-    const handleExerciseClick = (set) => {
+    const handleFieldClick = (set, field) => {
         setSelectedSet(set);
+        setSelectedField(field);
         setShowEditModal(true);
     };
 
     const handleClose = () => {
         setShowEditModal(false);
         setSelectedSet(null);
+        setSelectedField(null);
     };
 
     const renderTable = (sets, title) => (
@@ -46,17 +49,45 @@ const WorkoutSplitSetView = ({ workoutData, onSetUpdate }) => {
                             <tr key={set.set_order}>
                                 <td>{set.set_order}</td>
                                 <td
-                                    style={{ color: "blue", cursor: "pointer", whiteSpace: "nowrap" }}
-                                    onClick={() => handleExerciseClick(set)}
+                                    className="editable-cell"
+                                    onClick={() => handleFieldClick(set, "exercise_name")}
                                 >
                                     {set.exercise_name}
                                 </td>
-                                <td>{set.set_type || "N/A"}</td>
-                                <td>{set.focus || "N/A"}</td>
-                                <td>{set.reps || "N/A"}</td>
-                                <td>{set.loading ? `${set.loading}kg` : "Bodyweight"}</td>
-                                <td>{set.rest || "N/A"}s</td>
-                                <td style={{ wordWrap: "break-word", overflowWrap: "break-word" }}>
+                                <td
+                                    className="editable-cell"
+                                    onClick={() => handleFieldClick(set, "set_type")}
+                                >
+                                    {set.set_type || "N/A"}
+                                </td>
+                                <td
+                                    className="editable-cell"
+                                    onClick={() => handleFieldClick(set, "focus")}
+                                >
+                                    {set.focus || "N/A"}
+                                </td>
+                                <td
+                                    className="editable-cell"
+                                    onClick={() => handleFieldClick(set, "reps")}
+                                >
+                                    {set.reps || "N/A"}
+                                </td>
+                                <td
+                                    className="editable-cell"
+                                    onClick={() => handleFieldClick(set, "loading")}
+                                >
+                                    {set.loading ? `${set.loading} kg` : "Bodyweight"}
+                                </td>
+                                <td
+                                    className="editable-cell"
+                                    onClick={() => handleFieldClick(set, "rest")}
+                                >
+                                    {set.rest || "N/A"} s
+                                </td>
+                                <td
+                                    className="editable-cell"
+                                    onClick={() => handleFieldClick(set, "notes")}
+                                >
                                     {set.notes || "N/A"}
                                 </td>
                             </tr>
@@ -71,28 +102,26 @@ const WorkoutSplitSetView = ({ workoutData, onSetUpdate }) => {
 
     return (
         <div className="split-set-view">
-            {/* Flexbox Layout for Incomplete & Complete Sets Side by Side */}
             <div className="split-tables-container">
-                <div className="table-wrapper">{renderTable(uncompletedSets, "All Remaining Sets")}</div>
-                <div className="table-wrapper">{renderTable(completedSets, "All Completed Sets")}</div>
+                <div className="table-wrapper">{renderTable(uncompletedSets, "Incomplete Sets")}</div>
+                <div className="table-wrapper">{renderTable(completedSets, "Completed Sets")}</div>
             </div>
 
-            {/* Edit Modal */}
+            {/* Edit Modal (Field-Specific) */}
             <Modal show={showEditModal} onHide={handleClose} centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>Edit Set</Modal.Title>
+                    <Modal.Title>Edit {selectedField ? selectedField.replace("_", " ") : "Set"}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {selectedSet && (
-                        <SetEdit
+                    {selectedSet && selectedField && (
+                        <LiveSetEdit
                             workoutId={workoutData.id}
-                            setOrder={selectedSet.set_order}
-                            exerciseName={selectedSet.exercise_name}
+                            setData={selectedSet}
+                            field={selectedField}
                             onUpdateSuccess={() => {
                                 handleClose();
                                 onSetUpdate();
                             }}
-                            handleClose={handleClose}
                         />
                     )}
                 </Modal.Body>
@@ -102,4 +131,3 @@ const WorkoutSplitSetView = ({ workoutData, onSetUpdate }) => {
 };
 
 export default WorkoutSplitSetView;
-
