@@ -5,10 +5,17 @@ Exciting news, the MVP/Alpha is built and ready to use! I'll use it for my worko
 
 ### Alpha Testing UI Improvements:
     - Live Tracking Page Created
-        - Next Five Sets component feed displayed at top
+        - Next Five Sets component added to feed 
+            - Refactored display to be more useful
+            - Displays to the left of the screen
+        - Added Last Five Sets component
+            - Returns most relevant data
+            - Displays to the right of the screen
         - Countdown timer based on rest intervals displays once set marked complete
+            - Default value/timer completion now displays "Time to start your next set!"
         - Split view of complete/incomplete sets, updates dynamically once set marked complete
             - Edit sets by clicking the exercise name in either complete or incomplete table
+                - Modal now launches for the individual field selected
 
 ### v3 - Three Model Version
 
