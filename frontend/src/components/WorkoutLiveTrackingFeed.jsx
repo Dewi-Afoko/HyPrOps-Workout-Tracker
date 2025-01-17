@@ -8,10 +8,9 @@ import LastFiveSets from "./WorkoutLastFiveSets";
 
 const WorkoutLiveTrackingFeed = ({ workoutId }) => {
     const [workoutData, setWorkoutData] = useState(null);
-    const [restTime, setRestTime] = useState(null); // Store rest time for countdown
-    const [isCountdownActive, setIsCountdownActive] = useState(false); // Manage countdown visibility
-    const [countdownExpired, setCountdownExpired] = useState(false);
-
+    const [restTime, setRestTime] = useState(null);
+    const [isCountdownActive, setIsCountdownActive] = useState(false);
+    const [countdownEndTime, setCountdownEndTime] = useState(null);
 
     const fetchWorkoutData = async () => {
         const token = localStorage.getItem("token");
@@ -37,22 +36,23 @@ const WorkoutLiveTrackingFeed = ({ workoutId }) => {
     };
 
     useEffect(() => {
-        fetchWorkoutData(); // Fetch data on component mount
+        fetchWorkoutData();
     }, [workoutId]);
 
-    const handleSetUpdate = (restTime) => {
-        fetchWorkoutData(); // Refresh workout data when a set is updated
+    const handleSetUpdate = (newRestTime) => {
+        fetchWorkoutData();
 
-        if (restTime) {
-            setRestTime(restTime); // Set the rest time for the countdown
-            setIsCountdownActive(true); // Show the countdown timer
+        if (newRestTime) {
+            const endTime = Date.now() + newRestTime * 1000;
+            setCountdownEndTime(endTime);
+            setIsCountdownActive(true);
         }
     };
 
     const handleCountdownComplete = () => {
-        setCountdownExpired(true); // ✅ Show the expired message instead of hiding the countdown
+        setIsCountdownActive(false);
+        setCountdownEndTime(null);
     };
-    
 
     if (!workoutData) {
         return <div>Loading workout details...</div>;
@@ -60,50 +60,44 @@ const WorkoutLiveTrackingFeed = ({ workoutId }) => {
 
     return (
         <div className="live-tracking-container">
-            {/* NextFiveSets section */}
-            <div className="next-five">
-                <NextFiveSets
-                    workoutData={workoutData}
-                    onSetUpdate={(updatedRestTime) => handleSetUpdate(updatedRestTime)}
-                />
-            </div>
-    
-{/* Countdown Timer */}
-<div className="countdown-timer">
-    {isCountdownActive && restTime && !countdownExpired && (
-        <Countdown
-            date={Date.now() + restTime * 1000}
-            onComplete={handleCountdownComplete}
-            renderer={({ minutes, seconds }) => {
-                const isBlinking = minutes === 0 && seconds <= 10;
-                return (
-                    <div className={`timer-display ${isBlinking ? "blink" : ""}`}>
-                        Rest Time Until Next Set: {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
+            {/* Timer Section (Centered) */}
+            <div className="timer-container">
+                {!isCountdownActive && !countdownEndTime && (
+                    <div className="timer-complete">
+                        <strong>Time to start your next set!</strong>
                     </div>
-                );
-            }}
-        />
-    )}
+                )}
 
-    {/* Expired Message: Show when countdown reaches zero */}
-    {countdownExpired && (
-        <div className="timer-complete">
-            <strong style={{ color: "red", fontSize: "1.5rem", fontWeight: "bold" }}>
-                Time to start your next set!
-            </strong>
-        </div>
-    )}
-</div>
-
-
-
-
-    
-            {/* LastFiveSets section */}
-            <div className="last-five">
-                <LastFiveSets workoutData={workoutData} />
+                {isCountdownActive && countdownEndTime && (
+                    <Countdown
+                        key={countdownEndTime}
+                        date={countdownEndTime}
+                        onComplete={handleCountdownComplete}
+                        renderer={({ minutes, seconds }) => {
+                            const isBlinking = minutes === 0 && seconds <= 10;
+                            return (
+                                <div className={`timer-display ${isBlinking ? "blink" : ""}`}>
+                                    Rest Time Until Next Set: {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
+                                </div>
+                            );
+                        }}
+                    />
+                )}
             </div>
-    
+
+            {/* Flexbox Layout for NextFiveSets and LastFiveSets */}
+            <div className="tracking-layout">
+                <div className="tracking-section">
+                    <NextFiveSets
+                        workoutData={workoutData}
+                        onSetUpdate={(updatedRestTime) => handleSetUpdate(updatedRestTime)}
+                    />
+                </div>
+                <div className="tracking-section">
+                    <LastFiveSets workoutData={workoutData} />
+                </div>
+            </div>
+
             {/* WorkoutSplitSetView */}
             <div className="split-set-view">
                 <WorkoutSplitSetView

@@ -1,25 +1,26 @@
 import React, { useState } from "react";
-import { Table } from "react-bootstrap";
-import LiveSetEdit from "./WorkoutLiveSetEdit";
-import "./../styles/tables.css"; // For consistent table styling
+import { Table, Modal } from "react-bootstrap";
+import SetEdit from "./WorkoutSetEdit";
+import "./../styles/tables.css";
 
 const WorkoutSplitSetView = ({ workoutData, onSetUpdate }) => {
-    const [editingField, setEditingField] = useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [selectedSet, setSelectedSet] = useState(null);
-    const [showLiveEditModal, setShowLiveEditModal] = useState(false);
 
-    // Separate completed and uncompleted sets
-    const completedSets = workoutData.set_dicts_list?.filter((set) => set.complete) || [];
-    const uncompletedSets = workoutData.set_dicts_list?.filter((set) => !set.complete) || [];
+    if (!workoutData || !workoutData.set_dicts_list) {
+        return <div>Loading sets...</div>;
+    }
 
-    const handleFieldClick = (set, field) => {
+    const completedSets = workoutData.set_dicts_list.filter((set) => set.complete);
+    const uncompletedSets = workoutData.set_dicts_list.filter((set) => !set.complete);
+
+    const handleExerciseClick = (set) => {
         setSelectedSet(set);
-        setEditingField(field);
-        setShowLiveEditModal(true);
+        setShowEditModal(true);
     };
 
     const handleClose = () => {
-        setShowLiveEditModal(false);
+        setShowEditModal(false);
         setSelectedSet(null);
     };
 
@@ -44,25 +45,18 @@ const WorkoutSplitSetView = ({ workoutData, onSetUpdate }) => {
                         {sets.map((set) => (
                             <tr key={set.set_order}>
                                 <td>{set.set_order}</td>
-                                <td onClick={() => handleFieldClick(set, "exercise_name")} style={{ cursor: "pointer", color: "blue" }}>
+                                <td
+                                    style={{ color: "blue", cursor: "pointer", whiteSpace: "nowrap" }}
+                                    onClick={() => handleExerciseClick(set)}
+                                >
                                     {set.exercise_name}
                                 </td>
-                                <td onClick={() => handleFieldClick(set, "set_type")} style={{ cursor: "pointer", color: "blue" }}>
-                                    {set.set_type || "N/A"}
-                                </td>
-                                <td onClick={() => handleFieldClick(set, "focus")} style={{ cursor: "pointer", color: "blue" }}>
-                                    {set.focus || "N/A"}
-                                </td>
-                                <td onClick={() => handleFieldClick(set, "reps")} style={{ cursor: "pointer", color: "blue" }}>
-                                    {set.reps || "N/A"}
-                                </td>
-                                <td onClick={() => handleFieldClick(set, "loading")} style={{ cursor: "pointer", color: "blue" }}>
-                                    {set.loading ? `${set.loading} kg` : "Bodyweight"}
-                                </td>
-                                <td onClick={() => handleFieldClick(set, "rest")} style={{ cursor: "pointer", color: "blue" }}>
-                                    {set.rest || "N/A"} s
-                                </td>
-                                <td onClick={() => handleFieldClick(set, "notes")} style={{ cursor: "pointer", color: "blue" }}>
+                                <td>{set.set_type || "N/A"}</td>
+                                <td>{set.focus || "N/A"}</td>
+                                <td>{set.reps || "N/A"}</td>
+                                <td>{set.loading ? `${set.loading}kg` : "Bodyweight"}</td>
+                                <td>{set.rest || "N/A"}s</td>
+                                <td style={{ wordWrap: "break-word", overflowWrap: "break-word" }}>
                                     {set.notes || "N/A"}
                                 </td>
                             </tr>
@@ -77,23 +71,35 @@ const WorkoutSplitSetView = ({ workoutData, onSetUpdate }) => {
 
     return (
         <div className="split-set-view">
-            {renderTable(uncompletedSets, "Uncompleted Sets")}
-            {renderTable(completedSets, "Completed Sets")}
+            {/* Flexbox Layout for Incomplete & Complete Sets Side by Side */}
+            <div className="split-tables-container">
+                <div className="table-wrapper">{renderTable(uncompletedSets, "All Remaining Sets")}</div>
+                <div className="table-wrapper">{renderTable(completedSets, "All Completed Sets")}</div>
+            </div>
 
-            {/* LiveSetEdit Modal - Moved OUTSIDE renderTable */}
-            <LiveSetEdit
-                workoutId={workoutData.id}
-                setData={selectedSet}
-                field={editingField}
-                show={showLiveEditModal}
-                handleClose={handleClose}
-                onUpdateSuccess={() => {
-                    setShowLiveEditModal(false);
-                    onSetUpdate();
-                }}
-            />
+            {/* Edit Modal */}
+            <Modal show={showEditModal} onHide={handleClose} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Set</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {selectedSet && (
+                        <SetEdit
+                            workoutId={workoutData.id}
+                            setOrder={selectedSet.set_order}
+                            exerciseName={selectedSet.exercise_name}
+                            onUpdateSuccess={() => {
+                                handleClose();
+                                onSetUpdate();
+                            }}
+                            handleClose={handleClose}
+                        />
+                    )}
+                </Modal.Body>
+            </Modal>
         </div>
     );
 };
 
 export default WorkoutSplitSetView;
+

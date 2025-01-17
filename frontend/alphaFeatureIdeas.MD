@@ -4,6 +4,8 @@
             - Move completed sets to separate table ✅
             - Potentially "Next 3/5/x sets" component ✅
         - Live rest duration tracker - shows time since last set marked complete -- Changed to countdown timer and complete ✅
+            - Clock breaks if sets added/updated - Fixed! ✅
+
 
         - Add last five sets component in reverse order below timer ✅
         - Bigger timer, more dynamic and garish ✅

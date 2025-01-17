@@ -1,73 +1,26 @@
-.next-five-sets {
-    margin-bottom: 20px;
-    overflow-x: auto;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-td,
-th {
-    text-align: center;
-    padding: 10px;
-    vertical-align: middle;
-}
-
-th {
-    background-color: #f8f9fa;
-    font-weight: bold;
-}
-
-button {
-    padding: 5px 10px;
-    font-size: 14px;
-}
-.split-set-view {
-    display: flex;
-    justify-content: space-between; /* Space between the tables */
-    gap: 20px; /* Add spacing between the tables */
-    width: 100%;
-}
-
-.table-container {
-    flex: 1; /* Allow tables to take equal space */
-    overflow-x: auto; /* Enable horizontal scrolling if the table overflows */
-    margin: 10px;
-    padding: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Add some shadow for better separation */
-    border-radius: 5px; /* Rounded corners for better aesthetics */
-    background-color: #f9f9f9; /* Optional: Background color for better distinction */
-}
-.table-container tbody tr td {
-    transition: color 0.2s ease-in-out;
-}
-
-.table-container tbody tr td:hover {
-    color: #0056b3; /* Hover color for exercise name */
-    text-decoration: underline;
-}
-/* Timer Container */
-.countdown-timer {
+/* Timer should be centered above everything */
+.timer-container {
     display: flex;
     justify-content: center;
     align-items: center;
     margin: 20px auto;
-    padding: 10px 20px;
-    background-color: #f8f9fa; /* Light background */
-    border: 2px solid #dee2e6; /* Subtle border */
-    border-radius: 10px; /* Rounded corners */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    padding: 15px;
+    background-color: #f8f9fa;
+    border: 2px solid #dee2e6;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
     width: fit-content;
-    font-family: 'Arial', sans-serif; /* Consistent font */
+    min-width: 300px;
+    font-size: 1.5rem;
+
 }
 
-/* Timer Display Text */
+/* Timer Display */
 .timer-display {
-    font-size: 1.5rem; /* Large and readable */
+    font-size: 1.5rem;
     font-weight: bold;
-    color: #343a40; /* Dark color for good contrast */
+    color: #343a40;
 }
 
 /* Blinking Effect for Last 10 Seconds */
@@ -79,14 +32,94 @@ button {
 
 .timer-display.blink {
     animation: blink 1s infinite;
-    color: #dc3545; /* Danger red for urgency */
-}
-.blink {
-    animation: blinker 1s step-start infinite;
+    color: #dc3545;
 }
 
-@keyframes blinker {
-    50% {
-        opacity: 0;
+/* Default "Time to start your next set!" message */
+.timer-complete {
+    font-size: 1.5rem;
+    color: red;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* Layout for NextFiveSets & LastFiveSets under the timer */
+.tracking-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px;
+    flex-wrap: wrap; /* Ensures responsiveness */
+}
+
+/* Ensures tables have equal width */
+.tracking-section {
+    flex: 1;
+    min-width: 320px;
+    max-width: 48%; /* Prevents them from taking full width */
+}
+
+/* Responsive behavior for mobile */
+@media screen and (max-width: 900px) {
+    .tracking-layout {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .tracking-section {
+        max-width: 100%;
+    }
+
+    .timer-container {
+        width: 100%;
+        text-align: center;
+    }
+}
+/* Ensures Incomplete and Completed sets stay side by side */
+.split-tables-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap; /* Allows wrapping to prevent overlap */
+    width: 100%;
+}
+
+/* Each table takes equal space */
+.table-wrapper {
+    flex: 1;
+    min-width: 350px; /* Ensures it doesn't shrink too much */
+    max-width: 50%;
+}
+
+/* Prevents text from overflowing */
+td, th {
+    text-align: center;
+    padding: 10px;
+    vertical-align: middle;
+    word-wrap: break-word; /* Ensures long words break */
+    overflow-wrap: break-word; /* Ensures wrapping works */
+    white-space: normal; /* Prevents forced single-line display */
+}
+
+/* Allow exercise names to wrap if needed but remain clickable */
+.table-container tbody tr td {
+    transition: color 0.2s ease-in-out;
+}
+
+.table-container tbody tr td:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+/* Responsive Behavior for Small Screens */
+@media screen and (max-width: 900px) {
+    .split-tables-container {
+        flex-direction: column; /* Stacks tables on smaller screens */
+        align-items: center;
+    }
+
+    .table-wrapper {
+        max-width: 100%; /* Full width on small screens */
     }
 }

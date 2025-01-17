@@ -1,9 +1,13 @@
 import React from "react";
 import { Table, Button } from "react-bootstrap";
 import axios from "axios";
-import "./../styles/tables.css"; // Ensure consistent table styling across the app
+import "./../styles/tables.css";
 
 const NextFiveSets = ({ workoutData, onSetUpdate }) => {
+    if (!workoutData || !workoutData.set_dicts_list) {
+        return <div>Loading sets...</div>;
+    }
+
     const handleCompleteClick = async (setOrder, restTime) => {
         const token = localStorage.getItem("token");
         if (!token) {
@@ -12,6 +16,7 @@ const NextFiveSets = ({ workoutData, onSetUpdate }) => {
         }
 
         try {
+            // ✅ API call to mark set as complete in the backend
             await axios.patch(
                 `http://127.0.0.1:5000/workouts/${workoutData.id}/${setOrder}/mark_complete`,
                 {},
@@ -19,28 +24,29 @@ const NextFiveSets = ({ workoutData, onSetUpdate }) => {
                     headers: { Authorization: `Bearer ${token}` },
                 }
             );
-            onSetUpdate(restTime); // Pass restTime to trigger countdown
+
+            // ✅ Trigger workout update and start rest timer
+            onSetUpdate(restTime);
         } catch (error) {
             console.error("Error marking set complete:", error);
             alert("Failed to update set status.");
         }
     };
 
-    // Filter the next five incomplete sets
     const nextFiveSets = workoutData.set_dicts_list
-        ?.filter((set) => !set.complete)
+        .filter((set) => !set.complete)
         .sort((a, b) => a.set_order - b.set_order)
         .slice(0, 5);
 
     return (
         <div className="next-five-sets">
             <h2>Next Five Sets</h2>
-            {nextFiveSets && nextFiveSets.length > 0 ? (
+            {nextFiveSets.length > 0 ? (
                 <Table striped bordered hover>
                     <thead>
                         <tr>
-                            <th>Order</th>
                             <th>Exercise</th>
+                            <th>Set Number</th>
                             <th>Set Type</th>
                             <th>Focus</th>
                             <th>Reps</th>
@@ -51,27 +57,25 @@ const NextFiveSets = ({ workoutData, onSetUpdate }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {nextFiveSets.map((set) => (
+                        {nextFiveSets.map((set, index) => (
                             <tr key={set.set_order}>
-                                <td>{set.set_order}</td>
                                 <td>{set.exercise_name}</td>
+                                <td>{set.set_number || "N/A"}</td>
                                 <td>{set.set_type || "N/A"}</td>
                                 <td>{set.focus || "N/A"}</td>
                                 <td>{set.reps || "N/A"}</td>
-                                <td>{set.loading ? `${set.loading}kg` : "Bodyweight"}</td>
-                                <td>{set.rest || "N/A"}s</td>
+                                <td>{set.loading ? `${set.loading} kg` : "Bodyweight"}</td>
+                                <td>{set.rest || "N/A"} s</td>
                                 <td>{set.notes || "N/A"}</td>
                                 <td>
-                                <Button
-    variant="success"
-    onClick={() => {
-        handleCompleteClick(set.set_order);
-        onSetUpdate(set.rest); // Pass the rest time to trigger the timer
-    }}
->
-    Mark Complete
-</Button>
-
+                                    {index === 0 && ( // ✅ Only show button on the first exercise
+                                        <Button
+                                            variant="success"
+                                            onClick={() => handleCompleteClick(set.set_order, set.rest)}
+                                        >
+                                            Mark Complete
+                                        </Button>
+                                    )}
                                 </td>
                             </tr>
                         ))}
