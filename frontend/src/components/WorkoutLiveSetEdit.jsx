@@ -43,7 +43,7 @@ const LiveSetEdit = ({ workoutId, setData, field, onUpdateSuccess }) => {
     };
 
     return (
-        <>
+
             <Form>
                 <Form.Group className="mb-3">
                     <Form.Label>Edit {field.replace("_", " ")}</Form.Label>
@@ -58,7 +58,7 @@ const LiveSetEdit = ({ workoutId, setData, field, onUpdateSuccess }) => {
                     Save Changes
                 </Button>
             </Form>
-        </>
+
     );
 };
 
