@@ -47,7 +47,7 @@ class User(Document):
             payload['dob'] = self.dob.strftime(date_format)
         if len(self.weight )> 0 :
             latest_weigh_in = max(self.weight, key=lambda date: datetime.strptime(date, date_format))
-            payload['weight'] = self.weight[latest_weigh_in],
+            payload['weight'] = self.weight[latest_weigh_in]
             payload['last_weighed_on'] = latest_weigh_in
 
         return payload

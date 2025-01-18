@@ -24,7 +24,9 @@
 
     -  What do I want workouts to look like? Where do I want to display the information? What is useful for the user?
    
-   
+
+## Extra Backend Functionality for v3.2
+
     - Set type as tag
         - Highlight based on tags
 
