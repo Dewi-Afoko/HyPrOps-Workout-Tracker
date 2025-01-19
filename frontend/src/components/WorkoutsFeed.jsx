@@ -90,7 +90,10 @@ const WorkoutsFeed = () => {
 
     return (
         <div>
+                <br></br>
+                <br></br>
             <CreateWorkout onCreateSuccess={() => setRefreshWorkouts(!refreshWorkouts)} />
+                <br></br>
             <h3>Workouts</h3>
             <Table striped bordered hover>
                 <thead>
