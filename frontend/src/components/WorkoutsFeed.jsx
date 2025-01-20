@@ -90,13 +90,17 @@ const WorkoutsFeed = () => {
 
     return (
         <div>
+                <br></br>
+                <br></br>
             <CreateWorkout onCreateSuccess={() => setRefreshWorkouts(!refreshWorkouts)} />
+                <br></br>
             <h3>Workouts</h3>
             <Table striped bordered hover>
                 <thead>
                     <tr>
                         <th>Name</th>
                         <th>Date</th>
+                        <th>Notes</th>
                         <th>Lifts</th>
                         <th>Complete</th>
                         <th>Duplicate Workout</th>
@@ -118,6 +122,14 @@ const WorkoutsFeed = () => {
                                     {workout.workout_name}
                                 </td>
                                 <td>{workout.date.split("T")[0]}</td>
+                                <td>
+                                {workout.notes.length > 0 
+                                    ? workout.notes.map((note, index) => (
+                                        <div key={index}>Note {index + 1}: {note}<br /></div>
+                                )) 
+                                    : "No notes"}
+                                </td>
+
                                 <td>{uniqueLifts.length > 0 ? uniqueLifts.join(", ") : "No exercises"}</td>
                                 <td>
                                     <Button

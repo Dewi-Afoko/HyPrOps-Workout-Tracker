@@ -10,6 +10,7 @@ import { WorkoutsProvider } from "./context/WorkoutsContext";
 import { SpecificWorkout } from "./pages/WorkoutDetails/SpecificWorkout";
 import NavBar from "./components/Navbar";
 import { AllMyWorkouts } from "./pages/WorkoutFeed/AllMyWorkouts";
+import { LiveTracking } from "./pages/WorkoutLiveTracking/WorkoutLiveTracker";
 
 
 const App = () => {
@@ -25,6 +26,7 @@ const App = () => {
         <Route path='/profile' element={<Dashboard/>}/>
         <Route path='/thisworkout' element={<SpecificWorkout/>}/>
         <Route path='/myworkouts' element={<AllMyWorkouts/>}/>
+        <Route path='/livetracker' element={<LiveTracking/>}/>
         </Routes>
     </BrowserRouter>
 </div>

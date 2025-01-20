@@ -8,7 +8,7 @@ from copy import deepcopy
 class Workout(Document):
     user_id = ReferenceField('User', required=True)
     workout_name = StringField(require=True)
-    date = DateTimeField(default=datetime.now().replace(hour=0, minute=0, second=0, microsecond=0))
+    date = DateTimeField(default=datetime.now().date())
     complete = BooleanField(default=False)
     set_dicts_list = EmbeddedDocumentListField(SetDicts)
     user_weight = FloatField()

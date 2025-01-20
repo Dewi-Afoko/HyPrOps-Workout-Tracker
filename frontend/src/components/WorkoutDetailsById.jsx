@@ -5,96 +5,84 @@ import SetEdit from "./WorkoutSetEdit";
 import AddSetToWorkout from "./WorkoutAddSet";
 import SetDuplicate from "./WorkoutSetDuplicate";
 import SetDeleteButton from "./WorkoutSetDelete";
+import "./../styles/tables.css";
 
-const WorkoutDetailsById = () => {
-    const [thisWorkout, setThisWorkout] = useState(null);
+const WorkoutDetailsById = ({ workoutId, workoutData, onSetUpdate }) => {
+    const [localWorkoutData, setLocalWorkoutData] = useState(workoutData || null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [editSetData, setEditSetData] = useState(null);
     const [showAddSetModal, setShowAddSetModal] = useState(false);
 
-    const getThisWorkout = async () => {
+    const fetchWorkoutData = async () => {
         const token = localStorage.getItem("token");
-        const workout_id = localStorage.getItem("workout_id");
 
-        if (!token || !workout_id) {
-            alert("Token or Workout ID not found in localStorage.");
+        if (!token || !workoutId) {
+            alert("Token or workout ID not found.");
             return;
         }
 
         try {
-            const response = await axios.get(
-                `http://127.0.0.1:5000/workouts/${workout_id}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            setThisWorkout(response.data.workout);
+            const response = await axios.get(`http://127.0.0.1:5000/workouts/${workoutId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setLocalWorkoutData(response.data.workout);
+            if (onSetUpdate) onSetUpdate(response.data.workout);
         } catch (error) {
             console.error("Error fetching workout details:", error);
-            alert("Failed to fetch workout details. Check console for more details.");
+            alert("Failed to fetch workout details.");
         }
     };
 
     useEffect(() => {
-        getThisWorkout();
-    }, []);
+        fetchWorkoutData();
+    }, [workoutId]);
 
     const handleEditClick = (setData) => {
         setEditSetData(setData);
         setShowEditModal(true);
     };
 
-    const handleCompleteClick = async (setOrder) => {
+    const handleAddSetClick = () => {
+        setShowAddSetModal(true);
+    };
+
+    const handleCompleteToggle = async (setOrder) => {
         const token = localStorage.getItem("token");
         try {
             await axios.patch(
-                `http://127.0.0.1:5000/workouts/${thisWorkout.id}/${setOrder}/mark_complete`,
+                `http://127.0.0.1:5000/workouts/${workoutId}/${setOrder}/mark_complete`,
                 {},
                 {
                     headers: { Authorization: `Bearer ${token}` },
                 }
             );
-            getThisWorkout();
+            fetchWorkoutData();
         } catch (error) {
             console.error("Error toggling set completion:", error);
             alert("Failed to toggle set completion.");
         }
     };
 
-    const handleAddSetClick = () => {
-        setShowAddSetModal(true);
-    };
+    const currentWorkoutData = localWorkoutData;
 
-    if (!thisWorkout) {
+    if (!currentWorkoutData) {
         return <div>Loading workout details...</div>;
     }
 
     return (
         <div>
-            <h1>Workout Details</h1>
-            <p><strong>ID:</strong> {thisWorkout.id}</p>
-            <p><strong>Name:</strong> {thisWorkout.workout_name}</p>
-            <p><strong>Date:</strong> {thisWorkout.date.split("T")[0]}</p>
-            <p><strong>Weight:</strong> {thisWorkout.user_weight || "None"}</p>
-            <p><strong>Sleep Score:</strong> {thisWorkout.sleep_score || "None"}</p>
-            <p><strong>Sleep Quality:</strong> {thisWorkout.sleep_quality || "None"}</p>
-            <p><strong>Complete:</strong> {thisWorkout.complete ? "Yes" : "No"}</p>
-
-
-            {/* Add Set Modal */}
-            <Button variant="primary" onClick={() => setShowAddSetModal(true)}>
-    Add Set
-</Button>
-<AddSetToWorkout
-    show={showAddSetModal}
-    handleClose={() => setShowAddSetModal(false)}
-    onSetAdded={getThisWorkout}
-/>
+            <Button
+                variant="primary"
+                onClick={handleAddSetClick}
+                style={{ marginBottom: "20px" }}
+            >
+                Add Set
+            </Button>
 
             <h2>Sets</h2>
-            {thisWorkout.set_dicts_list?.length > 0 ? (
+            {currentWorkoutData.set_dicts_list?.length > 0 ? (
                 <Table striped bordered hover>
                     <thead>
                         <tr>
@@ -108,13 +96,13 @@ const WorkoutDetailsById = () => {
                             <th>Rest</th>
                             <th>Notes</th>
                             <th>Complete</th>
-                            <th>Duplicate Set</th>
+                            <th>Duplicate</th>
                             <th>Edit</th>
                             <th>Delete</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {thisWorkout.set_dicts_list
+                        {currentWorkoutData.set_dicts_list
                             .sort((a, b) => a.set_order - b.set_order)
                             .map((set) => (
                                 <tr key={set.set_order}>
@@ -124,22 +112,22 @@ const WorkoutDetailsById = () => {
                                     <td>{set.set_type || "N/A"}</td>
                                     <td>{set.focus || "N/A"}</td>
                                     <td>{set.reps || "N/A"}</td>
-                                    <td>{set.loading || "N/A"}</td>
-                                    <td>{set.rest || "N/A"}</td>
+                                    <td>{set.loading ? `${set.loading} kg` : "Bodyweight"}</td>
+                                    <td>{set.rest || "N/A"} s</td>
                                     <td>{set.notes || "N/A"}</td>
                                     <td>
                                         <Button
                                             variant={set.complete ? "success" : "warning"}
-                                            onClick={() => handleCompleteClick(set.set_order)}
+                                            onClick={() => handleCompleteToggle(set.set_order)}
                                         >
                                             {set.complete ? "Complete" : "Incomplete"}
                                         </Button>
                                     </td>
                                     <td>
                                         <SetDuplicate
-                                            workoutId={thisWorkout.id}
+                                            workoutId={workoutId}
                                             setOrder={set.set_order}
-                                            onDuplicateSuccess={getThisWorkout}
+                                            onDuplicateSuccess={fetchWorkoutData}
                                         />
                                     </td>
                                     <td>
@@ -152,9 +140,9 @@ const WorkoutDetailsById = () => {
                                     </td>
                                     <td>
                                         <SetDeleteButton
-                                            workoutId={thisWorkout.id}
+                                            workoutId={workoutId}
                                             setOrder={set.set_order}
-                                            onDeleteSuccess={getThisWorkout}
+                                            onDeleteSuccess={fetchWorkoutData}
                                         />
                                     </td>
                                 </tr>
@@ -166,24 +154,39 @@ const WorkoutDetailsById = () => {
             )}
 
             {/* Edit Modal */}
-            <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+            <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Edit Set</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {editSetData && (
                         <SetEdit
-                            workoutId={thisWorkout.id}
+                            workoutId={workoutId}
                             setOrder={editSetData.set_order}
                             exerciseName={editSetData.exercise_name}
                             show={showEditModal}
                             handleClose={() => setShowEditModal(false)}
-                            onUpdateSuccess={getThisWorkout}
+                            onUpdateSuccess={fetchWorkoutData}
                         />
                     )}
                 </Modal.Body>
             </Modal>
 
+            {/* Add Set Modal */}
+            <Modal show={showAddSetModal} onHide={() => setShowAddSetModal(false)} centered>
+    <Modal.Header closeButton>
+        <Modal.Title>Add a New Set</Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
+        <AddSetToWorkout
+            workoutId={workoutId}
+            onSetAdded={() => {
+                setShowAddSetModal(false);
+                fetchWorkoutData();
+            }}
+        />
+    </Modal.Body>
+</Modal>
 
         </div>
     );

@@ -91,7 +91,7 @@ const UserUpdateDetails = () => {
                             <label htmlFor="dob">Date of Birth</label>
                             <input
                                 id="dob"
-                                type="text"
+                                type="text "
                                 placeholder="Enter your date of birth (YYYY/MM/DD)"
                                 value={dob}
                                 onChange={(event) => setDob(event.target.value)}
@@ -144,15 +144,8 @@ const UserUpdateDetails = () => {
 
     return (
         <>
-            <div>
-                <h3>User Details</h3>
-                <p><strong>Name:</strong> {currentDetails.name || "Not provided"}</p>
-                <p><strong>Date of Birth:</strong> {currentDetails.dob || "Not provided"}</p>
-                <p><strong>Height:</strong> {currentDetails.height ? `${currentDetails.height} cm` : "Not provided"}</p>
-                <p><strong>Weight:</strong> {currentDetails.weight ? `${currentDetails.weight} kg` : "Not provided"}</p>
-                <p><strong>Last Weigh In:</strong> {currentDetails.weight ? `${currentDetails.last_weighed_on}` : "Not provided"}</p>
-            </div>
-            <button
+        <br></br>
+                    <button
                 style={{
                     backgroundColor: "#007bff",
                     color: "white",
@@ -167,6 +160,16 @@ const UserUpdateDetails = () => {
                 Update Personal Details
             </button>
             {isModalOpen && <Modal />}
+            <div>
+                <br></br>
+                <h3>User Details</h3>
+                <p><strong>Name:</strong> {currentDetails.name || "Not provided"}</p>
+                <p><strong>Date of Birth:</strong> {currentDetails.dob || "Not provided"}</p>
+                <p><strong>Height:</strong> {currentDetails.height ? `${currentDetails.height} cm` : "Not provided"}</p>
+                <p><strong>Weight:</strong> {currentDetails.weight ? `${currentDetails.weight} kg` : "Not provided"}</p>
+                <p><strong>Last Weigh In:</strong> {currentDetails.weight ? `${currentDetails.last_weighed_on}` : "Not provided"}</p>
+            </div>
+
         </>
     );
 };

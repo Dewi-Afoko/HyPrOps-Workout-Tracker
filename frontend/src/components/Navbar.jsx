@@ -36,6 +36,11 @@ const NavBar = () => {
                 Detailed Workout View
             </Link>
             </li>
+            <li className="nav-item">
+            <Link className="nav-link" to="/livetracker">
+                Live Workout Tracker
+            </Link>
+            </li>
         </ul>
         </div>
     </div>
