@@ -17,12 +17,11 @@
         - Modal for only the field clicked ✅
    
    
-    - Add notes to workout component
-        - Delete note component
-        - Display for workout notes
+    - Add notes to workout component ✅ - Added to WorkoutEditDetails
+        - Delete note component ✅
+        - Display for workout notes ✅
     
 
-    -  What do I want workouts to look like? Where do I want to display the information? What is useful for the user?
    
 
 ## Extra Backend Functionality for v3.2
@@ -31,9 +30,13 @@
         - Highlight based on tags
 
   
+- New Embedded Document - UserRecords
     - All My Lifts Page
         - Separate tables for each exercise
             - Personal Best highlighted
                 - Include date and workout
+            - User extra info component 
+    - Last workout
+        - Date, name and notes
     
     

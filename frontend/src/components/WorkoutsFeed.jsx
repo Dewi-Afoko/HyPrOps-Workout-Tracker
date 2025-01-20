@@ -122,7 +122,14 @@ const WorkoutsFeed = () => {
                                     {workout.workout_name}
                                 </td>
                                 <td>{workout.date.split("T")[0]}</td>
-                                <td>{workout.notes}</td>
+                                <td>
+                                {workout.notes.length > 0 
+                                    ? workout.notes.map((note, index) => (
+                                        <div key={index}>Note {index + 1}: {note}<br /></div>
+                                )) 
+                                    : "No notes"}
+                                </td>
+
                                 <td>{uniqueLifts.length > 0 ? uniqueLifts.join(", ") : "No exercises"}</td>
                                 <td>
                                     <Button

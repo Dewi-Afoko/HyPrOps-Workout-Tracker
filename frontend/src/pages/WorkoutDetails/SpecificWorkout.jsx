@@ -46,6 +46,18 @@ export function SpecificWorkout() {
             <p><strong>Sleep Score:</strong> {workoutData.sleep_score || "None"}</p>
             <p><strong>Sleep Quality:</strong> {workoutData.sleep_quality || "None"}</p>
             <p><strong>Complete:</strong> {workoutData.complete ? "Yes" : "No"}</p>
+            <div>
+            {workoutData.notes.length > 0 ? (
+                <ul>
+                {workoutData.notes.map((note, index) => (
+                    <li key={index}><strong>Note {index + 1}:</strong> {note}</li>
+                ))}
+                </ul>
+            ) : (
+                <p>No notes</p>
+            )}
+            </div>
+
             <WorkoutDetailsById workoutId={workoutId} workoutData={workoutData} />
         </div>
     );
