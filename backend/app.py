@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory, request
+from flask import Flask, send_from_directory, request, jsonify
 from lib.database_connection import initialize_db
 from dotenv import load_dotenv
 from flask_cors import CORS
@@ -15,9 +15,9 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 
 def create_app():
     app = Flask(
-        __name__, 
-        static_folder=STATIC_DIR,  
-        template_folder=STATIC_DIR  
+        __name__,
+        static_folder=STATIC_DIR,
+        template_folder=STATIC_DIR
     )
 
     api = Api(
@@ -25,7 +25,7 @@ def create_app():
         version='3.1',
         title='HyPrOps Workout Tracker API',
         description='API for managing workout tracking',
-        doc='/api/docs'  # ✅ Swagger UI available at `/api/docs`
+        doc='/api/docs'  # ✅ Keeps Swagger UI working
     )
 
     CORS(app, resources={r"/*": {"origins": "*"}}, methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
@@ -40,20 +40,33 @@ def create_app():
     api.add_namespace(user_ns, path='/user')
     api.add_namespace(workout_ns, path='/workouts')
 
-    # ✅ Fix: Explicitly serve React `index.html` for `/`
+    # ✅ Serve `index.html` for the base route `/`
     @app.route("/")
     def serve_root():
-        print(f"Serving index.html from {STATIC_DIR}")  # ✅ Debugging line
+        print(f"Serving index.html from {STATIC_DIR}")  # Debug log
         return send_from_directory(STATIC_DIR, "index.html")
 
-    # ✅ Serve React files & fallback for frontend routes
+    # ✅ Serve static files properly
+    @app.route("/assets/<path:filename>")
+    def serve_assets(filename):
+        return send_from_directory(os.path.join(STATIC_DIR, "assets"), filename)
+
+    # ✅ Handle all **other frontend routes** by returning `index.html`
     @app.route("/<path:path>")
-    def serve_react(path):
-        if path and os.path.exists(os.path.join(STATIC_DIR, path)):
+    def serve_react_routes(path):
+        # 🔹 If the requested file exists in static folder, serve it (JS, CSS, images, etc.)
+        requested_file = os.path.join(STATIC_DIR, path)
+        if os.path.exists(requested_file) and not os.path.isdir(requested_file):
             return send_from_directory(STATIC_DIR, path)
 
-        # ✅ If file doesn't exist, serve `index.html` (React handles routing)
+        # 🔹 Otherwise, assume it's a React route & serve `index.html`
+        print(f"React route triggered, serving index.html for {path}")  # Debugging
         return send_from_directory(STATIC_DIR, "index.html")
+
+    # ✅ Health Check Endpoint (Optional)
+    @app.route("/health")
+    def health_check():
+        return jsonify({"status": "OK", "message": "Backend is running"}), 200
 
     return app
 
