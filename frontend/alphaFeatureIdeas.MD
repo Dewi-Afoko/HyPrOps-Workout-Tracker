@@ -15,6 +15,11 @@
 
     - More user friendly set edit for Live Tracking ✅
         - Modal for only the field clicked ✅
+        
+    - 💡 Radio buttons to offer mass editing of same exercise
+        - "All sets", "All subsequent sets", "Only this set"
+            - Makes reusing old workouts as templates much easier
+        
    
    
     - Add notes to workout component ✅ - Added to WorkoutEditDetails
