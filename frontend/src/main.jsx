@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import { HomePage } from "./pages/Homepage/LandingPage";
 import { RegisterUser } from "./pages/Register/Register";
 import { Login } from "./pages/Login/Login";
@@ -17,7 +17,7 @@ const App = () => {
     return (
         <div style={{ textAlign: "center", marginTop: "50px" }}>
                         <h1>HyPrOps Granular Workout App ALPHA</h1>
-        <BrowserRouter>
+        <HashRouter>
         <NavBar/>
         <Routes>
         <Route path="/" element={<HomePage />} />
@@ -28,7 +28,7 @@ const App = () => {
         <Route path='/myworkouts' element={<AllMyWorkouts/>}/>
         <Route path='/livetracker' element={<LiveTracking/>}/>
         </Routes>
-    </BrowserRouter>
+    </HashRouter>
 </div>
     );
 };
