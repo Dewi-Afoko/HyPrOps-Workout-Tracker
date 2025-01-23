@@ -340,7 +340,20 @@ class EditSet(Resource):
             if "rest" in data and not isinstance(data["rest"], (int, float)):
                 return {"error": f"Invalid rest value: {data['rest']}. Must be a float or int."}, 400
             
-            editable_data = {key: value for key, value in data.items() if key != "set_order"}
+            editable_data = {}
+
+            for key, value in data.items():
+                if key == "set_order":
+                    continue  # Skip set_order, as it's used for lookup
+
+                if key == "loading":  # ✅ Ensure loading is explicitly converted to float
+                    try:
+                        editable_data[key] = float(value)
+                    except ValueError:
+                        return {"error": f"Invalid value for {key}. Expected a number."}, 400
+                else:
+                    editable_data[key] = value  # Keep other fields unchanged
+
             response = workout.edit_set(set_order, **editable_data)
             return response, 200
         except ValueError as e:
