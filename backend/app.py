@@ -11,7 +11,8 @@ from datetime import timedelta
 load_dotenv()
 
 # ✅ Absolute Path to React Build Folder
-FRONTEND_DIST_DIR = "/Users/dewi/Desktop/programming/projects/Fullstack_HyPrOps/frontend/dist"
+FRONTEND_DIST_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../frontend/dist")
+
 
 # ✅ Debugging: Check if the directory exists
 if not os.path.exists(FRONTEND_DIST_DIR):
