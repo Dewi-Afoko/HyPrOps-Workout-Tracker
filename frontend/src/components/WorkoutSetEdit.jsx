@@ -29,7 +29,6 @@ const SetEdit = ({ workoutId, setOrder, exerciseName, onUpdateSuccess, handleClo
         if (rest) data.rest = parseFloat(rest);
         if (notes) data.notes = notes;
 
-        console.log("Sending PATCH request with data:", JSON.stringify(data, null, 2));  // ✅ Debugging output
 
 
         if (Object.keys(data).length === 1) {

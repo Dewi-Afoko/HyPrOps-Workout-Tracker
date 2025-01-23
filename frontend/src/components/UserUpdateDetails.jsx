@@ -3,7 +3,6 @@ import { createPortal } from "react-dom";
 import axios from "axios";
 import API_BASE_URL from "../config";
 
-
 const UserUpdateDetails = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentDetails, setCurrentDetails] = useState({
@@ -12,10 +11,14 @@ const UserUpdateDetails = () => {
         height: "",
         weight: "",
     });
-    const [name, setName] = useState("");
-    const [dob, setDob] = useState("");
-    const [height, setHeight] = useState("");
-    const [weight, setWeight] = useState("");
+
+    // ✅ Use a separate state for form inputs to prevent deselection
+    const [formData, setFormData] = useState({
+        name: "",
+        dob: "",
+        height: "",
+        weight: "",
+    });
 
     useEffect(() => {
         const fetchCurrentDetails = async () => {
@@ -38,13 +41,24 @@ const UserUpdateDetails = () => {
         fetchCurrentDetails();
     }, []);
 
+    // ✅ Pre-fill modal inputs when it opens
+    useEffect(() => {
+        if (isModalOpen) {
+            setFormData({ ...currentDetails });
+        }
+    }, [isModalOpen, currentDetails]);
+
+    const handleChange = (event) => {
+        setFormData({ ...formData, [event.target.name]: event.target.value });
+    };
+
     const handleSubmit = async () => {
         const data = {};
 
-        if (name) data.name = name;
-        if (dob) data.dob = dob;
-        if (height) data.height = height;
-        if (weight) data.weight = weight;
+        if (formData.name) data.name = formData.name;
+        if (formData.dob) data.dob = formData.dob;
+        if (formData.height) data.height = formData.height;
+        if (formData.weight) data.weight = formData.weight;
 
         if (Object.keys(data).length === 0) {
             alert("Please enter the personal details you wish to update.");
@@ -62,9 +76,9 @@ const UserUpdateDetails = () => {
                     },
                 }
             );
-            alert(`message: ${response.data.message}`);
-            setIsModalOpen(false); // Close modal
-            setCurrentDetails({ ...currentDetails, ...data }); // Update current details
+            alert(`Message: ${response.data.message}`);
+            setIsModalOpen(false);
+            setCurrentDetails({ ...currentDetails, ...data });
         } catch (error) {
             console.error(error);
             const errorMessage = error.response?.data?.error || "An error occurred";
@@ -82,10 +96,11 @@ const UserUpdateDetails = () => {
                             <label htmlFor="name">Name</label>
                             <input
                                 id="name"
+                                name="name"
                                 type="text"
                                 placeholder="Enter your name"
-                                value={name}
-                                onChange={(event) => setName(event.target.value)}
+                                value={formData.name}
+                                onChange={handleChange}
                                 style={modalStyles.input}
                             />
                         </div>
@@ -93,32 +108,34 @@ const UserUpdateDetails = () => {
                             <label htmlFor="dob">Date of Birth</label>
                             <input
                                 id="dob"
-                                type="text "
-                                placeholder="Enter your date of birth (YYYY/MM/DD)"
-                                value={dob}
-                                onChange={(event) => setDob(event.target.value)}
+                                name="dob"
+                                type="date"  // ✅ Changed to Date Picker
+                                value={formData.dob}
+                                onChange={handleChange}
                                 style={modalStyles.input}
                             />
                         </div>
                         <div style={modalStyles.formGroup}>
-                            <label htmlFor="height">Height</label>
+                            <label htmlFor="height">Height (cm)</label>
                             <input
                                 id="height"
+                                name="height"
                                 type="number"
-                                placeholder="Enter your height (cm)"
-                                value={height}
-                                onChange={(event) => setHeight(event.target.value)}
+                                placeholder="Enter your height"
+                                value={formData.height}
+                                onChange={handleChange}
                                 style={modalStyles.input}
                             />
                         </div>
                         <div style={modalStyles.formGroup}>
-                            <label htmlFor="weight">Weight</label>
+                            <label htmlFor="weight">Weight (kg)</label>
                             <input
                                 id="weight"
+                                name="weight"
                                 type="number"
-                                placeholder="Enter your weight (kg)"
-                                value={weight}
-                                onChange={(event) => setWeight(event.target.value)}
+                                placeholder="Enter your weight"
+                                value={formData.weight}
+                                onChange={handleChange}
                                 style={modalStyles.input}
                             />
                         </div>
@@ -146,8 +163,8 @@ const UserUpdateDetails = () => {
 
     return (
         <>
-        <br></br>
-                    <button
+            <br />
+            <button
                 style={{
                     backgroundColor: "#007bff",
                     color: "white",
@@ -163,7 +180,7 @@ const UserUpdateDetails = () => {
             </button>
             {isModalOpen && <Modal />}
             <div>
-                <br></br>
+                <br />
                 <h3>User Details</h3>
                 <p><strong>Name:</strong> {currentDetails.name || "Not provided"}</p>
                 <p><strong>Date of Birth:</strong> {currentDetails.dob || "Not provided"}</p>
@@ -171,7 +188,6 @@ const UserUpdateDetails = () => {
                 <p><strong>Weight:</strong> {currentDetails.weight ? `${currentDetails.weight} kg` : "Not provided"}</p>
                 <p><strong>Last Weigh In:</strong> {currentDetails.weight ? `${currentDetails.last_weighed_on}` : "Not provided"}</p>
             </div>
-
         </>
     );
 };

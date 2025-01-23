@@ -322,7 +322,6 @@ class EditSet(Resource):
     def patch(self, workout_id):
         """Edit details of a set in a workout"""
         data = request.get_json()
-        print(f"Received PATCH request data: {data}")  # ✅ Log incoming data
 
         user = find_user_from_jwt()
         if check_for_error(user):
