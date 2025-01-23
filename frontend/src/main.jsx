@@ -15,7 +15,7 @@ import { LiveTracking } from "./pages/WorkoutLiveTracking/WorkoutLiveTracker";
 const App = () => {
     return (
         <div style={{ textAlign: "center", marginTop: "50px" }}>
-            <h1>HyPrOps Granular Workout App ALPHA</h1>
+            <h1>GainsTrust Granular Workout App ALPHA</h1>
             <BrowserRouter>
                 <NavBar />
                 <Routes>

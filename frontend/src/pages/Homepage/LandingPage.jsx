@@ -7,7 +7,7 @@ export function HomePage() {
     return (
         <div>
             <header className="text-center py-4 bg-primary text-white">
-                <h1>HyProPs Workout Tracker</h1>
+                <h1>GainsTrust Workout Tracker</h1>
             </header>
 
             {/* Call-to-action buttons */}

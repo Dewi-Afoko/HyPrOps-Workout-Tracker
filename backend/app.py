@@ -70,8 +70,9 @@ def create_app():
     return app
 
 def main():
+    """ ✅ Debug Mode Disabled for Deployment """
     app = create_app()
-    app.run(debug=True)
+    app.run(debug=False)  # 🚀 Debug mode OFF
 
 if __name__ == '__main__':
     main()
