@@ -12,7 +12,7 @@ const UserUpdateDetails = () => {
         weight: "",
     });
 
-    // ✅ Use a separate state for form inputs to prevent deselection
+    // ✅ Prevent deselection by using a separate form state
     const [formData, setFormData] = useState({
         name: "",
         dob: "",
@@ -26,12 +26,17 @@ const UserUpdateDetails = () => {
                 const token = localStorage.getItem("token");
 
                 const response = await axios.get(`${API_BASE_URL}/user/details`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                    headers: { Authorization: `Bearer ${token}` },
                 });
 
-                setCurrentDetails(response.data);
+                const fetchedData = response.data;
+
+                // ✅ Convert `dob` to `YYYY-MM-DD` format for date input
+                if (fetchedData.dob) {
+                    fetchedData.dob = new Date(fetchedData.dob).toISOString().split("T")[0];
+                }
+
+                setCurrentDetails(fetchedData);
             } catch (error) {
                 console.error("Error fetching user details:", error);
                 alert("Failed to fetch current user details.");
@@ -41,22 +46,23 @@ const UserUpdateDetails = () => {
         fetchCurrentDetails();
     }, []);
 
-    // ✅ Pre-fill modal inputs when it opens
     useEffect(() => {
         if (isModalOpen) {
             setFormData({ ...currentDetails });
         }
     }, [isModalOpen, currentDetails]);
 
+    // ✅ Prevent deselecting by keeping focus on the input
     const handleChange = (event) => {
-        setFormData({ ...formData, [event.target.name]: event.target.value });
+        const { name, value } = event.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = async () => {
         const data = {};
 
         if (formData.name) data.name = formData.name;
-        if (formData.dob) data.dob = formData.dob;
+        if (formData.dob) data.dob = formData.dob; // Already formatted correctly
         if (formData.height) data.height = formData.height;
         if (formData.weight) data.weight = formData.weight;
 
@@ -71,9 +77,7 @@ const UserUpdateDetails = () => {
                 `${API_BASE_URL}/user/update_personal_data`,
                 data,
                 {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                    headers: { Authorization: `Bearer ${token}` },
                 }
             );
             alert(`Message: ${response.data.message}`);
@@ -109,7 +113,7 @@ const UserUpdateDetails = () => {
                             <input
                                 id="dob"
                                 name="dob"
-                                type="date"  // ✅ Changed to Date Picker
+                                type="date" // ✅ Now uses date picker
                                 value={formData.dob}
                                 onChange={handleChange}
                                 style={modalStyles.input}
