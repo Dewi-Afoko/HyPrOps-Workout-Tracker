@@ -16,7 +16,7 @@ const LogIn = () => {
             return;
         }
         try {
-            const response = await axios.post(`http://127.0.0.1:5000/api/login`, { username, password });
+            const response = await axios.post(`${API_BASE_URL}/api/login`, { username, password });
             const token = response.data.token;
             localStorage.setItem('token', token);
             alert(`API Response: ${JSON.stringify(response.data.message)}`);

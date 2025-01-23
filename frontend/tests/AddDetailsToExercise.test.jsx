@@ -69,7 +69,7 @@ describe('AddDetailsToExercise Component', () => {
         
         await userEvent.click(button);
 
-        expect(axios.patch).toHaveBeenCalledWith('http://127.0.0.1:5000/workouts/testUser123/testWorkout456/add_details',
+        expect(axios.patch).toHaveBeenCalledWith('${API_BASE_URL}/workouts/testUser123/testWorkout456/add_details',
             expect.objectContaining({
                 exercise_name: "Push-ups",
                 reps: 12,

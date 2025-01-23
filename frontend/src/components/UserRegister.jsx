@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Button, Form } from "react-bootstrap";
+import API_BASE_URL from "../config";
 
 const UserRegister = () => {
     const [username, setUsername] = useState("");
@@ -14,7 +15,7 @@ const UserRegister = () => {
             return;
         }
         try {
-            const response = await axios.post(`http://127.0.0.1:5000/user/register`, { username, password });
+            const response = await axios.post(`${API_BASE_URL}/user/register`, { username, password });
             alert(`message: ${response.data.message}`);
             navigate("/login");
         } catch (error) {

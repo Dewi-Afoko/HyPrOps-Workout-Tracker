@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { Button } from "react-bootstrap";
+import API_BASE_URL from "../config";
 
 const SetDeleteButton = ({ workoutId, setOrder, onDeleteSuccess }) => {
     const handleDelete = async () => {
@@ -17,7 +18,7 @@ const SetDeleteButton = ({ workoutId, setOrder, onDeleteSuccess }) => {
 
         try {
             const response = await axios.delete(
-                `http://127.0.0.1:5000/workouts/${workoutId}/delete_set/${setOrder}`,
+                `${API_BASE_URL}/workouts/${workoutId}/delete_set/${setOrder}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

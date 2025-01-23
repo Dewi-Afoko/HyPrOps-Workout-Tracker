@@ -6,6 +6,7 @@ import AddSetToWorkout from "./WorkoutAddSet";
 import SetDuplicate from "./WorkoutSetDuplicate";
 import SetDeleteButton from "./WorkoutSetDelete";
 import "./../styles/tables.css";
+import API_BASE_URL from "../config";
 
 const WorkoutDetailsById = ({ workoutId, workoutData, onSetUpdate }) => {
     const [localWorkoutData, setLocalWorkoutData] = useState(workoutData || null);
@@ -22,7 +23,7 @@ const WorkoutDetailsById = ({ workoutId, workoutData, onSetUpdate }) => {
         }
 
         try {
-            const response = await axios.get(`http://127.0.0.1:5000/workouts/${workoutId}`, {
+            const response = await axios.get(`${API_BASE_URL}/workouts/${workoutId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -52,7 +53,7 @@ const WorkoutDetailsById = ({ workoutId, workoutData, onSetUpdate }) => {
         const token = localStorage.getItem("token");
         try {
             await axios.patch(
-                `http://127.0.0.1:5000/workouts/${workoutId}/${setOrder}/mark_complete`,
+                `${API_BASE_URL}/workouts/${workoutId}/${setOrder}/mark_complete`,
                 {},
                 {
                     headers: { Authorization: `Bearer ${token}` },

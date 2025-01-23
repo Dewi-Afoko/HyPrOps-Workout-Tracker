@@ -5,6 +5,7 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import "bootstrap/dist/css/bootstrap.min.css";
+import API_BASE_URL from "../config";
 
 const AddDetailsToExercise = ({ exerciseName, onUpdate }) => {
     const [reps, setReps] = useState(0);
@@ -26,7 +27,7 @@ const AddDetailsToExercise = ({ exerciseName, onUpdate }) => {
         }
         try {
             await axios.patch(
-                `http://127.0.0.1:5000/workouts/${user_id}/${workout_id}/add_details`,
+                `${API_BASE_URL}/workouts/${user_id}/${workout_id}/add_details`,
                 {
                     exercise_name: exerciseName,
                     reps: parseFloat(reps),

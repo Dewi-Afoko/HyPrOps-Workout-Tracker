@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import axios from "axios";
+import API_BASE_URL from "../config";
 
 const AddSetToWorkout = ({ workoutId, onSetAdded }) => {
     const [exerciseName, setExerciseName] = useState("");
@@ -35,7 +36,7 @@ const AddSetToWorkout = ({ workoutId, onSetAdded }) => {
 
         try {
             const response = await axios.post(
-                `http://127.0.0.1:5000/workouts/${workoutId}/add_set`,
+                `${API_BASE_URL}/workouts/${workoutId}/add_set`,
                 data,
                 {
                     headers: {

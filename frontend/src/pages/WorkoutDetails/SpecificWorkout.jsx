@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import WorkoutDetailsById from "../../components/WorkoutDetailsById";
 import axios from "axios";
+import API_BASE_URL from "../../config";
 
 export function SpecificWorkout() {
     const workoutId = localStorage.getItem("workout_id");
@@ -15,7 +16,7 @@ export function SpecificWorkout() {
 
         try {
             const response = await axios.get(
-                `http://127.0.0.1:5000/workouts/${workoutId}`,
+                `${API_BASE_URL}/workouts/${workoutId}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

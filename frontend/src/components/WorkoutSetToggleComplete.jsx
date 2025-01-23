@@ -1,5 +1,6 @@
 import React from "react";
 import axios from "axios";
+import API_BASE_URL from "../config";
 
 const SetToggleComplete = ({ workoutId, setOrder, complete, onToggleSetComplete }) => {
     const handleToggle = async () => {
@@ -12,7 +13,7 @@ const SetToggleComplete = ({ workoutId, setOrder, complete, onToggleSetComplete 
 
         try {
             const response = await axios.patch(
-                `http://127.0.0.1:5000/workouts/${workoutId}/${setOrder}/mark_complete`,
+                `${API_BASE_URL}/workouts/${workoutId}/${setOrder}/mark_complete`,
                 {},
                 {
                     headers: {

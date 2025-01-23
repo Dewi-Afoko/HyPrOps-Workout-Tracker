@@ -7,6 +7,7 @@ import AddExerciseToWorkout from "./AddExerciseToWorkout";
 import CompleteSet from "./MarkExerciseComplete";
 import DeleteDetails from "./DeleteExerciseDetails";
 import DeleteExercise from "./DeleteExerciseFromWorkout";
+import API_BASE_URL from "../config";
 
 const SplitIndividualWorkoutDetails = () => {
     const [thisWorkout, setThisWorkout] = useState({
@@ -25,7 +26,7 @@ const SplitIndividualWorkoutDetails = () => {
         }
         try {
             const response = await axios.get(
-                `http://127.0.0.1:5000/workouts/${workout_id}`,
+                `${API_BASE_URL}/workouts/${workout_id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

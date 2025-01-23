@@ -15,7 +15,7 @@ const DeleteExercise = ({ exerciseName, onDeleteSuccess }) => {
 
         try {
             const response = await axios.delete(
-                `http://127.0.0.1:5000/workouts/${user_id}/${workout_id}/delete_exercise`,
+                `${API_BASE_URL}/workouts/${user_id}/${workout_id}/delete_exercise`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

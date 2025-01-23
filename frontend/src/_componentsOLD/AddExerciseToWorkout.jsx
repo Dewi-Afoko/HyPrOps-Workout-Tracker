@@ -17,7 +17,7 @@ const AddExerciseToWorkout = ({ onNewExercise }) => {
         }
         try {
             const response = await axios.post(
-                `http://127.0.0.1:5000/workouts/${user_id}/${workout_id}/add_exercise`,
+                `${API_BASE_URL}/workouts/${user_id}/${workout_id}/add_exercise`,
                 { exercise_name: exerciseName },
                 {
                     headers: {

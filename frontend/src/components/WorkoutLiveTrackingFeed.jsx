@@ -5,6 +5,7 @@ import Countdown from "react-countdown";
 import axios from "axios";
 import "../styles/tables.css";
 import LastFiveSets from "./WorkoutLastFiveSets";
+import API_BASE_URL from "../config";
 
 const WorkoutLiveTrackingFeed = ({ workoutId }) => {
     const [workoutData, setWorkoutData] = useState(null);
@@ -21,7 +22,7 @@ const WorkoutLiveTrackingFeed = ({ workoutId }) => {
 
         try {
             const response = await axios.get(
-                `http://127.0.0.1:5000/workouts/${workoutId}`,
+                `${API_BASE_URL}/workouts/${workoutId}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

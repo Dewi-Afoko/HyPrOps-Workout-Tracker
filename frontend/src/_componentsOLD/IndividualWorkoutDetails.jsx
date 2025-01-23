@@ -25,7 +25,7 @@ const IndividualWorkoutDetails = () => {
         }
         try {
             const response = await axios.get(
-                `http://127.0.0.1:5000/api/workouts/${workout_id}`,
+                `${API_BASE_URL}/api/workouts/${workout_id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config";
 
 const CreateWorkout = () => {
     const navigate = useNavigate();
@@ -30,7 +31,7 @@ const CreateWorkout = () => {
 
         try {
             const response = await axios.post(
-                `http://127.0.0.1:5000/workouts`,
+                `${API_BASE_URL}/workouts`,
                 data,
                 {
                     headers: {

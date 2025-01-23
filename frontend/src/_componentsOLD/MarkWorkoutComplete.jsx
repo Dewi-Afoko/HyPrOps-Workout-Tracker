@@ -17,7 +17,7 @@ const CompleteWorkout = ({ workoutId, initialComplete, onStatusChange }) => {
         }
         try {
             const response = await axios.patch(
-                `http://127.0.0.1:5000/workouts/${user_id}/${workoutId}`,
+                `${API_BASE_URL}/workouts/${user_id}/${workoutId}`,
                 { complete: newCompleteStatus },
                 {
                     headers: {

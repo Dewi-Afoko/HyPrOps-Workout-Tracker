@@ -6,6 +6,7 @@ import WorkoutDelete from "./WorkoutDelete";
 import CreateWorkout from "./WorkoutCreate";
 import WorkoutDuplicate from "./WorkoutDuplicate";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config";
 
 const WorkoutsFeed = () => {
     const [myWorkouts, setMyWorkouts] = useState([]);
@@ -23,7 +24,7 @@ const WorkoutsFeed = () => {
             return;
         }
         try {
-            const response = await axios.get(`http://127.0.0.1:5000/workouts`, {
+            const response = await axios.get(`${API_BASE_URL}/workouts`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -64,7 +65,7 @@ const WorkoutsFeed = () => {
         }
         try {
             const response = await axios.patch(
-                `http://127.0.0.1:5000/workouts/${workoutId}/mark_complete`,
+                `${API_BASE_URL}/workouts/${workoutId}/mark_complete`,
                 {},
                 {
                     headers: {

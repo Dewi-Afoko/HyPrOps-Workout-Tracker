@@ -33,7 +33,7 @@ describe('GetUsers Component', () => {
         const button = screen.getByText("Click Me to Call GET Users");
         await userEvent.click(button);
 
-        expect(axios.get).toHaveBeenCalledWith("http://127.0.0.1:5000/users");
+        expect(axios.get).toHaveBeenCalledWith("${API_BASE_URL}/users");
         expect(window.alert).toHaveBeenCalledWith('API Response: [{"id":1,"name":"John Doe"}]');
     });
 
@@ -46,7 +46,7 @@ describe('GetUsers Component', () => {
         const button = screen.getByText("Click Me to Call GET Users");
         await userEvent.click(button);
 
-        expect(axios.get).toHaveBeenCalledWith("http://127.0.0.1:5000/users");
+        expect(axios.get).toHaveBeenCalledWith("${API_BASE_URL}/users");
         expect(window.alert).toHaveBeenCalledWith("Failed to fetch data. Check console for details.");
         expect(console.error).toHaveBeenCalledWith("Error making API call:", expect.any(Error));
     });

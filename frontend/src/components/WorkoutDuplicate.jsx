@@ -1,5 +1,6 @@
 import React from "react";
 import axios from "axios";
+import API_BASE_URL from "../config";
 
 const WorkoutDuplicate = ({ workoutId, onDuplicateSuccess }) => {
     const handleDuplicateWorkout = async () => {
@@ -11,7 +12,7 @@ const WorkoutDuplicate = ({ workoutId, onDuplicateSuccess }) => {
 
         try {
             const response = await axios.post(
-                `http://127.0.0.1:5000/workouts/${workoutId}/duplicate`,
+                `${API_BASE_URL}/workouts/${workoutId}/duplicate`,
                 {},
                 {
                     headers: {

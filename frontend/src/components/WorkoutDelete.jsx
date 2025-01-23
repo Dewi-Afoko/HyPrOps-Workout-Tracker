@@ -1,5 +1,6 @@
 import React from "react";
 import axios from "axios";
+import API_BASE_URL from "../config";
 
 const WorkoutDelete = ({ workoutId, onDeleteSuccess }) => {
     const handleDelete = async () => {
@@ -16,7 +17,7 @@ const WorkoutDelete = ({ workoutId, onDeleteSuccess }) => {
 
         try {
             const response = await axios.delete(
-                `http://127.0.0.1:5000/workouts/${workoutId}`,
+                `${API_BASE_URL}/workouts/${workoutId}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

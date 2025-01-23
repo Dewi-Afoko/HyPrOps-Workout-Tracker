@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { Button } from "react-bootstrap";
+import API_BASE_URL from "../config";
 
 const SetDuplicate = ({ workoutId, setOrder, onDuplicateSuccess }) => {
     const handleDuplicateSet = async () => {
@@ -18,7 +19,7 @@ const SetDuplicate = ({ workoutId, setOrder, onDuplicateSuccess }) => {
         try {
             console.log(`Attempting to duplicate set. Workout ID: ${workoutId}, Set Order: ${setOrder}`);
             const response = await axios.post(
-                `http://127.0.0.1:5000/workouts/${workoutId}/${setOrder}/duplicate_set`,
+                `${API_BASE_URL}/workouts/${workoutId}/${setOrder}/duplicate_set`,
                 {},
                 {
                     headers: {

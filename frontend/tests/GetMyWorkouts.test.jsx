@@ -53,7 +53,7 @@ describe("GetWorkouts Component", () => {
         await userEvent.click(button);
 
         // Assert that axios.get was called with the correct URL
-        expect(axios.get).toHaveBeenCalledWith("http://127.0.0.1:5000/workouts/testUser123");
+        expect(axios.get).toHaveBeenCalledWith("${API_BASE_URL}/workouts/testUser123");
 
         // Assert that the workouts are rendered correctly
         const workoutItems = await screen.findAllByRole("listitem");
@@ -72,7 +72,7 @@ describe("GetWorkouts Component", () => {
         await userEvent.click(button);
 
         // Assert that axios.get was called with the correct URL
-        expect(axios.get).toHaveBeenCalledWith("http://127.0.0.1:5000/workouts/testUser123");
+        expect(axios.get).toHaveBeenCalledWith("${API_BASE_URL}/workouts/testUser123");
 
         // Assert that the failure alert is shown
         expect(window.alert).toHaveBeenCalledWith("Failed to fetch data. Check console for details.");

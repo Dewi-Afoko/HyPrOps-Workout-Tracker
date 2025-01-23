@@ -2,6 +2,7 @@ import React from "react";
 import { Table, Button } from "react-bootstrap";
 import axios from "axios";
 import "./../styles/tables.css";
+import API_BASE_URL from "../config";
 
 const NextFiveSets = ({ workoutData, onSetUpdate }) => {
     if (!workoutData || !workoutData.set_dicts_list) {
@@ -18,7 +19,7 @@ const NextFiveSets = ({ workoutData, onSetUpdate }) => {
         try {
             // ✅ API call to mark set as complete in the backend
             await axios.patch(
-                `http://127.0.0.1:5000/workouts/${workoutData.id}/${setOrder}/mark_complete`,
+                `${API_BASE_URL}/workouts/${workoutData.id}/${setOrder}/mark_complete`,
                 {},
                 {
                     headers: { Authorization: `Bearer ${token}` },

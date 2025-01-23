@@ -16,7 +16,7 @@ const CreateUser = () => {
             return;
         }
         try {
-            const response = await axios.post(`http://127.0.0.1:5000/api/users`, { username, password });
+            const response = await axios.post(`${API_BASE_URL}/api/users`, { username, password });
             alert(`API Response: ${JSON.stringify(response.data.message)}`);
             navigate('/login');
         } catch (error) {

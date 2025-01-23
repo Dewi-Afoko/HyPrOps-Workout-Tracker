@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
+import API_BASE_URL from '../config';
 
 const WorkoutsContext = createContext();
 
@@ -14,7 +15,7 @@ export const WorkoutsProvider = ({ children }) => {
         }
         try {
             const response = await axios.get(
-                `http://127.0.0.1:5000/workouts/${user_id}`,
+                `${API_BASE_URL}/workouts/${user_id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

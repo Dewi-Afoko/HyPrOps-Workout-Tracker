@@ -7,7 +7,7 @@ const GetUsers = () => {
 
     const handleButtonClick = async () => {
         try {
-            const response = await axios.get("http://127.0.0.1:5000/users");
+            const response = await axios.get("${API_BASE_URL}/users");
             alert(`API Response: ${JSON.stringify(response.data)}`);
         } catch (error) {
             console.error("Error making API call:", error);

@@ -52,7 +52,7 @@ describe('AddExerciseToWorkout Component', () => {
         await userEvent.click(button);
 
         expect(axios.post).toHaveBeenCalledWith(
-            "http://127.0.0.1:5000/workouts/testUser123/testWorkout456/add_exercise",
+            "${API_BASE_URL}/workouts/testUser123/testWorkout456/add_exercise",
             { exercise_name: "Push-ups" }
         );
         expect(window.alert).toHaveBeenCalledWith('API Response: {"message":"Exercise added successfully"}');
@@ -72,7 +72,7 @@ describe('AddExerciseToWorkout Component', () => {
         await userEvent.click(button);
 
         expect(axios.post).toHaveBeenCalledWith(
-            "http://127.0.0.1:5000/workouts/testUser123/testWorkout456/add_exercise",
+            "${API_BASE_URL}/workouts/testUser123/testWorkout456/add_exercise",
             { exercise_name: "Push-ups" }
         );
         expect(window.alert).toHaveBeenCalledWith("Exercise already exists");

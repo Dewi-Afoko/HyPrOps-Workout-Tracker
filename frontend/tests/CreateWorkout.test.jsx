@@ -53,7 +53,7 @@ describe('CreateWorkout Component', () => {
 
         await userEvent.click(button);
 
-        expect(axios.post).toHaveBeenCalledWith("http://127.0.0.1:5000/workouts/testUser123");
+        expect(axios.post).toHaveBeenCalledWith("${API_BASE_URL}/workouts/testUser123");
         expect(window.alert).toHaveBeenCalledWith('API Response: {"workout_id":"workout456"}');
         expect(localStorage.setItem).toHaveBeenCalledWith("workout_id", "workout456");
     });
@@ -67,7 +67,7 @@ describe('CreateWorkout Component', () => {
     
         await userEvent.click(button);
     
-        expect(axios.post).toHaveBeenCalledWith("http://127.0.0.1:5000/workouts/testUser123");
+        expect(axios.post).toHaveBeenCalledWith("${API_BASE_URL}/workouts/testUser123");
         expect(window.alert).toHaveBeenCalledWith("Failed to fetch data. Check console for details.");
         expect(consoleSpy).toHaveBeenCalledWith("Error making API call:", expect.any(Error));
     

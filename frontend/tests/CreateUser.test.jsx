@@ -59,7 +59,7 @@ describe('CreateUser Component', () => {
         await userEvent.type(passwordInput, "testpass");
         await userEvent.click(button);
 
-        expect(axios.post).toHaveBeenCalledWith("http://127.0.0.1:5000/users", {
+        expect(axios.post).toHaveBeenCalledWith("${API_BASE_URL}/users", {
             username: "testuser",
             password: "testpass",
         });
@@ -79,7 +79,7 @@ describe('CreateUser Component', () => {
         await userEvent.type(passwordInput, "testpass");
         await userEvent.click(button);
 
-        expect(axios.post).toHaveBeenCalledWith("http://127.0.0.1:5000/users", {
+        expect(axios.post).toHaveBeenCalledWith("${API_BASE_URL}/users", {
             username: "testuser",
             password: "testpass",
         });

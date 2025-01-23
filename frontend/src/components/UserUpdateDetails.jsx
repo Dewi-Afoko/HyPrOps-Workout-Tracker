@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import axios from "axios";
+import API_BASE_URL from "../config";
+
 
 const UserUpdateDetails = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,7 +22,7 @@ const UserUpdateDetails = () => {
             try {
                 const token = localStorage.getItem("token");
 
-                const response = await axios.get("http://127.0.0.1:5000/user/details", {
+                const response = await axios.get(`${API_BASE_URL}/user/details`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -52,7 +54,7 @@ const UserUpdateDetails = () => {
         try {
             const token = localStorage.getItem("token");
             const response = await axios.patch(
-                `http://127.0.0.1:5000/user/update_personal_data`,
+                `${API_BASE_URL}/user/update_personal_data`,
                 data,
                 {
                     headers: {

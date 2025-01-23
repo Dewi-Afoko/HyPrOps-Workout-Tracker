@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import axios from "axios";
+import API_BASE_URL from "../config";
 
 const SetEdit = ({ workoutId, setOrder, exerciseName, onUpdateSuccess, handleClose }) => {
     const [newExerciseName, setNewExerciseName] = useState(exerciseName || "");
@@ -35,7 +36,7 @@ const SetEdit = ({ workoutId, setOrder, exerciseName, onUpdateSuccess, handleClo
 
         try {
             const response = await axios.patch(
-                `http://127.0.0.1:5000/workouts/${workoutId}/edit_set`,
+                `${API_BASE_URL}/workouts/${workoutId}/edit_set`,
                 data,
                 {
                     headers: {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, ListGroup } from "react-bootstrap";
 import axios from "axios";
+import API_BASE_URL from "../config";
 
 const WorkoutEditDetails = ({ workoutId, onUpdateSuccess, handleClose }) => {
     const [name, setName] = useState("");
@@ -23,7 +24,7 @@ const WorkoutEditDetails = ({ workoutId, onUpdateSuccess, handleClose }) => {
         }
 
         try {
-            const response = await axios.get(`http://127.0.0.1:5000/workouts/${workoutId}`, {
+            const response = await axios.get(`${API_BASE_URL}/workouts/${workoutId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -61,7 +62,7 @@ const WorkoutEditDetails = ({ workoutId, onUpdateSuccess, handleClose }) => {
 
         try {
             const response = await axios.patch(
-                `http://127.0.0.1:5000/workouts/${workoutId}/edit_details`,
+                `${API_BASE_URL}/workouts/${workoutId}/edit_details`,
                 data,
                 {
                     headers: { Authorization: `Bearer ${token}` },
@@ -89,7 +90,7 @@ const WorkoutEditDetails = ({ workoutId, onUpdateSuccess, handleClose }) => {
 
         try {
             const response = await axios.patch(
-                `http://127.0.0.1:5000/workouts/${workoutId}/add_notes`,
+                `${API_BASE_URL}/workouts/${workoutId}/add_notes`,
                 { notes: newNote },
                 {
                     headers: { Authorization: `Bearer ${token}` },
@@ -116,7 +117,7 @@ const WorkoutEditDetails = ({ workoutId, onUpdateSuccess, handleClose }) => {
 
         try {
             await axios.delete(
-                `http://127.0.0.1:5000/workouts/${workoutId}/delete_note/${index}`,
+                `${API_BASE_URL}/workouts/${workoutId}/delete_note/${index}`,
                 {
                     headers: { Authorization: `Bearer ${token}` },
                 }
