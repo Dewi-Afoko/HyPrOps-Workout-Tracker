@@ -74,9 +74,10 @@ def create_app():
     return app
 
 def main():
-    """ ✅ Debug Mode Disabled for Deployment """
     app = create_app()
-    app.run(debug=False)  # 🚀 Debug mode OFF
+    port = int(os.environ.get("PORT", 10000))  # Render provides PORT dynamically
+    app.run(host="0.0.0.0", port=port)
+
 
 if __name__ == '__main__':
     main()
