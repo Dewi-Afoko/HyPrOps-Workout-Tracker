@@ -38,7 +38,10 @@ def create_app():
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "default_secret_key")
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=4)
     JWTManager(app)
-    initialize_db(db_name="HyPrOps")
+    MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/HyPrOps")  # Default to local if not set
+    initialize_db(MONGO_URI)
+
+
 
     api.add_namespace(auth_ns, path="/auth")
     api.add_namespace(user_ns, path='/user')
