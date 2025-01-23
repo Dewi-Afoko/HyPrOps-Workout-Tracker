@@ -2,6 +2,7 @@
 
 ## Update!
 Exciting news, the MVP/Alpha is built and ready to use! I'll use it for my workouts this week, use that as an opportunity to find any bugs, then clean up code, documentation and any bug fixes next week! 🍾
+Update to the update - Deployed on Render after a week of testing! Fixed all initial bugs, works on mobile! 🍾
 
 ### Alpha Testing UI Improvements:
     - Live Tracking Page Created
