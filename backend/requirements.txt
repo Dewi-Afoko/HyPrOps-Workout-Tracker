@@ -12,7 +12,7 @@ charset-normalizer==3.4.0
 click==8.1.7
 colorama==0.4.6
 coverage==7.6.4
-dnspython==1.16.0
+dnspython>=2.0.0
 email_validator==2.2.0
 eventlet==0.38.0
 Flask==3.0.3
