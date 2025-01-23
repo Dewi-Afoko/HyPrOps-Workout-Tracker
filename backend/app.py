@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory, request, jsonify
+from flask import Flask, jsonify, send_from_directory, request
 from lib.database_connection import initialize_db
 from dotenv import load_dotenv
 from flask_cors import CORS
@@ -10,14 +10,20 @@ from datetime import timedelta
 
 load_dotenv()
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-STATIC_DIR = os.path.join(BASE_DIR, "static")
+# ✅ Absolute Path to React Build Folder
+FRONTEND_DIST_DIR = "/Users/dewi/Desktop/programming/projects/Fullstack_HyPrOps/frontend/dist"
+
+# ✅ Debugging: Check if the directory exists
+if not os.path.exists(FRONTEND_DIST_DIR):
+    raise RuntimeError(f"⚠️ ERROR: Frontend build directory not found: {FRONTEND_DIST_DIR}")
+
+print(f"🚀 Serving frontend from: {FRONTEND_DIST_DIR}")
 
 def create_app():
     app = Flask(
         __name__,
-        static_folder=STATIC_DIR,
-        template_folder=STATIC_DIR
+        static_folder=FRONTEND_DIST_DIR,  # ✅ Serve frontend build from absolute path
+        static_url_path=""  
     )
 
     api = Api(
@@ -25,54 +31,47 @@ def create_app():
         version='3.1',
         title='HyPrOps Workout Tracker API',
         description='API for managing workout tracking',
-        doc='/api/docs'  # ✅ Keeps Swagger UI working
+        doc="/api/docs"
     )
 
     CORS(app, resources={r"/*": {"origins": "*"}}, methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
-
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "default_secret_key")
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=4)
     JWTManager(app)
-
     initialize_db(db_name="HyPrOps")
 
     api.add_namespace(auth_ns, path="/auth")
     api.add_namespace(user_ns, path='/user')
     api.add_namespace(workout_ns, path='/workouts')
 
-    # ✅ Serve `index.html` for the base route `/`
+    # ✅ Serve index.html for the root `/`
     @app.route("/")
     def serve_root():
-        print(f"Serving index.html from {STATIC_DIR}")  # Debug log
-        return send_from_directory(STATIC_DIR, "index.html")
+        return send_from_directory(FRONTEND_DIST_DIR, "index.html")
 
-    # ✅ Serve static files properly
-    @app.route("/assets/<path:filename>")
-    def serve_assets(filename):
-        return send_from_directory(os.path.join(STATIC_DIR, "assets"), filename)
+    # ✅ Serve Static Assets (JS, CSS, Images)
+    @app.route('/assets/<path:path>')
+    def serve_assets(path):
+        return send_from_directory(os.path.join(FRONTEND_DIST_DIR, "assets"), path)
 
-    # ✅ Handle all **other frontend routes** by returning `index.html`
-    @app.route("/<path:path>")
-    def serve_react_routes(path):
-        # 🔹 If the requested file exists in static folder, serve it (JS, CSS, images, etc.)
-        requested_file = os.path.join(STATIC_DIR, path)
-        if os.path.exists(requested_file) and not os.path.isdir(requested_file):
-            return send_from_directory(STATIC_DIR, path)
+    # ✅ API Routes Should Not Be Handled by React
+    @app.route("/auth/<path:path>")
+    @app.route("/user/<path:path>")
+    @app.route("/workouts/<path:path>")
+    def serve_api_routes(path):
+        return jsonify({"error": "API endpoint not found"}), 404
 
-        # 🔹 Otherwise, assume it's a React route & serve `index.html`
-        print(f"React route triggered, serving index.html for {path}")  # Debugging
-        return send_from_directory(STATIC_DIR, "index.html")
-
-    # ✅ Health Check Endpoint (Optional)
-    @app.route("/health")
-    def health_check():
-        return jsonify({"status": "OK", "message": "Backend is running"}), 200
+    # ✅ Catch-All Route for React Router (Fixes Refreshing Issue)
+    @app.errorhandler(404)
+    def serve_react(_):
+        print(f"🔹 Serving React index.html for a 404 route")
+        return send_from_directory(FRONTEND_DIST_DIR, "index.html")
 
     return app
 
 def main():
     app = create_app()
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(debug=True)
 
 if __name__ == '__main__':
     main()
