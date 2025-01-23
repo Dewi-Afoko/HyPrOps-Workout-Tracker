@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import axios from "axios";
 import API_BASE_URL from "../config";
@@ -12,31 +12,21 @@ const UserUpdateDetails = () => {
         weight: "",
     });
 
-    // ✅ Prevent deselection by using a separate form state
-    const [formData, setFormData] = useState({
-        name: "",
-        dob: "",
-        height: "",
-        weight: "",
-    });
+    // ✅ Use useRef to store input values without causing re-renders
+    const nameRef = useRef("");
+    const dobRef = useRef("");
+    const heightRef = useRef("");
+    const weightRef = useRef("");
 
     useEffect(() => {
         const fetchCurrentDetails = async () => {
             try {
                 const token = localStorage.getItem("token");
-
                 const response = await axios.get(`${API_BASE_URL}/user/details`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
-                const fetchedData = response.data;
-
-                // ✅ Convert `dob` to `YYYY-MM-DD` format for date input
-                if (fetchedData.dob) {
-                    fetchedData.dob = new Date(fetchedData.dob).toISOString().split("T")[0];
-                }
-
-                setCurrentDetails(fetchedData);
+                setCurrentDetails(response.data);
             } catch (error) {
                 console.error("Error fetching user details:", error);
                 alert("Failed to fetch current user details.");
@@ -46,25 +36,17 @@ const UserUpdateDetails = () => {
         fetchCurrentDetails();
     }, []);
 
-    useEffect(() => {
-        if (isModalOpen) {
-            setFormData({ ...currentDetails });
-        }
-    }, [isModalOpen, currentDetails]);
-
-    // ✅ Prevent deselecting by keeping focus on the input
-    const handleChange = (event) => {
-        const { name, value } = event.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
-    };
-
     const handleSubmit = async () => {
         const data = {};
 
-        if (formData.name) data.name = formData.name;
-        if (formData.dob) data.dob = formData.dob; // Already formatted correctly
-        if (formData.height) data.height = formData.height;
-        if (formData.weight) data.weight = formData.weight;
+        if (nameRef.current.value) data.name = nameRef.current.value;
+        if (dobRef.current.value) {
+            const dobDate = new Date(dobRef.current.value);
+            const formattedDob = `${dobDate.getFullYear()}/${(dobDate.getMonth() + 1).toString().padStart(2, "0")}/${dobDate.getDate().toString().padStart(2, "0")}`;
+            data.dob = formattedDob;
+        }
+        if (heightRef.current.value) data.height = parseFloat(heightRef.current.value);
+        if (weightRef.current.value) data.weight = parseFloat(weightRef.current.value);
 
         if (Object.keys(data).length === 0) {
             alert("Please enter the personal details you wish to update.");
@@ -73,13 +55,10 @@ const UserUpdateDetails = () => {
 
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.patch(
-                `${API_BASE_URL}/user/update_personal_data`,
-                data,
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
+            const response = await axios.patch(`${API_BASE_URL}/user/update_personal_data`, data, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
             alert(`Message: ${response.data.message}`);
             setIsModalOpen(false);
             setCurrentDetails({ ...currentDetails, ...data });
@@ -98,64 +77,25 @@ const UserUpdateDetails = () => {
                     <form>
                         <div style={modalStyles.formGroup}>
                             <label htmlFor="name">Name</label>
-                            <input
-                                id="name"
-                                name="name"
-                                type="text"
-                                placeholder="Enter your name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                style={modalStyles.input}
-                            />
+                            <input id="name" name="name" type="text" placeholder="Enter your name" defaultValue={currentDetails.name} ref={nameRef} style={modalStyles.input} />
                         </div>
                         <div style={modalStyles.formGroup}>
                             <label htmlFor="dob">Date of Birth</label>
-                            <input
-                                id="dob"
-                                name="dob"
-                                type="date" // ✅ Now uses date picker
-                                value={formData.dob}
-                                onChange={handleChange}
-                                style={modalStyles.input}
-                            />
+                            <input id="dob" name="dob" type="date" defaultValue={currentDetails.dob} ref={dobRef} style={modalStyles.input} />
                         </div>
                         <div style={modalStyles.formGroup}>
                             <label htmlFor="height">Height (cm)</label>
-                            <input
-                                id="height"
-                                name="height"
-                                type="number"
-                                placeholder="Enter your height"
-                                value={formData.height}
-                                onChange={handleChange}
-                                style={modalStyles.input}
-                            />
+                            <input id="height" name="height" type="number" placeholder="Enter your height" defaultValue={currentDetails.height} ref={heightRef} style={modalStyles.input} />
                         </div>
                         <div style={modalStyles.formGroup}>
                             <label htmlFor="weight">Weight (kg)</label>
-                            <input
-                                id="weight"
-                                name="weight"
-                                type="number"
-                                placeholder="Enter your weight"
-                                value={formData.weight}
-                                onChange={handleChange}
-                                style={modalStyles.input}
-                            />
+                            <input id="weight" name="weight" type="number" placeholder="Enter your weight" defaultValue={currentDetails.weight} ref={weightRef} style={modalStyles.input} />
                         </div>
                         <div style={modalStyles.buttonGroup}>
-                            <button
-                                type="button"
-                                onClick={handleSubmit}
-                                style={modalStyles.primaryButton}
-                            >
+                            <button type="button" onClick={handleSubmit} style={modalStyles.primaryButton}>
                                 Update Details
                             </button>
-                            <button
-                                type="button"
-                                onClick={() => setIsModalOpen(false)}
-                                style={modalStyles.secondaryButton}
-                            >
+                            <button type="button" onClick={() => setIsModalOpen(false)} style={modalStyles.secondaryButton}>
                                 Cancel
                             </button>
                         </div>
@@ -190,7 +130,7 @@ const UserUpdateDetails = () => {
                 <p><strong>Date of Birth:</strong> {currentDetails.dob || "Not provided"}</p>
                 <p><strong>Height:</strong> {currentDetails.height ? `${currentDetails.height} cm` : "Not provided"}</p>
                 <p><strong>Weight:</strong> {currentDetails.weight ? `${currentDetails.weight} kg` : "Not provided"}</p>
-                <p><strong>Last Weigh In:</strong> {currentDetails.weight ? `${currentDetails.last_weighed_on}` : "Not provided"}</p>
+                <p><strong>Last Weigh In:</strong> {currentDetails.last_weighed_on ? currentDetails.last_weighed_on : "Not provided"}</p>
             </div>
         </>
     );
