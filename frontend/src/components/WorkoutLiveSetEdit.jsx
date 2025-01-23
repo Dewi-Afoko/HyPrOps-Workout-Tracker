@@ -14,17 +14,25 @@ const LiveSetEdit = ({ workoutId, setData, field, onUpdateSuccess }) => {
             alert("Token not found in localStorage.");
             return;
         }
-
+    
         try {
-            // ✅ Ensure input values are properly formatted
-            const formattedValue = typeof setData[field] === "number" ? Number(inputValue) : inputValue;
-
+            let formattedValue = inputValue;
+    
+            // ✅ Convert number fields to their correct types
+            if (typeof setData[field] === "number") {
+                formattedValue = parseFloat(inputValue);  // Ensure numbers are correctly parsed
+                if (isNaN(formattedValue)) {
+                    alert("Invalid number entered.");
+                    return;
+                }
+            }
+    
             // ✅ Ensure request body follows the expected API format
             const requestBody = {
                 set_order: setData.set_order, // Ensure set_order is included
                 [field]: formattedValue, // Update only the specific field
             };
-
+    
             // ✅ Send PATCH request
             const response = await axios.patch(
                 `${API_BASE_URL}/workouts/${workoutId}/edit_set`,
@@ -33,15 +41,16 @@ const LiveSetEdit = ({ workoutId, setData, field, onUpdateSuccess }) => {
                     headers: { Authorization: `Bearer ${token}` },
                 }
             );
-
+    
             console.log("Update success:", response.data);
-
+    
             onUpdateSuccess(); // Refresh workout data on success
         } catch (error) {
             console.error("Error updating set:", error.response ? error.response.data : error);
             alert(`Failed to update set: ${error.response?.data?.error || "Unknown error"}`);
         }
     };
+    
 
     return (
 
