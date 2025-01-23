@@ -322,28 +322,35 @@ class EditSet(Resource):
     def patch(self, workout_id):
         """Edit details of a set in a workout"""
         data = request.get_json()
+        print(f"Received PATCH request data: {data}")  # ✅ Log incoming data
+
         user = find_user_from_jwt()
         if check_for_error(user):
             return user
-        
+
         workout = find_single_workout(workout_id)
         if check_for_error(workout):
             return workout
 
-        set_order = data.get('set_order')
+        set_order = data.get("set_order")
         if set_order is None:
-            return {'error': 'Set order is required'}, 400
+            return {"error": "Set order is required"}, 400
 
         try:
-            editable_data = {key: value for key, value in data.items() if key != 'set_order'}
+            # Validate `rest` type before updating
+            if "rest" in data and not isinstance(data["rest"], (int, float)):
+                return {"error": f"Invalid rest value: {data['rest']}. Must be a float or int."}, 400
+            
+            editable_data = {key: value for key, value in data.items() if key != "set_order"}
             response = workout.edit_set(set_order, **editable_data)
             return response, 200
         except ValueError as e:
-            return {'error': str(e)}, 400
+            return {"error": str(e)}, 400
         except KeyError as e:
-            return {'error': f"Invalid field: {str(e)}"}, 400
+            return {"error": f"Invalid field: {str(e)}"}, 400
         except Exception as e:
-            return {'error': f"Failed to update set: {str(e)}"}, 400
+            return {"error": f"Failed to update set: {str(e)}"}, 400
+
 
 
 @workout_ns.route('/<string:workout_id>')
