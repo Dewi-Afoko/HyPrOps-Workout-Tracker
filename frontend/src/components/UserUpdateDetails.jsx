@@ -10,6 +10,7 @@ const UserUpdateDetails = () => {
         dob: "",
         height: "",
         weight: "",
+        last_weighed_on: ""
     });
 
     // ✅ Use useRef to store input values without causing re-renders

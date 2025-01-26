@@ -26,17 +26,35 @@
 
 ## Extra Backend Functionality for v3.2
 
+### Current Feature Enhancement
+
     - Set type as tag
         - Highlight based on tags
 
-  
+- View other users workouts?
+
+
+
+
+### New Features
+
 - New Embedded Document - UserRecords
     - All My Lifts Page
         - Separate tables for each exercise
             - Personal Best highlighted
                 - Include date and workout
-            - User extra info component 
+            - User specific exercise info component 
     - Last workout
         - Date, name and notes
-    
-    
+    - Component to compare current lift values to best/last, etc.
+    - At some stage this enables suggestions
+        - Write my own algos to start
+            - Include an LLM (Dench Clippy 💪🏾)
+
+
+- Workout having "type/template/current" setting so it can be easily duped and used as standard workout
+
+- Set duration tiumer, add to SetDict model, records time between set completions
+- Marking set complete out of order changes running order?
+
+- Exercise suggestions? Links to a website/API?
