@@ -10,7 +10,7 @@ const UserUpdateDetails = () => {
         dob: "",
         height: "",
         weight: "",
-        last_weighed_on: ""
+        last_weighed_on: "",
     });
 
     // ✅ Use useRef to store input values without causing re-renders
@@ -19,21 +19,22 @@ const UserUpdateDetails = () => {
     const heightRef = useRef("");
     const weightRef = useRef("");
 
+    // ✅ Fetch current details
+    const fetchCurrentDetails = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await axios.get(`${API_BASE_URL}/user/details`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            setCurrentDetails(response.data);
+        } catch (error) {
+            console.error("Error fetching user details:", error);
+            alert("Failed to fetch current user details.");
+        }
+    };
+
     useEffect(() => {
-        const fetchCurrentDetails = async () => {
-            try {
-                const token = localStorage.getItem("token");
-                const response = await axios.get(`${API_BASE_URL}/user/details`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-
-                setCurrentDetails(response.data);
-            } catch (error) {
-                console.error("Error fetching user details:", error);
-                alert("Failed to fetch current user details.");
-            }
-        };
-
         fetchCurrentDetails();
     }, []);
 
@@ -56,13 +57,14 @@ const UserUpdateDetails = () => {
 
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.patch(`${API_BASE_URL}/user/update_personal_data`, data, {
+            await axios.patch(`${API_BASE_URL}/user/update_personal_data`, data, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
-            alert(`Message: ${response.data.message}`);
+            alert("User details updated successfully!");
+
             setIsModalOpen(false);
-            setCurrentDetails({ ...currentDetails, ...data });
+            fetchCurrentDetails(); // ✅ Refetch user details after update
         } catch (error) {
             console.error(error);
             const errorMessage = error.response?.data?.error || "An error occurred";
