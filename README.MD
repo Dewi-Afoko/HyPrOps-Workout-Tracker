@@ -1,5 +1,15 @@
 # This isn't an actual read me, this is just so I can remember the last thing I did... 😅
 
+# Next Steps!
+
+We're splitting into two development branches:
+
+    - Branch 1: New features
+        - Exercise DB, User Record Embedded Document
+
+    - Branch 2: Django Migration
+        - Learn enough Django to build Branch 1 in a way that's easy to convert from flask
+
 ## Update!
 Exciting news, the MVP/Alpha is built and ready to use! I'll use it for my workouts this week, use that as an opportunity to find any bugs, then clean up code, documentation and any bug fixes next week! 🍾
 

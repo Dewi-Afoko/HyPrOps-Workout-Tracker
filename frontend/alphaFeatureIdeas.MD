@@ -33,10 +33,20 @@
 
 - View other users workouts?
 
+- Password reset
+
+- Next set appears in timer
 
 
 
 ### New Features
+
+- Exercise API  
+    - Try to get access to EXRX library
+        - Dropdown of exercise names (plus 'custom exercise')
+        - Click through to EXRX for intructions on performance
+    - Question: What does the API data from EXRX look like?
+        - JSON, but what values/fields?
 
 - New Embedded Document - UserRecords
     - All My Lifts Page
